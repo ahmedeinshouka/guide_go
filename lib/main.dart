@@ -3,7 +3,10 @@
 import 'package:flutter/material.dart';
 import 'screens/home.dart';
 import 'screens/AgeebaMountains.dart';
-
+import 'screens/splash.dart';
+import 'screens/HomePage.dart';
+import 'screens/Login';
+import 'screens/SignUp';
 
 void main() {
   runApp(const MyApp());
@@ -17,11 +20,15 @@ class MyApp extends StatelessWidget {
     
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      initialRoute: '/splash',
 
       routes: {
         '/': (context) => home(),
       '/ageeba':(context) => ageeba(),
+      '/splash' : (context) => SplashScreen(),
+      '/Homepage' : (context) => HomePage(),
+      '/Login' : (context) => LoginScreen(),
+      '/SignUp' : (context) => SignupScreen(),
       },
     );
   }

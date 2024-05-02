@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'screens/home.dart';
+import 'screens/AgeebaMountains.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
 
       routes: {
         '/': (context) => home(),
-      
+      '/ageeba':(context) => ageeba(),
       },
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'dart:ui';
 
 class home extends StatelessWidget {
   const home({super.key});
@@ -11,7 +12,6 @@ class home extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color.fromRGBO(255, 252, 252, 1),
-        
         body: SizedBox(
           width: double.infinity,
           child: SingleChildScrollView(
@@ -253,7 +253,9 @@ class home extends StatelessWidget {
                                     "4.4",
                                     style: TextStyle(fontSize: 10),
                                   ),
-                                  SizedBox(height: 2,),
+                                  SizedBox(
+                                    height: 2,
+                                  ),
                                   Text(
                                     " | 6 Reviews",
                                     style: TextStyle(
@@ -273,7 +275,9 @@ class home extends StatelessWidget {
                   Stack(
                     children: [
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pushNamed(context, '/ageeba');
+                        },
                         child: Container(
                           height: 206,
                           width: 161,
@@ -366,7 +370,9 @@ class home extends StatelessWidget {
                   )
                 ],
               ),
-              SizedBox(height:20,),
+              SizedBox(
+                height: 20,
+              ),
               const Row(
                 children: [
                   SizedBox(
@@ -472,8 +478,14 @@ class home extends StatelessWidget {
                         ],
                       )
                     ],
-                  )
-                ,ElevatedButton(onPressed: (){}, child: Icon(Icons.arrow_right,size: 20,))],
+                  ),
+                  ElevatedButton(
+                      onPressed: () {},
+                      child: Icon(
+                        Icons.arrow_right,
+                        size: 20,
+                      ))
+                ],
               )
             ],
           )),

@@ -137,11 +137,83 @@ class ageeba extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      children: [SizedBox(width: 10,),Text("Kamona",style: TextStyle(fontSize:20,fontWeight: FontWeight.bold ),),SizedBox(width: 20,),Container(child: Row(children: [Icon(Icons.restaurant,color:  Colors.grey[600],),Text("Resturant",style: TextStyle(color: Colors.grey[600]),)],),decoration: BoxDecoration(borderRadius: BorderRadius.circular(32),color: Color.fromARGB(235, 255, 255, 255)),padding: EdgeInsets.all(5),),ElevatedButton(onPressed: (){}, child: Icon(Icons.arrow_forward_ios_rounded,size: 20,),style: ButtonStyle(fixedSize: MaterialStatePropertyAll(Size(5, 50),),shape: MaterialStatePropertyAll(OvalBorder(eccentricity: 1),),),)],
+                                      children: [
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          "Kamona",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Container(
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.restaurant,
+                                                color: Colors.grey[600],
+                                                size: 14,
+                                              ),
+                                              Text(
+                                                "Resturant",
+                                                style: TextStyle(
+                                                    color: Colors.grey[600],
+                                                    fontSize: 13),
+                                              )
+                                            ],
+                                          ),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(32),
+                                              color: Color.fromRGBO(
+                                                  234, 232, 232, 0.759)),
+                                          padding: EdgeInsets.all(5),
+                                        ),
+                                        SizedBox(
+                                          width: 40,
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {},
+                                          child: Icon(
+                                            Icons.arrow_forward_ios_rounded,
+                                            size: 20,
+                                          ),
+                                          style: ButtonStyle(
+                                              fixedSize:
+                                                  MaterialStatePropertyAll(
+                                                      Size(10, 10))),
+                                        )
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.location_on,
+                                          color: Colors.grey,
+                                          size: 20,
+                                        ),
+                                        Text(
+                                          "Marsa matrouh, Egypt",
+                                          style: TextStyle(
+                                              fontSize: 12, color: Colors.grey),
+                                        )
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.star),
+                                        Text("4.0"),
+                                        Text(
+                                          " |36 Reviews|",
+                                          style: TextStyle(color: Colors.grey),
+                                        )
+                                      ],
                                     )
-                                  ,Row(children: [Icon(Icons.location_on,color: Colors.grey,size: 20,),Text("Marsa matrouh, Egypt",style: TextStyle(fontSize: 12,color: Colors.grey),)],),Row(
-                                    children: [Icon(Icons.star),Text("4.0"),Text(" |36 Reviews|",style: TextStyle(color: Colors.grey),)],
-                                  )],
+                                  ],
                                 )
                               ],
                             ),

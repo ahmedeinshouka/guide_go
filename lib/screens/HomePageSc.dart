@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:guidego_1/Screens/Login.dart';
+import 'package:GUIDE_GO/Screens/Login.dart';
 import 'package:guidego_1/Screens/SignUp.dart';
 import 'package:guidego_1/utils/theme/app_colors.dart';
 

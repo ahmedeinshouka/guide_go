@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'screens/home.dart';
 import 'screens/AgeebaMountains.dart';
 import 'screens/splash.dart';
-import 'screens/HomePage.dart';
-import 'screens/Login';
-import 'screens/SignUp';
+import 'package:guide_go/screens/HomePageSc.dart';
+import 'package:guide_go/screens/Login.dart';
+import 'package:guide_go/screens/SignUp.dart';
 
 void main() {
   runApp(const MyApp());

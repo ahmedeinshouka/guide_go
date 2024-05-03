@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Login.dart';
 import 'SignUp.dart';
-import 'package:guidego_1/utils/theme/app_colors.dart';
+import 'package:guide_go/utils/theme/app_colors.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key});
@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image.asset(
-              "assets/images/background.jpeg",
+              "assets/background.jpeg",
               fit: BoxFit.contain, // Ensure the image covers the entire screen
             ),
           ),

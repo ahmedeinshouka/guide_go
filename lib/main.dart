@@ -5,8 +5,8 @@ import 'screens/home.dart';
 import 'screens/AgeebaMountains.dart';
 import 'screens/splash.dart';
 import 'screens/HomePage.dart';
-import 'screens/Login';
-import 'screens/SignUp';
+import 'screens/Login.dart';
+import 'screens/SignUp.dart';
 
 void main() {
   runApp(const MyApp());

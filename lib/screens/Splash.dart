@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'HomePageSc.dart'; // Import the HomePage widget
 
 class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Use Future.delayed to wait for a specified duration
@@ -19,7 +21,7 @@ class SplashScreen extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image.asset(
-              "assets/images/background.jpeg",
+              "assets/background.jpeg",
               fit: BoxFit.contain, // Ensure the image covers the entire screen
             ),
           ),

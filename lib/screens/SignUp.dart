@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:guidego_1/Screens/Login.dart';
-import 'package:guidego_1/Widget/SignUpForm.dart';
+import 'Login.dart';
+import 'package:guide_go/widgets/SignUpForm.dart';
 
 class SignupScreen extends StatelessWidget {
   @override
@@ -16,7 +16,8 @@ class SignupScreen extends StatelessWidget {
         title: Text('Sign up'),
       ),
       body: Padding(
-        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
+        padding:
+            EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
         child: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.all(20.0),
@@ -36,7 +37,8 @@ class SignupScreen extends StatelessWidget {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 Text(
                   'Welcome! Please enter your Name, email, and password to create your account.',
-                  style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04),
+                  style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width * 0.04),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                 SignUpForm(),
@@ -46,13 +48,15 @@ class SignupScreen extends StatelessWidget {
                   children: [
                     Text(
                       "Already have an account? ",
-                      style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04),
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width * 0.04),
                     ),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => LoginScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen()),
                         );
                       },
                       child: Text(

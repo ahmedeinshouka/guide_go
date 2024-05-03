@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:guidego_1/Screens/Login.dart';
-import 'package:guidego_1/Screens/SignUp.dart';
+import 'Login.dart';
+import 'SignUp.dart';
 import 'package:guidego_1/utils/theme/app_colors.dart';
 
 class HomePage extends StatelessWidget {

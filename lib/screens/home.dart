@@ -4,6 +4,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:ui';
 
+import 'package:lottie/lottie.dart';
+
 class home extends StatelessWidget {
   const home({super.key});
 
@@ -72,37 +74,15 @@ class home extends StatelessWidget {
                 ],
               ),
               const SizedBox(
-                height: 35,
+                height: 0
               ),
-              Row(
-                children: [
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 232, 229, 229),
-                        borderRadius: BorderRadius.circular(26),
-                        border: Border.all(
-                            color: const Color.fromARGB(255, 255, 255, 255))),
-                    width: 350,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: TextField(
-                      onTap: () {},
-                      decoration: const InputDecoration(
-                        icon: Icon(
-                          Icons.search,
-                          color: Color.fromARGB(255, 0, 0, 0),
-                        ),
-                        hintText: "Start searching here...",
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
+              Row(mainAxisAlignment: MainAxisAlignment.center,
+                children: [Container(child:  LottieBuilder.network("https://lottie.host/3dcdea97-c01c-40e4-9912-28d24e10f2d6/FxPs3sa4Zr.json",fit: BoxFit.cover,),height: 200,width: 360,alignment: Alignment.center,),
+                  
                 ],
               ),
               const SizedBox(
-                height: 30,
+                height: 0,
               ),
               const Text(
                 "   Discover",

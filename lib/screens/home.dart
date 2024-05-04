@@ -95,7 +95,7 @@ class home extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   const SizedBox(
-                    width: 7,
+                    width: 1,
                   ),
                   ElevatedButton(
                     style: const ButtonStyle(

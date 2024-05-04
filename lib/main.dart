@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
     
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/ageeba',
+      initialRoute: '/splash',
 
       routes: {
         '/': (context) => home(),

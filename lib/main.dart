@@ -7,6 +7,10 @@ import 'screens/splash.dart';
 import 'package:guide_go/screens/HomePageSc.dart';
 import 'package:guide_go/screens/Login.dart';
 import 'package:guide_go/screens/SignUp.dart';
+import'package:guide_go/screens/Manialpalace.dart';
+import 'package:guide_go/screens/Komona.dart';
+import 'screens/cookdoor.dart';
+import 'screens/Siwa.dart' ;
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +24,7 @@ class MyApp extends StatelessWidget {
     
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/splash',
+      initialRoute: '/ageeba',
 
       routes: {
         '/': (context) => home(),
@@ -29,6 +33,10 @@ class MyApp extends StatelessWidget {
       '/Homepage' : (context) => HomePage(),
       '/Login' : (context) => LoginScreen(),
       '/SignUp' : (context) => SignupScreen(),
+      '/manial':(context) => Manial(),
+      '/komona':(context) => komona(),
+      '/cookdoor':(context) => cookdoor(),
+      "/siwa":(context) => siwa(),
       },
     );
   }

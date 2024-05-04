@@ -187,7 +187,9 @@ class home extends StatelessWidget {
                   Stack(
                     children: [
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pushNamed(context, "/manial");
+                        },
                         child: Container(
                           height: 206,
                           width: 161,
@@ -480,7 +482,9 @@ class home extends StatelessWidget {
                     ],
                   ),
                   ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/siwa");
+                      },
                       child: Icon(
                         Icons.arrow_right,
                         size: 20,
@@ -523,16 +527,10 @@ class home extends StatelessWidget {
                     size: 40,
                   )),
               const SizedBox(
-                width: 20,
-              ),
-              IconButton(
-                highlightColor: Colors.amber,
-                onPressed: () {},
-                icon: const Icon(Icons.favorite),
-                iconSize: 40,
+                width: 10,
               ),
               const SizedBox(
-                width: 20,
+                width: 10,
               ),
               IconButton(
                   highlightColor: Colors.amber,
@@ -543,7 +541,13 @@ class home extends StatelessWidget {
                   )),
               const SizedBox(
                 width: 10,
-              )
+              ),
+              IconButton(
+                highlightColor: Colors.amber,
+                onPressed: () {},
+                icon: const Icon(Icons.person),
+                iconSize: 40,
+              ),
             ],
           ),
         ),

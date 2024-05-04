@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ageeba extends StatefulWidget {
-  const ageeba({super.key});
+class Manial extends StatefulWidget {
+  const Manial({super.key});
 
   @override
-  State<ageeba> createState() => _ageebaState();
+  State<Manial> createState() => _ageebaState();
 }
 
-class _ageebaState extends State<ageeba> {
+class _ageebaState extends State<Manial> {
   Future<void>? _launched;
   Future<void> _launchInBrowserView(Uri url) async {
     if (!await launchUrl(url, mode: LaunchMode.inAppBrowserView)) {
@@ -26,9 +26,8 @@ class _ageebaState extends State<ageeba> {
   Widget build(BuildContext context) {
     final Uri toLaunch = Uri(
         scheme: 'https',
-        host: 'www.lonelyplanet.com',
-        path:
-            '/egypt/mediterranean-coast/marsa-matruh/attractions/agiba-beach/a/poi-sig/1426585/355236');
+        host: 'egymonuments.gov.eg',
+        path: '/en/museums/manial-palace-museum');
     return SafeArea(
       child: Scaffold(
         body: SizedBox(
@@ -49,7 +48,7 @@ class _ageebaState extends State<ageeba> {
                               borderRadius: BorderRadius.circular(34),
                               image: const DecorationImage(
                                   image: AssetImage(
-                                    "assets/ageeba-4748877.jpg",
+                                    "assets/c9871822e93c31e18b16aa95a1944ae6.jpg",
                                   ),
                                   fit: BoxFit.cover)),
                           width: 341,
@@ -96,7 +95,7 @@ class _ageebaState extends State<ageeba> {
                                   size: 33,
                                 ),
                                 Text(
-                                  "Marsa matrouh, Egypt",
+                                  "Manial,Cairo, Egypt",
                                   style: TextStyle(
                                       fontSize: 15,
                                       color: Colors.grey,
@@ -110,7 +109,7 @@ class _ageebaState extends State<ageeba> {
                                   color: Colors.amber,
                                 ),
                                 Text(
-                                  "5.0",
+                                  "4.4",
                                   style: TextStyle(fontSize: 19),
                                 )
                               ],
@@ -119,12 +118,12 @@ class _ageebaState extends State<ageeba> {
                               height: 5,
                             ),
                             Text(
-                              "Ageeba Mountains",
+                              "Manial Palace Museum",
                               style: TextStyle(
                                   fontSize: 30, fontWeight: FontWeight.w900),
                             ),
                             Text(
-                              "“There's no words can describe that place than its \n name (Ageeba) that mean amazing because it is God \n is gift and gave it all the beautiful that never been in \n other place.“ ",
+                              "“The Museum of Prince Muhammad Ali’s Palace in\n Manial is one of the most beautiful and important\n historical museum in Egypt.“ ",
                               maxLines: 4,
                               softWrap: true,
                               overflow: TextOverflow.ellipsis,
@@ -134,9 +133,9 @@ class _ageebaState extends State<ageeba> {
                               height: 5,
                             ),
                             Text(
-                              "Services in Ageeba Mountains",
+                              "Services in Muhammad Ali’s Palace",
                               style: TextStyle(
-                                  fontWeight: FontWeight.w900, fontSize: 20),
+                                  fontWeight: FontWeight.w900, fontSize: 19),
                             ),
                             SizedBox(
                               height: 5,
@@ -148,7 +147,7 @@ class _ageebaState extends State<ageeba> {
                                   decoration: BoxDecoration(
                                       image: DecorationImage(
                                           image: AssetImage(
-                                              "assets/414462087_668597158763555_1544068293350259189_n.jpg"),
+                                              "assets/images.png"),
                                           fit: BoxFit.cover),
                                       borderRadius: BorderRadius.circular(14)),
                                   height: 80,
@@ -164,7 +163,7 @@ class _ageebaState extends State<ageeba> {
                                           width: 10,
                                         ),
                                         Text(
-                                          "Kamona",
+                                          "Cook Door",
                                           style: TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.bold),
@@ -196,12 +195,12 @@ class _ageebaState extends State<ageeba> {
                                           padding: EdgeInsets.all(5),
                                         ),
                                         SizedBox(
-                                          width: 40,
+                                          width: 30,
                                         ),
                                         ElevatedButton(
                                           onPressed: () {
                                             Navigator.pushNamed(
-                                                context, "/komona");
+                                                context, "/cookdoor");
                                           },
                                           child: Icon(
                                             Icons.arrow_forward_ios_rounded,
@@ -222,7 +221,7 @@ class _ageebaState extends State<ageeba> {
                                           size: 20,
                                         ),
                                         Text(
-                                          "Marsa matrouh, Egypt",
+                                          "Manial, Cairo,Egypt",
                                           style: TextStyle(
                                               fontSize: 12, color: Colors.grey),
                                         )
@@ -231,7 +230,7 @@ class _ageebaState extends State<ageeba> {
                                     Row(
                                       children: [
                                         Icon(Icons.star),
-                                        Text("4.0"),
+                                        Text("4.2"),
                                         Text(
                                           " |36 Reviews|",
                                           style: TextStyle(color: Colors.grey),
@@ -265,14 +264,14 @@ class _ageebaState extends State<ageeba> {
                     onPressed: () => setState(() {
                       _launched = _launchInBrowserView(toLaunch);
                     }),
-                    style: const ButtonStyle(overlayColor: MaterialStatePropertyAll(Colors.amber),
+                    style: const ButtonStyle(
+                      overlayColor: MaterialStatePropertyAll(Colors.amber),
                       backgroundColor: MaterialStatePropertyAll(
                           Color.fromARGB(255, 255, 255, 255)),
                       shadowColor: MaterialStatePropertyAll(Colors.grey),
                       shape: MaterialStatePropertyAll(CircleBorder()),
                       iconSize: MaterialStatePropertyAll(50),
-                      iconColor: MaterialStatePropertyAll(
-                          Colors.black),
+                      iconColor: MaterialStatePropertyAll(Colors.black),
                     ),
                     child: const Padding(
                       padding: EdgeInsets.all(5.0),

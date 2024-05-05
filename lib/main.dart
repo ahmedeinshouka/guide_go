@@ -14,6 +14,7 @@ import 'screens/Siwa.dart';
 import 'screens/maps.dart';
 import'screens/userprofile.dart';
 
+
 void main() {
   runApp(const MyApp());
 }
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => home(),
         '/ageeba': (context) => ageeba(),
         '/splash': (context) => SplashScreen(),
-        '/Homepage': (context) => HomePage(),
+        '/Homepage': (context) => Intro(),
         '/Login': (context) => LoginScreen(),
         '/SignUp': (context) => SignupScreen(),
         '/manial': (context) => Manial(),

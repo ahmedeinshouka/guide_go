@@ -11,7 +11,7 @@ class SplashScreen extends StatelessWidget {
     Future.delayed(Duration(seconds: 10), () {
       // Use Navigator to push the HomePage onto the navigation stack
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => Intro()),
       );
     });
 

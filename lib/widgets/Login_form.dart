@@ -30,7 +30,7 @@ class _LoginFormState extends State<LoginForm> {
             'Email Address',
             false,
             _emailController,
-                (value) {
+            (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your email address';
               } else if (!isValidEmail(value)) {
@@ -43,7 +43,7 @@ class _LoginFormState extends State<LoginForm> {
             'Your Password',
             true,
             _passwordController,
-                (value) {
+            (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your password';
               }
@@ -56,6 +56,7 @@ class _LoginFormState extends State<LoginForm> {
               if (_formKey.currentState!.validate()) {
                 // Perform login logic here
                 print(_emailController.text);
+                Navigator.pushNamed(context, "/");
               }
             },
             child: Container(
@@ -83,11 +84,11 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Padding buildInputForm(
-      String label,
-      bool obscureText,
-      TextEditingController controller,
-      String? Function(String?)? validator,
-      ) {
+    String label,
+    bool obscureText,
+    TextEditingController controller,
+    String? Function(String?)? validator,
+  ) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
@@ -102,15 +103,15 @@ class _LoginFormState extends State<LoginForm> {
           ),
           suffixIcon: obscureText
               ? IconButton(
-            onPressed: () {
-              setState(() {
-                _isObscure = !_isObscure;
-              });
-            },
-            icon: Icon(
-              _isObscure ? Icons.visibility : Icons.visibility_off,
-            ),
-          )
+                  onPressed: () {
+                    setState(() {
+                      _isObscure = !_isObscure;
+                    });
+                  },
+                  icon: Icon(
+                    _isObscure ? Icons.visibility : Icons.visibility_off,
+                  ),
+                )
               : null,
         ),
       ),

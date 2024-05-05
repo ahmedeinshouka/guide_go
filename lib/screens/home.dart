@@ -73,88 +73,35 @@ class home extends StatelessWidget {
                   )
                 ],
               ),
-              const SizedBox(
-                height: 0
-              ),
-              Row(mainAxisAlignment: MainAxisAlignment.center,
-                children: [Container(child:  LottieBuilder.network("https://lottie.host/3dcdea97-c01c-40e4-9912-28d24e10f2d6/FxPs3sa4Zr.json",fit: BoxFit.cover,),height: 200,width: 360,alignment: Alignment.center,),
-                  
+              const SizedBox(height: 0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    child: LottieBuilder.network(
+                      "https://lottie.host/3dcdea97-c01c-40e4-9912-28d24e10f2d6/FxPs3sa4Zr.json",
+                      fit: BoxFit.cover,
+                    ),
+                    height: 200,
+                    width: 360,
+                    alignment: Alignment.center,
+                  ),
                 ],
               ),
               const SizedBox(
                 height: 0,
               ),
-              const Text(
-                "   Discover",
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
-              ),
               const SizedBox(
                 height: 15,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  const SizedBox(
-                    width: 1,
-                  ),
-                  ElevatedButton(
-                    style: const ButtonStyle(
-                        backgroundColor:
-                            MaterialStatePropertyAll(Colors.white)),
-                    onPressed: () {},
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(
-                          Icons.all_inclusive,
-                          color: Colors.grey,
-                        ),
-                        Text(
-                          " All",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: const ButtonStyle(
-                        backgroundColor:
-                            MaterialStatePropertyAll(Colors.white)),
-                    onPressed: () {},
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(
-                          Icons.museum_outlined,
-                          color: Colors.grey,
-                        ),
-                        Text(
-                          " museum",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: const ButtonStyle(
-                        backgroundColor:
-                            MaterialStatePropertyAll(Colors.white)),
-                    onPressed: () {},
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(
-                          Icons.park,
-                          color: Colors.grey,
-                        ),
-                        Text(
-                          " Parks",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [SizedBox(width: 20,),
+                  Text(
+                    "Sugessted Destinitions",
+                    style: TextStyle(fontFamily: "LilitaOne", fontSize: 25),
                   )
-                ],
+                ,Icon(Icons.place)],
               ),
               const SizedBox(
                 height: 20,
@@ -353,7 +300,7 @@ class home extends StatelessWidget {
                 ],
               ),
               SizedBox(
-                height: 20,
+                height: 35,
               ),
               const Row(
                 children: [
@@ -470,7 +417,54 @@ class home extends StatelessWidget {
                         size: 20,
                       ))
                 ],
-              )
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "   Discover Around your location",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, "/maps");
+                    },
+                    icon: Icon(
+                      Icons.location_searching,
+                      color: Colors.white,
+                    ),
+                    style: ButtonStyle(
+                      overlayColor: MaterialStatePropertyAll(Colors.amber),
+                      backgroundColor: MaterialStatePropertyAll(Colors.grey),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 1,
+                  )
+                ],
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, "/maps");
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      child: LottieBuilder.network(
+                        "https://lottie.host/c327b7a9-7e9a-4d4c-a582-37a6081594a1/8BT93NTwnS.json",
+                        fit: BoxFit.cover,
+                      ),
+                      height: 345,
+                      width: 300,
+                      alignment: Alignment.center,
+                    ),
+                  ],
+                ),
+              ),
             ],
           )),
         ),
@@ -486,7 +480,9 @@ class home extends StatelessWidget {
               ),
               IconButton(
                   highlightColor: Colors.amber,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/");
+                  },
                   icon: const ImageIcon(
                     AssetImage(
                       "assets/icons8-home-page-32.png",

@@ -7,10 +7,11 @@ import 'screens/splash.dart';
 import 'package:guide_go/screens/HomePageSc.dart';
 import 'package:guide_go/screens/Login.dart';
 import 'package:guide_go/screens/SignUp.dart';
-import'package:guide_go/screens/Manialpalace.dart';
+import 'package:guide_go/screens/Manialpalace.dart';
 import 'package:guide_go/screens/Komona.dart';
 import 'screens/cookdoor.dart';
-import 'screens/Siwa.dart' ;
+import 'screens/Siwa.dart';
+import 'screens/maps.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,22 +22,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/splash',
-
+      initialRoute: '/',
       routes: {
         '/': (context) => home(),
-      '/ageeba':(context) => ageeba(),
-      '/splash' : (context) => SplashScreen(),
-      '/Homepage' : (context) => HomePage(),
-      '/Login' : (context) => LoginScreen(),
-      '/SignUp' : (context) => SignupScreen(),
-      '/manial':(context) => Manial(),
-      '/komona':(context) => komona(),
-      '/cookdoor':(context) => cookdoor(),
-      "/siwa":(context) => siwa(),
+        '/ageeba': (context) => ageeba(),
+        '/splash': (context) => SplashScreen(),
+        '/Homepage': (context) => HomePage(),
+        '/Login': (context) => LoginScreen(),
+        '/SignUp': (context) => SignupScreen(),
+        '/manial': (context) => Manial(),
+        '/komona': (context) => komona(),
+        '/cookdoor': (context) => cookdoor(),
+        "/siwa": (context) => siwa(),
+        '/maps':(context) => maps(),
       },
     );
   }

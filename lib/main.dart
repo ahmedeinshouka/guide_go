@@ -12,6 +12,7 @@ import 'package:guide_go/screens/Komona.dart';
 import 'screens/cookdoor.dart';
 import 'screens/Siwa.dart';
 import 'screens/maps.dart';
+import'screens/userprofile.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         '/cookdoor': (context) => cookdoor(),
         "/siwa": (context) => siwa(),
         '/maps':(context) => maps(),
+        '/profile':(context) => profile(),
       },
     );
   }

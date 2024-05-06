@@ -681,7 +681,7 @@ class home extends StatelessWidget {
               IconButton(
                   highlightColor: Colors.amber,
                   onPressed: () {
-                    Navigator.pushNamed(context, "/");
+                    Navigator.popAndPushNamed(context, "/");
                   },
                   icon: const ImageIcon(
                     AssetImage(

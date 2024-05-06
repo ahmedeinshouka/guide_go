@@ -29,7 +29,6 @@ import 'screens/Romanamphitheatre.dart';
 import 'screens/zeeyarapyramidselite.dart';
 import 'screens/Montaggio.dart';
 
-
 void main() {
   Gemini.init(
     apiKey: GEMINI_API_KEY,
@@ -63,8 +62,8 @@ class MyApp extends StatelessWidget {
         '/Chatbot_intro': (context) => Chatbot_intro(),
         '/Pyramids': (context) => Pyramids(),
         '/Roman': (context) => Romanamphitheatre(),
-        '/zeeyara':(context) => zeeyara(),
-        '/Montaggio':(context) => Montaggio(),
+        '/zeeyara': (context) => zeeyara(),
+        '/Montaggio': (context) => Montaggio(),
       },
     );
   }

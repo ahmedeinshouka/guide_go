@@ -69,7 +69,9 @@ class home extends StatelessWidget {
                       backgroundImage: AssetImage("assets/DSC_0564 copy.jpg"),
                       radius: 40,
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, "/profile");
+                    },
                   )
                 ],
               ),
@@ -78,13 +80,13 @@ class home extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
+                    height: 200,
+                    width: 360,
+                    alignment: Alignment.center,
                     child: LottieBuilder.network(
                       "https://lottie.host/3dcdea97-c01c-40e4-9912-28d24e10f2d6/FxPs3sa4Zr.json",
                       fit: BoxFit.cover,
                     ),
-                    height: 200,
-                    width: 360,
-                    alignment: Alignment.center,
                   ),
                 ],
               ),
@@ -96,12 +98,16 @@ class home extends StatelessWidget {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [SizedBox(width: 20,),
+                children: [
+                  SizedBox(
+                    width: 20,
+                  ),
                   Text(
                     "Sugessted Destinitions",
                     style: TextStyle(fontFamily: "LilitaOne", fontSize: 25),
-                  )
-                ,Icon(Icons.place)],
+                  ),
+                  Icon(Icons.place)
+                ],
               ),
               const SizedBox(
                 height: 20,
@@ -454,13 +460,13 @@ class home extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
+                      height: 345,
+                      width: 300,
+                      alignment: Alignment.center,
                       child: LottieBuilder.network(
                         "https://lottie.host/c327b7a9-7e9a-4d4c-a582-37a6081594a1/8BT93NTwnS.json",
                         fit: BoxFit.cover,
                       ),
-                      height: 345,
-                      width: 300,
-                      alignment: Alignment.center,
                     ),
                   ],
                 ),
@@ -520,7 +526,9 @@ class home extends StatelessWidget {
               ),
               IconButton(
                 highlightColor: Colors.amber,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, "/profile");
+                },
                 icon: const Icon(Icons.person),
                 iconSize: 40,
               ),

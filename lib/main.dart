@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/Pyramids',
+      initialRoute: '/splash',
       routes: {
         '/': (context) => home(),
         '/ageeba': (context) => ageeba(),

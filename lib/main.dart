@@ -13,8 +13,12 @@ import 'screens/cookdoor.dart';
 import 'screens/Siwa.dart';
 import 'screens/maps.dart';
 import'screens/userprofile.dart';
-
-
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dash_chat_2/dash_chat_2.dart';
+import 'package:image_picker/image_picker.dart';
 void main() {
   runApp(const MyApp());
 }

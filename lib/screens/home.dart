@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:ui';
 
 import 'package:lottie/lottie.dart';
@@ -13,6 +14,26 @@ class home extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButton: IconButton(highlightColor: Color(0000),
+            onPressed: () {
+              Navigator.pushNamed(context, "/Chatbot_intro");
+            },
+            icon: Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage(
+                            "assets/OIG1.5eQC_asL3LveGgBC.jpeg",
+                          ),
+                          fit: BoxFit.cover),
+                      borderRadius: BorderRadius.circular(20)),
+                  width: 70,
+                  height: 70,
+                ),  Positioned(child: SvgPicture.asset("assets/circle_small_filled_icon_200777 (1).svg",color: Colors.green,height: 60,),right: -20,bottom: -20,)
+              ],
+            )),
         backgroundColor: const Color.fromRGBO(255, 252, 252, 1),
         body: SizedBox(
           width: double.infinity,
@@ -112,198 +133,373 @@ class home extends StatelessWidget {
               const SizedBox(
                 height: 20,
               ),
-              Row(
-                children: [
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Stack(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, "/manial");
-                        },
-                        child: Container(
-                          height: 206,
-                          width: 161,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                              border: Border.all(color: Colors.black),
-                              image: const DecorationImage(
-                                  image: AssetImage(
-                                      "assets/c9871822e93c31e18b16aa95a1944ae6.jpg"),
-                                  fit: BoxFit.cover)),
-                        ),
-                      ),
-                      Positioned(
-                        top: 120,
-                        left: 20,
-                        child: Container(
-                          height: 66,
-                          width: 120,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(18)),
-                          child: const Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                "Prince Mohamed Ali Palace",
-                                style: TextStyle(
-                                    fontSize: 8, fontWeight: FontWeight.bold),
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Icon(
-                                    Icons.location_on,
-                                    size: 12,
-                                    color: Colors.grey,
-                                  ),
-                                  Text(
-                                    "Al Manial",
-                                    style: TextStyle(
-                                        fontSize: 9, color: Colors.grey),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Icon(
-                                    Icons.star,
-                                    size: 12,
-                                  ),
-                                  Text(
-                                    "4.4",
-                                    style: TextStyle(fontSize: 10),
-                                  ),
-                                  SizedBox(
-                                    height: 2,
-                                  ),
-                                  Text(
-                                    " | 6 Reviews",
-                                    style: TextStyle(
-                                        fontSize: 10, color: Colors.grey),
-                                  )
-                                ],
-                              )
-                            ],
+              SingleChildScrollView(scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Stack(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, "/manial");
+                          },
+                          child: Container(
+                            height: 206,
+                            width: 161,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                                border: Border.all(color: Colors.black),
+                                image: const DecorationImage(
+                                    image: AssetImage(
+                                        "assets/c9871822e93c31e18b16aa95a1944ae6.jpg"),
+                                    fit: BoxFit.cover)),
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Stack(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/ageeba');
-                        },
-                        child: Container(
-                          height: 206,
-                          width: 161,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                              border: Border.all(color: Colors.black),
-                              image: const DecorationImage(
-                                  image:
-                                      AssetImage("assets/ageeba-4748877.jpg"),
-                                  fit: BoxFit.cover)),
-                        ),
-                      ),
-                      Positioned(
-                        top: 120,
-                        left: 20,
-                        child: Container(
-                          height: 66,
-                          width: 120,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(18)),
-                          child: const Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    "Ageeba",
-                                    style: TextStyle(
-                                        fontSize: 8,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Icon(
-                                    Icons.location_on,
-                                    size: 12,
-                                    color: Colors.grey,
-                                  ),
-                                  Text(
-                                    "Marsa matrouh, Egypt",
-                                    style: TextStyle(
-                                        fontSize: 9, color: Colors.grey),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Icon(
-                                    Icons.star,
-                                    size: 12,
-                                  ),
-                                  Text(
-                                    "4.0",
-                                    style: TextStyle(fontSize: 10),
-                                  ),
-                                  Divider(
-                                    height: 2,
-                                    thickness: 1,
-                                  ),
-                                  Text(
-                                    " | 5 Reviews",
-                                    style: TextStyle(
-                                        fontSize: 10, color: Colors.grey),
-                                  )
-                                ],
-                              ),
-                            ],
+                        Positioned(
+                          top: 120,
+                          left: 20,
+                          child: Container(
+                            height: 66,
+                            width: 120,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(18)),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  "Prince Mohamed Ali Palace",
+                                  style: TextStyle(
+                                      fontSize: 8, fontWeight: FontWeight.bold),
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(
+                                      Icons.location_on,
+                                      size: 12,
+                                      color: Colors.grey,
+                                    ),
+                                    Text(
+                                      "Al Manial",
+                                      style: TextStyle(
+                                          fontSize: 9, color: Colors.grey),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(
+                                      Icons.star,
+                                      size: 12,
+                                    ),
+                                    Text(
+                                      "4.4",
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                    SizedBox(
+                                      height: 2,
+                                    ),
+                                    Text(
+                                      " | 6 Reviews",
+                                      style: TextStyle(
+                                          fontSize: 10, color: Colors.grey),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Stack(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/ageeba');
+                          },
+                          child: Container(
+                            height: 206,
+                            width: 161,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                                border: Border.all(color: Colors.black),
+                                image: const DecorationImage(
+                                    image:
+                                        AssetImage("assets/ageeba-4748877.jpg"),
+                                    fit: BoxFit.cover)),
                           ),
                         ),
-                      )
-                    ],
-                  )
-                ],
+                        Positioned(
+                          top: 120,
+                          left: 20,
+                          child: Container(
+                            height: 66,
+                            width: 120,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(18)),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      "Ageeba",
+                                      style: TextStyle(
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(
+                                      Icons.location_on,
+                                      size: 12,
+                                      color: Colors.grey,
+                                    ),
+                                    Text(
+                                      "Marsa matrouh, Egypt",
+                                      style: TextStyle(
+                                          fontSize: 9, color: Colors.grey),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(
+                                      Icons.star,
+                                      size: 12,
+                                    ),
+                                    Text(
+                                      "4.0",
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                    Divider(
+                                      height: 2,
+                                      thickness: 1,
+                                    ),
+                                    Text(
+                                      " | 5 Reviews",
+                                      style: TextStyle(
+                                          fontSize: 10, color: Colors.grey),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),SizedBox(width: 15,)
+                  ,Stack(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/Roman');
+                          },
+                          child: Container(
+                            height: 206,
+                            width: 161,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                                border: Border.all(color: Colors.black),
+                                image: const DecorationImage(
+                                    image: AssetImage(
+                                        "assets/The-Roman-amphitheatre.jpg"),
+                                    fit: BoxFit.cover)),
+                          ),
+                        ),
+                        Positioned(
+                          top: 120,
+                          left: 20,
+                          child: Container(
+                            height: 66,
+                            width: 120,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(18)),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  "The Roman Amphitheatre",
+                                  style: TextStyle(
+                                      fontSize: 8, fontWeight: FontWeight.bold),
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(
+                                      Icons.location_on,
+                                      size: 12,
+                                      color: Colors.grey,
+                                    ),
+                                    Text(
+                                      "Alexandria,Egypt",
+                                      style: TextStyle(
+                                          fontSize: 9, color: Colors.grey),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(
+                                      Icons.star,
+                                      size: 12,
+                                    ),
+                                    Text(
+                                      "4.9",
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                    SizedBox(
+                                      height: 2,
+                                    ),
+                                    Text(
+                                      " | 8 Reviews",
+                                      style: TextStyle(
+                                          fontSize: 10, color: Colors.grey),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),SizedBox(width: 15,)
+                  ,Stack(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, "/Pyramids");
+                          },
+                          child: Container(
+                            height: 206,
+                            width: 161,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                                border: Border.all(color: Colors.black),
+                                image: const DecorationImage(
+                                    image: AssetImage(
+                                        "assets/nada-habashy-zruwsJh-lOI-unsplash.jpg"),
+                                    fit: BoxFit.cover)),
+                          ),
+                        ),
+                        Positioned(
+                          top: 120,
+                          left: 20,
+                          child: Container(
+                            height: 66,
+                            width: 120,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(18)),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  "The Great Pyramid",
+                                  style: TextStyle(
+                                      fontSize: 8, fontWeight: FontWeight.bold),
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(
+                                      Icons.location_on,
+                                      size: 12,
+                                      color: Colors.grey,
+                                    ),
+                                    Text(
+                                      "Giza,Egypt",
+                                      style: TextStyle(
+                                          fontSize: 9, color: Colors.grey),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(
+                                      Icons.star,
+                                      size: 12,
+                                    ),
+                                    Text(
+                                      "5",
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                    SizedBox(
+                                      height: 2,
+                                    ),
+                                    Text(
+                                      " | 9 Reviews",
+                                      style: TextStyle(
+                                          fontSize: 10, color: Colors.grey),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),SizedBox(width: 15,)],
+                ),
               ),
               SizedBox(
                 height: 35,
@@ -322,107 +518,105 @@ class home extends StatelessWidget {
               const SizedBox(
                 height: 20,
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                        image: const DecorationImage(
-                          image: AssetImage("assets/z_siwaoasis-_2787.jpg"),
-                        ),
-                        borderRadius: BorderRadius.circular(20)),
-                    height: 86,
-                    width: 86,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const SizedBox(
-                            width: 5,
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, "/siwa");
+                },
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                          image: const DecorationImage(
+                            image: AssetImage("assets/z_siwaoasis-_2787.jpg"),
                           ),
-                          const Text(
-                            "Siwa Oasis",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w800),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Colors.grey[200]),
-                            width: 80,
-                            child: Row(
-                              children: [
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Icon(
-                                  Icons.park,
-                                  color: Colors.grey[800],
-                                ),
-                                const Text(
-                                  "Parks",
-                                  style: TextStyle(fontWeight: FontWeight.w600),
-                                )
-                              ],
+                          borderRadius: BorderRadius.circular(20)),
+                      height: 86,
+                      width: 86,
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 5,
                             ),
-                          )
-                        ],
-                      ),
-                      const Row(
-                        children: [
-                          Icon(
-                            Icons.location_on,
-                            color: Colors.grey,
-                          ),
-                          Text(
-                            "siwa ,Egypt",
-                            style: TextStyle(color: Colors.grey),
-                          )
-                        ],
-                      ),
-                      const Row(
-                        children: [
-                          Icon(
-                            Icons.star,
-                            color: Colors.amber,
-                          ),
-                          Text(
-                            "4.0",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 15),
-                          ),
-                          Text(
-                            "| 36 Reviews | ",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                          Text(
-                            "20.0€",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 15),
-                          ),
-                          Text(
-                            "/night",
-                            style: TextStyle(color: Colors.grey),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, "/siwa");
-                      },
-                      child: Icon(
-                        Icons.arrow_right,
-                        size: 20,
-                      ))
-                ],
+                            const Text(
+                              "Siwa Oasis",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w800),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.grey[200]),
+                              width: 80,
+                              child: Row(
+                                children: [
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Icon(
+                                    Icons.park,
+                                    color: Colors.grey[800],
+                                  ),
+                                  const Text(
+                                    "Parks",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                        const Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              color: Colors.grey,
+                            ),
+                            Text(
+                              "siwa ,Egypt",
+                              style: TextStyle(color: Colors.grey),
+                            )
+                          ],
+                        ),
+                        const Row(
+                          children: [
+                            Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                            ),
+                            Text(
+                              "4.0",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 15),
+                            ),
+                            Text(
+                              "| 36 Reviews | ",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            Text(
+                              "20.0€",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 15),
+                            ),
+                            Text(
+                              "/night",
+                              style: TextStyle(color: Colors.grey),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
               SizedBox(
                 height: 10,

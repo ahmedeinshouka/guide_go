@@ -35,7 +35,9 @@ class _profileState extends State<profile> {
                   height: 40,
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/editprofile');
+                  },
                   icon: Icon(
                     Icons.settings,
                     size: 35,
@@ -44,22 +46,28 @@ class _profileState extends State<profile> {
                 )
               ],
             ),
-          
-                CircleAvatar(
-                  backgroundImage: AssetImage(
-                    "assets/DSC_0564 copy.jpg",
-                  ),
-                  radius: 80,
-                ),SizedBox(height: 30,),
-              
-            
-          Row(mainAxisAlignment: MainAxisAlignment.center,children: [Text("Ahmed Einshouka",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),)],),
-          
-          
-          Text("data")],
+            CircleAvatar(
+              backgroundImage: AssetImage(
+                "assets/DSC_0564 copy.jpg",
+              ),
+              radius: 80,
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Ahmed Einshouka",
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+            Text("data")
+          ],
         ),
       ),
     ));
   }
-  
 }

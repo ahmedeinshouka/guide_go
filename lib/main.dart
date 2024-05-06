@@ -13,6 +13,7 @@ import 'screens/cookdoor.dart';
 import 'screens/Siwa.dart';
 import 'screens/maps.dart';
 import'screens/userprofile.dart';
+import 'screens/Editprofile.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
         "/siwa": (context) => siwa(),
         '/maps':(context) => maps(),
         '/profile':(context) => profile(),
+        '/editprofile':(context) => Edit_profile(),
       },
     );
   }

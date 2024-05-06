@@ -4,17 +4,17 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:csc_picker/csc_picker.dart'; // Import csc_picker for country/region
 import 'package:intl/intl.dart';
-import 'package:flutter_application_3/date_of_birth_field.dart'; // Replace with your file path
-import 'package:flutter_application_3/country_region_picker.dart'; // Replace with your actual path
+import'package:guide_go/widgets/date_of_birth_field.dart';
+import 'package:guide_go/widgets/country_region_picker.dart'; // Replace with your actual path
 
-class MyWidget extends StatefulWidget {
-  const MyWidget({super.key});
+class Edit_profile extends StatefulWidget {
+  const Edit_profile({super.key});
 
   @override
-  State<MyWidget> createState() => _MyWidgetState();
+  State<Edit_profile> createState() => _MyWidgetState();
 }
 
-class _MyWidgetState extends State<MyWidget> {
+class _MyWidgetState extends State<Edit_profile> {
   final _formKey = GlobalKey<FormState>();
   String _name = '';
   String _email = '';

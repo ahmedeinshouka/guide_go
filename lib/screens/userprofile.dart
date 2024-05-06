@@ -13,7 +13,9 @@ class _profileState extends State<profile> {
     return SafeArea(
         child: Scaffold(
       body: SizedBox(
+        width: double.infinity,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -51,10 +53,11 @@ class _profileState extends State<profile> {
                 ),SizedBox(height: 30,),
               
             
-          Row(children: [Text("Ahmed Einshouka",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),)],mainAxisAlignment: MainAxisAlignment.center,),Text("data")],
-          crossAxisAlignment: CrossAxisAlignment.center,
+          Row(mainAxisAlignment: MainAxisAlignment.center,children: [Text("Ahmed Einshouka",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),)],),
+          
+          
+          Text("data")],
         ),
-        width: double.infinity,
       ),
     ));
   }

@@ -57,7 +57,7 @@ class _MyWidgetState extends State<Edit_profile> {
                 Center(
                   child: ClipOval(
                     child: Image.asset(
-                      'assets/img/profile_pictures/3.jpg', // Replace with your actual path
+                      'assets/DSC_0564 copy.jpg', // Replace with your actual path
                       width: 120.0, // Set a larger width for a bigger image
                       height: 120.0, // Set a larger height for a bigger image
                       fit: BoxFit.cover, // Adjust fit to cover the entire area

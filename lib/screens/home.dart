@@ -15,7 +15,8 @@ class home extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton: IconButton(highlightColor: Color(0000),
+        floatingActionButton: IconButton(
+            highlightColor: Color(0000),
             onPressed: () {
               Navigator.pushNamed(context, "/Chatbot_intro");
             },
@@ -31,7 +32,16 @@ class home extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20)),
                   width: 70,
                   height: 70,
-                ),  Positioned(child: SvgPicture.asset("assets/circle_small_filled_icon_200777 (1).svg",color: Colors.green,height: 60,),right: -20,bottom: -20,)
+                ),
+                Positioned(
+                  child: SvgPicture.asset(
+                    "assets/circle_small_filled_icon_200777 (1).svg",
+                    color: Colors.green,
+                    height: 60,
+                  ),
+                  right: -20,
+                  bottom: -20,
+                )
               ],
             )),
         backgroundColor: const Color.fromRGBO(255, 252, 252, 1),
@@ -133,7 +143,8 @@ class home extends StatelessWidget {
               const SizedBox(
                 height: 20,
               ),
-              SingleChildScrollView(scrollDirection: Axis.horizontal,
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
                     const SizedBox(
@@ -324,8 +335,11 @@ class home extends StatelessWidget {
                           ),
                         )
                       ],
-                    ),SizedBox(width: 15,)
-                  ,Stack(
+                    ),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    Stack(
                       children: [
                         GestureDetector(
                           onTap: () {
@@ -411,8 +425,11 @@ class home extends StatelessWidget {
                           ),
                         )
                       ],
-                    ),SizedBox(width: 15,)
-                  ,Stack(
+                    ),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    Stack(
                       children: [
                         GestureDetector(
                           onTap: () {
@@ -498,7 +515,11 @@ class home extends StatelessWidget {
                           ),
                         )
                       ],
-                    ),SizedBox(width: 15,)],
+                    ),
+                    SizedBox(
+                      width: 15,
+                    )
+                  ],
                 ),
               ),
               SizedBox(

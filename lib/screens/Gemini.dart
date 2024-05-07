@@ -139,7 +139,7 @@ class _HomePageState extends State<HomePage> {
           .listen((event) {
         ChatMessage? lastMessage = messages.firstOrNull;
         if (lastMessage != null && lastMessage.user == geminiUser) {
-          lastMessage = messages.removeAt(0);
+          lastMessage = messages.removeAt(1);
           String response = event.content?.parts?.fold(
                   "", (previous, current) => "$previous ${current.text}") ??
               "";

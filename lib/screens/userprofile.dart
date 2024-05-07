@@ -68,6 +68,66 @@ class _profileState extends State<profile> {
           ],
         ),
       ),
-    ));
+    bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          shadowColor: Colors.white,
+          elevation: 0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const SizedBox(
+                width: 10,
+              ),
+              IconButton(
+                  highlightColor: Colors.amber,
+                  onPressed: () {
+                    Navigator.pop(context, "/");
+                  },
+                  icon: const ImageIcon(
+                    AssetImage(
+                      "assets/icons8-home-page-32.png",
+                    ),
+                    size: 40,
+                  )),
+              const SizedBox(
+                width: 20,
+              ),
+              Container(
+                color: Colors.black,
+              ),
+              IconButton(
+                  highlightColor: Colors.amber,
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.people_alt_rounded,
+                    size: 40,
+                  )),
+              const SizedBox(
+                width: 10,
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              IconButton(
+                  highlightColor: Colors.amber,
+                  onPressed: () {},
+                  icon: const ImageIcon(
+                    AssetImage("assets/chat.png"),
+                    size: 40,
+                  )),
+              const SizedBox(
+                width: 10,
+              ),
+              IconButton(
+                highlightColor: Colors.amber,
+                onPressed: () {
+                  Navigator.pushNamed(context, "/profile");
+                },
+                icon: const Icon(Icons.person),
+                iconSize: 40,
+              ),
+            ],
+          ),
+        )));
   }
 }

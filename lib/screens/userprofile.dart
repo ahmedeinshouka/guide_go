@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class profile extends StatefulWidget {
   const profile({super.key});
@@ -26,7 +27,7 @@ class _profileState extends State<profile> {
                     Navigator.pop(context);
                   },
                   icon: Icon(
-                    Icons.arrow_circle_left,
+                    Icons.arrow_back,
                     size: 35,
                   ),
                   highlightColor: Colors.amber,
@@ -65,9 +66,9 @@ class _profileState extends State<profile> {
               ],
             ),
             Text("data")
-          ],
+          ,Row(children: [IconButton(onPressed: (){}, icon: Icon(Icons.email_rounded,size: 35,)),Text("einshoukaa@gmail.com",style: TextStyle(fontWeight: FontWeight.bold),)],mainAxisAlignment: MainAxisAlignment.center,)],
         ),
-      ),
+      ),floatingActionButton: Row(children: [SizedBox(width: 40,),IconButton(onPressed: (){}, icon:SvgPicture.asset("assets/icons8-whatsapp.svg",color: Colors.green,)),SizedBox(width: 40,),IconButton(onPressed: (){}, icon:SvgPicture.asset("assets/icons8-facebook (2).svg",color: Colors.blue,)),SizedBox(width: 40,),IconButton(onPressed: (){}, icon:SvgPicture.asset("assets/icons8-instagram-100.svg",))],mainAxisAlignment: MainAxisAlignment.center,),
     bottomNavigationBar: BottomAppBar(
           color: Colors.white,
           shadowColor: Colors.white,

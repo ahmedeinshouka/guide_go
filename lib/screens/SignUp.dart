@@ -196,13 +196,6 @@ Future<UserCredential> signUpWithEmailandPassword(
       ),
     );
   }
-  bool isValidEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
-  }
-
-  bool isNameValid(String name) {
-    // Regular expression to check if name contains only letters and spaces
-    return RegExp(r'^[a-zA-Z\s]+$').hasMatch(name);
-  }
+  
 }
 

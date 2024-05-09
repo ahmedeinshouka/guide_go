@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:guide_go/screens/Login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:guide_go/widgets/SignUpForm.dart';
 
 class SignupScreen extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -62,129 +63,146 @@ Future<UserCredential> signUpWithEmailandPassword(
 }
 
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Text('Sign up'),
         ),
-        title: Text('Sign up'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Center(
-              child: Text(
-                'Sign up',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: MediaQuery.of(context).size.width * 0.08,
-                  fontFamily: "LilitaOne",
-                ),
-              ),
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-            Text(
-              'Welcome! Please enter your Name, email, and password to create your account.',
-              style:
-                  TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04),
-            ),
-             SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-            TextField(
-              controller: fullNameController, // Full name text field
-              decoration: InputDecoration(
-                labelText: 'Full Name', // Label for full name field
-                border: OutlineInputBorder(), // to make the text field box-shaped
-              ),
-            ),
-            SizedBox(height: 10), // add spacing between fields
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(), // to make the text field box-shaped
-              ),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(), // to make the text field box-shaped
-              ),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: confirmPasswordController, // Confirm password field
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Confirm Password', // Label for confirm password field
-                border: OutlineInputBorder(), // to make the text field box-shaped
-              ),
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    // Check if passwords match before signing up
-                    if (passwordController.text == confirmPasswordController.text) {
-                      try {
-                        await signUpWithEmailandPassword(
-                            emailController.text, passwordController.text, fullNameController.text);
-                        // Sign up successful, handle navigation to next page after sign up
-                      } catch (e) {
-                        // Error occurred during sign up, handle displaying error message to user
-                        print('Error during sign up: $e');
-                      }
-                    } else {
-                      // Passwords do not match, display error message
-                      print('Passwords do not match');
-                    }
-                  },
-                  child: Text('Sign Up'),
-                ),
-              ],
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Already have an account? ",
-                  style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width * 0.04),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
-                  },
-                  child: Text(
-                    'Login',
-                    style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      decorationThickness: 1,
-                      color: Colors.black,
-                      fontSize: MediaQuery.of(context).size.width * 0.04,
-                      fontWeight: FontWeight.bold,
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Center(
+                      child: Text(
+                        'Sign up',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: MediaQuery.of(context).size.width * 0.08,
+                          fontFamily: "LilitaOne",
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    Text(
+                      'Welcome! Please enter your Name, email, and password to create your account.',
+                      style:
+                          TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04),
+                    ),
+                     SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                    TextField(
+                      controller: fullNameController, // Full name text field
+                      decoration: InputDecoration(
+                        labelText: 'Full Name', // Label for full name field
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(48)), // to make the text field box-shaped
+                      ),
+                    ),
+                    SizedBox(height: 10), // add spacing between fields
+                    TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(48)), // to make the text field box-shaped
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(48)), // to make the text field box-shaped
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: confirmPasswordController, // Confirm password field
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password', // Label for confirm password field
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(48)), // to make the text field box-shaped
+                      ),
+                    ),
+                    
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            // Check if passwords match before signing up
+                            if (passwordController.text == confirmPasswordController.text) {
+                              try {
+                                await signUpWithEmailandPassword(
+                                    emailController.text, passwordController.text, fullNameController.text);
+                                // Sign up successful, handle navigation to next page after sign up
+                              } catch (e) {
+                                // Error occurred during sign up, handle displaying error message to user
+                                print('Error during sign up: $e');
+                              }
+                            } else {
+                              // Passwords do not match, display error message
+                              print('Passwords do not match');
+                            }
+                          },
+                          child: SizedBox(child: Text('Sign Up',style: TextStyle(color: Colors.white,fontSize: 30),textAlign:TextAlign.center,),width:250,height: 45,),
+                        style:ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff003961))),),
+                      ],
+                    ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Already have an account? ",
+                          style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.width * 0.04),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => LoginScreen()),
+                            );
+                          },
+                          child: Text(
+                            'Login',
+                            style: TextStyle(
+                              decoration: TextDecoration.underline,
+                              decorationThickness: 1,
+                              color: Colors.black,
+                              fontSize: MediaQuery.of(context).size.width * 0.04,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+  bool isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  bool isNameValid(String name) {
+    // Regular expression to check if name contains only letters and spaces
+    return RegExp(r'^[a-zA-Z\s]+$').hasMatch(name);
   }
 }
 

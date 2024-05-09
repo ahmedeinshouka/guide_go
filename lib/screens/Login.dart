@@ -33,97 +33,98 @@ Future<UserCredential> signInWithEmailandPassword(
   }
 }
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Text('Log in'),
         ),
-        title: Text('Log in'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Log in',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 50.0, fontFamily: "LilitaOne"),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 10), // add spacing between fields
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(), // to make the text field box-shaped
-              ),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(), // to make the text field box-shaped
-              ),
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      // ignore: unused_local_variable
-                      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-                        email: emailController.text,
-                        password: passwordController.text,
-                      );
-                      // Login successful
-                      // After successful login, navigate to the chat list page
-                      Navigator.pushReplacementNamed(context, '/chatList');
-                    } catch (e) {
-                      // An error occurred
-                      print('Error during login: $e');
-                    }
-                  },
-                  style: ButtonStyle(
-                    foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
-                    //حد يبقي يضيف هنا سطر لتكبير و تصغير حجم الزرار
-                    textStyle: MaterialStateProperty.all<TextStyle>(
-                      TextStyle(color: Colors.white, fontSize: 20), // تغيير لون النص إلى أبيض
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Log in',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 50.0, fontFamily: "LilitaOne"),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  child: Text('Login'),
+                    SizedBox(height: 50), // add spacing between fields
+                    TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(48)), // to make the text field box-shaped
+                      ),
+                    ),
+                    SizedBox(height: 25),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(48)), // to make the text field box-shaped
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            try {
+                              // ignore: unused_local_variable
+                              UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+                                email: emailController.text,
+                                password: passwordController.text,
+                              );
+                              // Login successful
+                              // After successful login, navigate to the chat list page
+                              Navigator.pushReplacementNamed(context, '/');
+                            } catch (e) {
+                              // An error occurred
+                              print('Error during login: $e');
+                            }
+                          },
+                        style:ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff003961)),),
+                          child: SizedBox(child: Text('Login',style: TextStyle(color: Colors.white,fontSize: 30),textAlign:TextAlign.center,),width:250,height: 45,),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('New to the app?'),
+                        SizedBox(width: 5),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => SignupScreen()),
+                            );
+                          },
+                          child: const Text(
+                            'Signup',
+                            style: TextStyle(decoration: TextDecoration.underline, decorationThickness: 1),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('New to the app?'),
-                SizedBox(width: 5),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SignupScreen()),
-                    );
-                  },
-                  child: const Text(
-                    'Signup',
-                    style: TextStyle(decoration: TextDecoration.underline, decorationThickness: 1),
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

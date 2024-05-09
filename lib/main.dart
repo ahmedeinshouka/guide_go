@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:guide_go/firebase_options.dart';
 import 'screens/home.dart';
 import 'screens/AgeebaMountains.dart';
 import 'screens/splash.dart';
@@ -28,8 +30,15 @@ import 'screens/Pyramids.dart';
 import 'screens/Romanamphitheatre.dart';
 import 'screens/zeeyarapyramidselite.dart';
 import 'screens/Montaggio.dart';
+import 'screens/chat_list_page.dart';
+import 'screens/chat_screen.dart';
+import 'screens/UserList.dart';
 
-void main() {
+Future<void> main() async {
+    WidgetsFlutterBinding.ensureInitialized();
+   await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   Gemini.init(
     apiKey: GEMINI_API_KEY,
   );
@@ -43,7 +52,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/profile',
+      initialRoute: '/splash',
       routes: {
         '/': (context) => home(),
         '/ageeba': (context) => ageeba(),
@@ -64,6 +73,9 @@ class MyApp extends StatelessWidget {
         '/Roman': (context) => Romanamphitheatre(),
         '/zeeyara': (context) => zeeyara(),
         '/Montaggio': (context) => Montaggio(),
+        '/chatList': (context) => ChatListPage(),
+        
+        
       },
     );
   }

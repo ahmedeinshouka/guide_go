@@ -731,7 +731,9 @@ class home extends StatelessWidget {
               ),
               IconButton(
                   highlightColor: Colors.amber,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/chatList");
+                  },
                   icon: const ImageIcon(
                     AssetImage("assets/chat.png"),
                     size: 40,

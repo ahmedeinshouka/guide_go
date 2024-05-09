@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1st_screen/UserList.dart';
+
+import 'package:guide_go/screens/UserList.dart';
 
 class ChatListPage extends StatelessWidget {
   @override

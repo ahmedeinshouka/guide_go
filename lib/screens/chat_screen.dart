@@ -34,14 +34,11 @@ class _ChatScreenState extends State<ChatScreen> {
     _firebaseAuth = FirebaseAuth.instance;
   }
 
-  void sendMessage() async {
-    if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(
-        widget.receiverUserID,
-        _messageController.text,
-      );
-      _messageController.clear();
-    }
+  void sendMessage(String message) async {
+    await _chatService.sendMessage(
+      widget.receiverUserID,
+      message,
+    );
   }
 
   void sendImage() async {
@@ -56,7 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
       uploadTask.then((res) async {
         String imageUrl = await res.ref.getDownloadURL();
-        sendMessage();
+        sendMessage(imageUrl); // Sending the image URL as a message
       });
     }
   }
@@ -188,7 +185,7 @@ class TextBubble extends StatelessWidget {
 
 class ChatInput extends StatelessWidget {
   final TextEditingController controller;
-  final Function() onSendPressed;
+  final Function(String) onSendPressed;
 
   const ChatInput({
     required this.controller,
@@ -203,21 +200,30 @@ class ChatInput extends StatelessWidget {
           child: TextField(
             controller: controller,
             decoration: InputDecoration(
-              suffix: IconButton(
-                onPressed: onSendPressed,
-                icon: Icon(Icons.send),
-              ),
               hintText: 'Type your message',
               border: OutlineInputBorder(
                 gapPadding: 5,
                 borderRadius: BorderRadius.circular(30.0),
               ),
             ),
-            onChanged: (text) {},
+            onChanged: (text) {}, // No need for this, remove if not needed
             onSubmitted: (text) {
-              onSendPressed();
+              if (text.trim().isNotEmpty) {
+                onSendPressed(text);
+                controller.clear(); // Clear the text field after sending the message
+              }
             },
           ),
+        ),
+        IconButton(
+          onPressed: () {
+            final text = controller.text.trim();
+            if (text.isNotEmpty) {
+              onSendPressed(text);
+              controller.clear(); // Clear the text field after sending the message
+            }
+          },
+          icon: Icon(Icons.send),
         ),
       ],
     );

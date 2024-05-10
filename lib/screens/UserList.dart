@@ -19,7 +19,7 @@ class UserList extends StatelessWidget {
         }
         final currentUserEmail = _auth.currentUser?.email;
         final users = snapshot.data!.docs
-            .where((doc) => doc['email'] != currentUserEmail)
+            .where((doc) => (doc.data() as Map<String, dynamic>).containsKey('email') && doc['email'] != currentUserEmail)
             .toList();
 
         return ListView(

@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'chat_screen.dart';
 
-
 class UserList extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -38,17 +37,20 @@ class UserList extends StatelessWidget {
     if (_auth.currentUser!.email != data['email']) {
       return ListTile(
         leading: CircleAvatar(
-          // هنا يمكنك تحميل الصورة الشخصية لكل مستخدم من قاعدة البيانات أو من أي مصدر آخر
-          backgroundImage: NetworkImage('رابط_الصورة_الشخصية'),
+          // Here you can load the user's profile image from Firestore or any other source
+          // For simplicity, I'm using a placeholder avatar
+          child: Icon(Icons.person),
         ),
-        title: Text(data['email']),
+        title: Text(data['Full Name']), // Display the user's name instead of email
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ChatScreen(
                 receiverUserID: data['uid'],
-                receiverUserEmail: data['email'], receiverUserName: data['Full Name'],
+                receiverUserEmail: data['email'],
+                receiverUserName: data['Full Name'], 
+                receiverUserImageURL:data['image'], // Pass the user's name
               ),
             ),
           );

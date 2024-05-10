@@ -38,7 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
   Future<void> signUpWithEmailAndPassword(
     String email,
     String password,
-    String fullName,
+    String name,
   ) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
@@ -48,12 +48,13 @@ class _SignupScreenState extends State<SignupScreen> {
       await _firestore.collection('users').doc(userCredential.user?.uid).set({
         'uid': userCredential.user?.uid,
         'email': email,
-        'fullName': fullName,
+        'fullName': name,
+        
       });
       // Sign up successful, handle navigation to next page after sign up
       // Navigator.pushReplacementNamed(context, '/next_page');
     } on FirebaseAuthException catch (e) {
-      String errorMessage = 'An error occurred during sign up';
+      String errorMessage = 'Check again your sign up info 🥹😁';
       if (e.code == 'weak-password') {
         errorMessage = 'The password provided is too weak.';
       } else if (e.code == 'email-already-in-use') {
@@ -64,7 +65,7 @@ class _SignupScreenState extends State<SignupScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Sign Up Error"),
-            content: Text(errorMessage),
+            content: Text(errorMessage,style: TextStyle(fontWeight: FontWeight.bold),),
             actions: <Widget>[
               TextButton(
                 child: Text("OK"),
@@ -150,7 +151,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       );
                     }
                   },
-                  child: Text('Sign Up',style: ,),
+                  child: Text('Sign Up',style:TextStyle(color: Colors.white) ,),style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff003961))),
                 ),
               ],
             ),

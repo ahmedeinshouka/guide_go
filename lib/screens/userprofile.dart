@@ -1,75 +1,181 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class profile extends StatefulWidget {
-  const profile({super.key});
+class Profile extends StatefulWidget {
+  const Profile({Key? key}) : super(key: key);
 
   @override
-  State<profile> createState() => _profileState();
+  State<Profile> createState() => _ProfileState();
 }
 
-class _profileState extends State<profile> {
+class _ProfileState extends State<Profile> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  late User? _currentUser;
+  late String _displayName = '';
+  late String _email = '';
+  late String _imageUrl = '';
+  late String _whatsappUrl = '';
+  late String _facebookUrl = '';
+  late String _instagramUrl = '';
+  InAppWebViewController? _webViewController;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUser = _auth.currentUser;
+    if (_currentUser != null) {
+      _getUserData();
+    }
+  }
+
+  Future<void> _getUserData() async {
+    try {
+      final DocumentSnapshot<Map<String, dynamic>> userData =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(_currentUser!.uid)
+              .get();
+
+      setState(() {
+        _displayName = userData['fullName'] ?? '';
+        _email = userData['email'] ?? '';
+        _imageUrl = userData["imageUrl"] ?? '';
+        _whatsappUrl = userData["whatsappLink"] ?? '';
+        _facebookUrl = userData["facebookLink"] ?? '';
+        _instagramUrl = userData["instagramLink"] ?? '';
+      });
+    } catch (e) {
+      // Handle error (show a SnackBar or a dialog)
+      print('Error fetching user data: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-      body: SizedBox(
-        width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.arrow_back,
-                    size: 35,
+      child: Scaffold(
+        body: SizedBox(
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.arrow_back,
+                      size: 35,
+                    ),
+                    highlightColor: Colors.amber,
                   ),
-                  highlightColor: Colors.amber,
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/editprofile');
-                  },
-                  icon: Icon(
-                    Icons.settings,
-                    size: 35,
+                  SizedBox(
+                    height: 40,
                   ),
-                  highlightColor: Colors.amber,
-                )
-              ],
-            ),
-            CircleAvatar(
-              backgroundImage: AssetImage(
-                "assets/DSC_0564 copy.jpg",
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/editprofile');
+                    },
+                    icon: Icon(
+                      Icons.settings,
+                      size: 35,
+                    ),
+                    highlightColor: Colors.amber,
+                  )
+                ],
               ),
-              radius: 80,
+              CircleAvatar(
+                backgroundImage:
+                    _imageUrl.isNotEmpty ? NetworkImage(_imageUrl) : null,
+                child: _imageUrl.isEmpty
+                    ? Icon(Icons.person, size: 80) // Use placeholder icon
+                    : null,
+                radius: 80,
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _displayName,
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
+              ),
+              Text("data"),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.email_rounded,
+                      size: 35,
+                    ),
+                  ),
+                  Text(
+                    _email,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )
+                ],
+                mainAxisAlignment: MainAxisAlignment.center,
+              )
+            ],
+          ),
+        ),
+        floatingActionButton: Row(
+          children: [
+            SizedBox(
+              width: 40,
+            ),
+            IconButton(
+              onPressed: () {
+                _launchURL(_whatsappUrl);
+              },
+              icon: SvgPicture.asset(
+                "assets/icons8-whatsapp.svg",
+                color: Colors.green,
+              ),
             ),
             SizedBox(
-              height: 30,
+              width: 40,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Ahmed Einshouka",
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                )
-              ],
+            IconButton(
+              onPressed: () {
+                _launchURL(_facebookUrl);
+              },
+              icon: SvgPicture.asset(
+                "assets/icons8-facebook (2).svg",
+                color: Colors.blue,
+              ),
             ),
-            Text("data")
-          ,Row(children: [IconButton(onPressed: (){}, icon: Icon(Icons.email_rounded,size: 35,)),Text("einshoukaa@gmail.com",style: TextStyle(fontWeight: FontWeight.bold),)],mainAxisAlignment: MainAxisAlignment.center,)],
+            SizedBox(
+              width: 40,
+            ),
+            IconButton(
+              onPressed: () {
+                _launchURL(_instagramUrl);
+              },
+              icon: SvgPicture.asset(
+                "assets/icons8-instagram-100.svg",
+              ),
+            )
+          ],
+          mainAxisAlignment: MainAxisAlignment.center,
         ),
-      ),floatingActionButton: Row(children: [SizedBox(width: 40,),IconButton(onPressed: (){}, icon:SvgPicture.asset("assets/icons8-whatsapp.svg",color: Colors.green,)),SizedBox(width: 40,),IconButton(onPressed: (){}, icon:SvgPicture.asset("assets/icons8-facebook (2).svg",color: Colors.blue,)),SizedBox(width: 40,),IconButton(onPressed: (){}, icon:SvgPicture.asset("assets/icons8-instagram-100.svg",))],mainAxisAlignment: MainAxisAlignment.center,),
-    bottomNavigationBar: BottomAppBar(
+        bottomNavigationBar: BottomAppBar(
           color: Colors.white,
           shadowColor: Colors.white,
           elevation: 0,
@@ -80,16 +186,17 @@ class _profileState extends State<profile> {
                 width: 10,
               ),
               IconButton(
-                  highlightColor: Colors.amber,
-                  onPressed: () {
-                    Navigator.pop(context, "/");
-                  },
-                  icon: const ImageIcon(
-                    AssetImage(
-                      "assets/icons8-home-page-32.png",
-                    ),
-                    size: 40,
-                  )),
+                highlightColor: Colors.amber,
+                onPressed: () {
+                  Navigator.pop(context, "/");
+                },
+                icon: ImageIcon(
+                  AssetImage(
+                    "assets/icons8-home-page-32.png",
+                  ),
+                  size: 40,
+                ),
+              ),
               const SizedBox(
                 width: 20,
               ),
@@ -97,12 +204,13 @@ class _profileState extends State<profile> {
                 color: Colors.black,
               ),
               IconButton(
-                  highlightColor: Colors.amber,
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.people_alt_rounded,
-                    size: 40,
-                  )),
+                highlightColor: Colors.amber,
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.people_alt_rounded,
+                  size: 40,
+                ),
+              ),
               const SizedBox(
                 width: 10,
               ),
@@ -110,12 +218,13 @@ class _profileState extends State<profile> {
                 width: 10,
               ),
               IconButton(
-                  highlightColor: Colors.amber,
-                  onPressed: () {},
-                  icon: const ImageIcon(
-                    AssetImage("assets/chat.png"),
-                    size: 40,
-                  )),
+                highlightColor: Colors.amber,
+                onPressed: () {},
+                icon: ImageIcon(
+                  AssetImage("assets/chat.png"),
+                  size: 40,
+                ),
+              ),
               const SizedBox(
                 width: 10,
               ),
@@ -129,6 +238,26 @@ class _profileState extends State<profile> {
               ),
             ],
           ),
-        )));
+        ),
+      ),
+    );
+  }
+
+  Future<void> _launchURL(String url) async {
+    if (url.isNotEmpty) {
+      try {
+        if (await canLaunch(url)) {
+          await launch(url);
+        } else {
+          throw 'Could not launch $url';
+        }
+      } catch (e) {
+        print('Error launching URL: $e');
+        // Handle error (show a SnackBar or a dialog)
+      }
+    } else {
+      print('URL is empty');
+      // Handle empty URL case (show a SnackBar or a dialog)
+    }
   }
 }

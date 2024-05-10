@@ -49,7 +49,6 @@ class _SignupScreenState extends State<SignupScreen> {
         'uid': userCredential.user?.uid,
         'email': email,
         'fullName': name,
-        
       });
       // Sign up successful, handle navigation to next page after sign up
       // Navigator.pushReplacementNamed(context, '/next_page');

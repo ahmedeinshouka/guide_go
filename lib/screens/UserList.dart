@@ -32,32 +32,47 @@ class UserList extends StatelessWidget {
   }
 
   Widget _buildUserListItem(BuildContext context, DocumentSnapshot document) {
-    Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
-    if (_auth.currentUser!.email != data['email']) {
-      return ListTile(
-        leading: CircleAvatar(
-          // Here you can load the user's profile image from Firestore or any other source
-          // For simplicity, I'm using a placeholder avatar
-          child: Icon(Icons.person),
-        ),
-        title: Text(data['Full Name']), // Display the user's name instead of email
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatScreen(
-                receiverUserID: data['uid'],
-                receiverUserEmail: data['email'],
-                receiverUserName: data['Full Name'], 
-                receiverUserImageURL:data['image'], // Pass the user's name
-              ),
+    Widget leadingWidget;
+
+    // Check if imageUrl is not null or empty
+    if (data['imageUrl'] != null && data['imageUrl'].isNotEmpty) {
+      // Use container with decoration to make image circular
+      leadingWidget = CircleAvatar(
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            image: DecorationImage(
+              image: NetworkImage(data['imageUrl']),
+              fit: BoxFit.cover,
             ),
-          );
-        },
+          ),
+        ),
       );
     } else {
-      return const SizedBox.shrink();
+      // If imageUrl is null or empty, use person icon
+      leadingWidget = CircleAvatar(
+        child: Icon(Icons.person),
+      );
     }
+
+    return ListTile(
+      leading: leadingWidget,
+      title: Text(data['fullName'] ?? ''), // Display the user's name instead of email
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatScreen(
+              receiverUserID: data['uid'] ?? '',
+              receiverUserEmail: data['email'] ?? '',
+              receiverUserName: data['fullName'] ?? '', 
+              receiverUserImageURL: data['imageUrl'] ?? '', // Pass the user's name
+            ),
+          ),
+        );
+      },
+    );
   }
 }

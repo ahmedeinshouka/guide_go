@@ -21,12 +21,14 @@ class _ageebaState extends State<cookdoor> {
       throw Exception('Could not launch $url');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final Uri toLaunch =
         Uri(scheme: 'https', host: 'www.facebook.com', path: '/cookdooreg/');
-    return SafeArea(child: Scaffold(
-      body: SizedBox(
+    return SafeArea(
+      child: Scaffold(
+        body: SizedBox(
             width: double.infinity,
             child: Stack(
               fit: StackFit.expand,
@@ -128,8 +130,6 @@ class _ageebaState extends State<cookdoor> {
                             SizedBox(
                               height: 5,
                             ),
-                            
-                          
                           ],
                         ),
                       ],
@@ -151,9 +151,10 @@ class _ageebaState extends State<cookdoor> {
                   right: 15,
                   child: ElevatedButton(
                     onPressed: () => setState(() {
-                  _launched = _launchInBrowserView(toLaunch);
-                }),
-                    style: const ButtonStyle(overlayColor: MaterialStatePropertyAll(Colors.amber),
+                      _launched = _launchInBrowserView(toLaunch);
+                    }),
+                    style: const ButtonStyle(
+                      overlayColor: MaterialStatePropertyAll(Colors.amber),
                       backgroundColor: MaterialStatePropertyAll(
                           Color.fromARGB(255, 255, 255, 255)),
                       shadowColor: MaterialStatePropertyAll(Colors.grey),
@@ -176,5 +177,3 @@ class _ageebaState extends State<cookdoor> {
     );
   }
 }
-
-    

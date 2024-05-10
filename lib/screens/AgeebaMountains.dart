@@ -265,14 +265,14 @@ class _ageebaState extends State<ageeba> {
                     onPressed: () => setState(() {
                       _launched = _launchInBrowserView(toLaunch);
                     }),
-                    style: const ButtonStyle(overlayColor: MaterialStatePropertyAll(Colors.amber),
+                    style: const ButtonStyle(
+                      overlayColor: MaterialStatePropertyAll(Colors.amber),
                       backgroundColor: MaterialStatePropertyAll(
                           Color.fromARGB(255, 255, 255, 255)),
                       shadowColor: MaterialStatePropertyAll(Colors.grey),
                       shape: MaterialStatePropertyAll(CircleBorder()),
                       iconSize: MaterialStatePropertyAll(50),
-                      iconColor: MaterialStatePropertyAll(
-                          Colors.black),
+                      iconColor: MaterialStatePropertyAll(Colors.black),
                     ),
                     child: const Padding(
                       padding: EdgeInsets.all(5.0),

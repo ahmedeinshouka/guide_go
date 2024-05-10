@@ -3,8 +3,8 @@ import 'Login.dart';
 import 'SignUp.dart';
 import 'package:guide_go/utils/theme/app_colors.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key});
+class Intro extends StatelessWidget {
+  const Intro({Key? key});
 
   @override
   Widget build(BuildContext context) {

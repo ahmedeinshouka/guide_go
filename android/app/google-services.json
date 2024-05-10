@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "427660763075",
+    "project_id": "guide-go-81578",
+    "storage_bucket": "guide-go-81578.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427660763075:android:0451089bfc430b6a04a776",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1st_screen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB97DtFGpqyKaMsG2YwyVjmjtXfkknn6FM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427660763075:android:5fc4fa276695272e04a776",
+        "android_client_info": {
+          "package_name": "com.example.guide_go"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB97DtFGpqyKaMsG2YwyVjmjtXfkknn6FM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

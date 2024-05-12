@@ -702,7 +702,10 @@ class home extends StatelessWidget {
               IconButton(
                   highlightColor: Colors.amber,
                   onPressed: () {
-                    Navigator.popAndPushNamed(context, "/");
+                    // Check if the current route is not the home screen
+    if (ModalRoute.of(context)?.settings.name != '/') {
+      Navigator.popAndPushNamed(context, "/");
+    }
                   },
                   icon: const ImageIcon(
                     AssetImage(
@@ -732,7 +735,10 @@ class home extends StatelessWidget {
               IconButton(
                   highlightColor: Colors.amber,
                   onPressed: () {
-                    Navigator.pushNamed(context, "/chatList");
+                    // Check if the current route is not the chatList screen
+    if (ModalRoute.of(context)?.settings.name != '/chatList') {
+      Navigator.pushNamed(context, "/chatList");
+    }
                   },
                   icon: const ImageIcon(
                     AssetImage("assets/chat.png"),
@@ -744,7 +750,10 @@ class home extends StatelessWidget {
               IconButton(
                 highlightColor: Colors.amber,
                 onPressed: () {
-                  Navigator.pushNamed(context, "/profile");
+                // Check if the current route is not the profile screen
+    if (ModalRoute.of(context)?.settings.name != '/profile') {
+      Navigator.pushNamed(context, "/profile");
+    }
                 },
                 icon: const Icon(Icons.person),
                 iconSize: 40,

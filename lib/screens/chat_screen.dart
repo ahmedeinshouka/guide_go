@@ -36,6 +36,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void sendMessage(String message) async {
     await _chatService.sendMessage(
+      _firebaseAuth.currentUser!.uid,
       widget.receiverUserID,
       message,
     );
@@ -94,8 +95,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget buildMessageList() {
     return StreamBuilder(
       stream: _chatService.getMessages(
-        widget.receiverUserID,
         _firebaseAuth.currentUser!.uid,
+        widget.receiverUserID,
       ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -231,57 +232,59 @@ class ChatInput extends StatelessWidget {
 }
 
 class ChatService extends ChangeNotifier {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> sendMessage(String receiverId, String message) async {
-    final String currentUserId = _firebaseAuth.currentUser!.uid;
-    final String currentUserEmail = _firebaseAuth.currentUser!.email.toString();
-    final Timestamp timestamp = Timestamp.now();
+  Future<void> sendMessage(String senderId, String receiverId, String message) async {
+    final String chatRoomId = getChatRoomId(senderId, receiverId);
+
+    // Check if chat room document exists
+    final docRef = _firestore.collection('chat_rooms').doc(chatRoomId);
+    final docSnapshot = await docRef.get();
+
+    // Create a new message document if chat room doesn't exist
+    final String documentId = !docSnapshot.exists ? docRef.id : _firestore.collection('chat_rooms').doc().id;
 
     Message newMessage = Message(
-      senderId: currentUserId,
-      senderEmail: currentUserEmail,
+      senderId: senderId,
       receiverId: receiverId,
-      timestamp: timestamp,
       message: message,
+      timestamp: Timestamp.now(),
     );
-
-    List<String> ids = [currentUserId, receiverId];
-    ids.sort();
-    String chatRoomId = ids.join("_");
 
     await _firestore
         .collection('chat_rooms')
         .doc(chatRoomId)
         .collection('messages')
-        .add(newMessage.toMap());
+        .doc(documentId)
+        .set(newMessage.toMap());
   }
 
   Stream<QuerySnapshot> getMessages(String userId, String otherUserId) {
-    List<String> ids = [userId, otherUserId];
-    ids.sort();
-    String chatRoomId = ids.join("_");
+    final String chatRoomId = getChatRoomId(userId, otherUserId);
 
     return _firestore
         .collection('chat_rooms')
         .doc(chatRoomId)
         .collection('messages')
-        .orderBy('timestamp', descending: false)
+        .orderBy('timestamp', descending: true)
         .snapshots();
+  }
+
+  String getChatRoomId(String userId, String otherUserId) {
+    List<String> ids = [userId, otherUserId];
+    ids.sort();
+    return ids.join("_");
   }
 }
 
 class Message {
   final String senderId;
-  final String senderEmail;
   final String receiverId;
   final String message;
   final Timestamp timestamp;
 
   const Message({
     required this.senderId,
-    required this.senderEmail,
     required this.receiverId,
     required this.timestamp,
     required this.message,
@@ -290,7 +293,6 @@ class Message {
   Map<String, dynamic> toMap() {
     return {
       'senderId': senderId,
-      'senderEmail': senderEmail,
       'receiverId': receiverId,
       'message': message,
       'timestamp': timestamp,

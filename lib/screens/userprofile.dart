@@ -32,27 +32,34 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  Future<void> _getUserData() async {
-    try {
-      final DocumentSnapshot<Map<String, dynamic>> userData =
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(_currentUser!.uid)
-              .get();
+Future<void> _getUserData() async {
+  try {
+    final DocumentSnapshot<Map<String, dynamic>> userData =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_currentUser!.uid)
+            .get();
 
+    if (userData.exists) {
       setState(() {
         _displayName = userData['fullName'] ?? '';
         _email = userData['email'] ?? '';
-        _imageUrl = userData["imageUrl"] ?? '';
+        // Check if 'imageUrl' field exists before accessing it
+        _imageUrl = userData.exists ? userData["imageUrl"] ?? '' : '';
         _whatsappUrl = userData["whatsappLink"] ?? '';
         _facebookUrl = userData["facebookLink"] ?? '';
         _instagramUrl = userData["instagramLink"] ?? '';
       });
-    } catch (e) {
-      // Handle error (show a SnackBar or a dialog)
-      print('Error fetching user data: $e');
+    } else {
+      // Handle case where 'imageUrl' field is missing
+      print('Error fetching user data: "imageUrl" field does not exist');
     }
+  } catch (e) {
+    // Handle other errors (show a SnackBar or a dialog)
+    print('Error fetching user data: $e');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +195,9 @@ class _ProfileState extends State<Profile> {
               IconButton(
                 highlightColor: Colors.amber,
                 onPressed: () {
-                  Navigator.pop(context, "/");
+                  if (ModalRoute.of(context)?.settings.name != '/') {
+            Navigator.popUntil(context, ModalRoute.withName('/'));
+          }
                 },
                 icon: ImageIcon(
                   AssetImage(
@@ -231,7 +240,10 @@ class _ProfileState extends State<Profile> {
               IconButton(
                 highlightColor: Colors.amber,
                 onPressed: () {
-                  Navigator.pushNamed(context, "/profile");
+                  // Check if the current route is not the profile screen
+    if (ModalRoute.of(context)?.settings.name != '/profile') {
+      Navigator.pushNamed(context, "/profile");
+    }
                 },
                 icon: const Icon(Icons.person),
                 iconSize: 40,

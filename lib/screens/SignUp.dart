@@ -39,6 +39,14 @@ class _SignupScreenState extends State<SignupScreen> {
     String email,
     String password,
     String name,
+    String city,
+    String country,
+    String dateOfBirth,
+    String facebookLink,
+    String imageUrl,
+    String instagramLink,
+    String region,
+    String whatsappLink,
   ) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
@@ -49,6 +57,15 @@ class _SignupScreenState extends State<SignupScreen> {
         'uid': userCredential.user?.uid,
         'email': email,
         'fullName': name,
+        'password': password,
+        'city': city,
+        'country': country,
+        'dateOfBirth': dateOfBirth,
+        'facebookLink': facebookLink,
+        'imageUrl': imageUrl,
+        'instagramLink': instagramLink,
+        'region': region,
+        'whatsappLink': whatsappLink
       });
       // Sign up successful, handle navigation to next page after sign up
       // Navigator.pushReplacementNamed(context, '/next_page');
@@ -64,7 +81,10 @@ class _SignupScreenState extends State<SignupScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Sign Up Error"),
-            content: Text(errorMessage,style: TextStyle(fontWeight: FontWeight.bold),),
+            content: Text(
+              errorMessage,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             actions: <Widget>[
               TextButton(
                 child: Text("OK"),
@@ -109,7 +129,8 @@ class _SignupScreenState extends State<SignupScreen> {
             SizedBox(height: 20.0),
             Text(
               'Welcome! Please enter your Name, email, and password to create your account.',
-              style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04),
+              style:
+                  TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04),
             ),
             SizedBox(height: 20.0),
             SignUpForm(
@@ -125,11 +146,20 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    if (passwordController.text == confirmPasswordController.text) {
+                    if (passwordController.text ==
+                        confirmPasswordController.text) {
                       await signUpWithEmailAndPassword(
-                          emailController.text,
-                          passwordController.text,
-                          fullNameController.text);
+                        emailController.text,
+                        passwordController.text,
+                        fullNameController.text, "", // City
+                        "", // Country
+                        "", // Date of Birth
+                        "", // Facebook Link
+                        "", // Image Url
+                        "", // Instagram Link
+                        "", // Region
+                        "", // Whatsapp Link);
+                      );
                     } else {
                       showDialog(
                         context: context,
@@ -150,7 +180,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       );
                     }
                   },
-                  child: Text('Sign Up',style:TextStyle(color: Colors.white) ,),style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff003961))),
+                  child: Text(
+                    'Sign Up',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStatePropertyAll(Color(0xff003961))),
                 ),
               ],
             ),
@@ -160,7 +196,8 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 Text(
                   "Already have an account? ",
-                  style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04),
+                  style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width * 0.04),
                 ),
                 GestureDetector(
                   onTap: () {
@@ -241,7 +278,9 @@ class SignUpForm extends StatelessWidget {
             }
             return null;
           }, confirmPasswordController),
-          SizedBox(height: 20), // Add spacing between form fields and the login button
+          SizedBox(
+              height:
+                  20), // Add spacing between form fields and the login button
         ],
       ),
     );

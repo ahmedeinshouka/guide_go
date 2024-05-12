@@ -93,7 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget buildMessageList() {
-    return StreamBuilder(
+    return StreamBuilder<QuerySnapshot>(
       stream: _chatService.getMessages(
         _firebaseAuth.currentUser!.uid,
         widget.receiverUserID,
@@ -107,11 +107,14 @@ class _ChatScreenState extends State<ChatScreen> {
             child: CircularProgressIndicator(),
           );
         }
-        return ListView(
+
+        return ListView.builder(
           reverse: true,
-          children: snapshot.data!.docs.map<Widget>((document) {
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            final DocumentSnapshot document = snapshot.data!.docs[index];
             return buildMessageItem(document);
-          }).toList(),
+          },
         );
       },
     );
@@ -119,7 +122,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget buildMessageItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-
     var isSender = (data['senderId'] == _firebaseAuth.currentUser!.uid);
 
     return Container(
@@ -131,13 +133,15 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             if (!isSender)
               CircleAvatar(
-                backgroundImage: NetworkImage(widget.receiverUserImageURL),
+                backgroundImage: widget.receiverUserImageURL.isNotEmpty
+                    ? NetworkImage(widget.receiverUserImageURL)
+                    : null, // No need for image if imageURL is empty
+                child: widget.receiverUserImageURL.isEmpty ? Icon(Icons.person) : null, // Display person icon if imageURL is empty
               ),
             TextBubble(
               message: data['message'],
-              timestamp: '',
+              timestamp: data['timestamp'].toDate().toString(), // Display timestamp
               isSender: isSender,
-              isReceiver: !isSender,
             ),
           ],
         ),
@@ -150,13 +154,11 @@ class TextBubble extends StatelessWidget {
   final String message;
   final String timestamp;
   final bool isSender;
-  final bool isReceiver;
 
   const TextBubble({
     required this.message,
     required this.timestamp,
     required this.isSender,
-    required this.isReceiver,
   });
 
   @override

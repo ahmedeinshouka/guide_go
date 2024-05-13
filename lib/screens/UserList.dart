@@ -5,6 +5,9 @@ import 'chat_screen.dart';
 
 class UserList extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final String? searchText;
+
+  UserList({this.searchText});
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +21,20 @@ class UserList extends StatelessWidget {
           return const Text('Loading...');
         }
         final currentUserEmail = _auth.currentUser?.email;
-        final users = snapshot.data!.docs
-            .where((doc) => (doc.data() as Map<String, dynamic>).containsKey('email') && doc['email'] != currentUserEmail)
+        List<DocumentSnapshot> users = snapshot.data!.docs
+            .where((doc) =>
+                (doc.data() as Map<String, dynamic>).containsKey('email') &&
+                doc['email'] != currentUserEmail)
             .toList();
+
+        // Filter users based on searchText
+        if (searchText != null && searchText!.isNotEmpty) {
+          users = users.where((user) {
+            String fullName =
+                (user.data() as Map<String, dynamic>)['fullName'] ?? '';
+            return fullName.toLowerCase().contains(searchText!.toLowerCase());
+          }).toList();
+        }
 
         return ListView(
           children: users
@@ -67,7 +81,7 @@ class UserList extends StatelessWidget {
             builder: (context) => ChatScreen(
               receiverUserID: data['uid'] ?? '',
               receiverUserEmail: data['email'] ?? '',
-              receiverUserName: data['fullName'] ?? '', 
+              receiverUserName: data['fullName'] ?? '',
               receiverUserImageURL: data['imageUrl'] ?? '', // Pass the user's name
             ),
           ),
@@ -76,3 +90,4 @@ class UserList extends StatelessWidget {
     );
   }
 }
+

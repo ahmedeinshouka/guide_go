@@ -144,11 +144,11 @@ class _ChatScreenState extends State<ChatScreen> {
             SizedBox(height: 5),
             Container(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.6, // Limit message box width to 60% of screen width
+                maxWidth: MediaQuery.of(context).size.width * 0.5, // Limit message box width to 60% of screen width
               ),
               padding: EdgeInsets.all(10.0),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20.0),
+                borderRadius: BorderRadius.circular(40.0),
                 color: isSender ? Colors.blue : Colors.grey[300], // Sender message color: Blue, Receiver message color: Grey
               ),
               child: Column(
@@ -167,15 +167,19 @@ class _ChatScreenState extends State<ChatScreen> {
                       Flexible(
                         child: Text(
                           data['message'],
-                          style: TextStyle(color: isSender ? Colors.white : Colors.black),
+                          style: TextStyle(color: isSender ? Colors.white : Colors.black,fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 5),
-                  Text(
-                    data['timestamp'].toDate().toString(),
-                    style: TextStyle(fontSize: 10.0, color: Colors.grey, fontWeight: FontWeight.w400),
+                  Row(mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        data['timestamp'].toDate().toString(),
+                        style: TextStyle(fontSize: 10.0, color: Colors.grey, fontWeight: FontWeight.w400),
+                      ),
+                    ],
                   ),
                 ],
               ),

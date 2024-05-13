@@ -64,7 +64,16 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.receiverUserName),
+        title: Row(
+          children: [CircleAvatar(
+                    backgroundImage: widget.receiverUserImageURL.isNotEmpty
+                        ? NetworkImage(widget.receiverUserImageURL,)
+                        : null, // No need for image if imageURL is empty
+                    child: widget.receiverUserImageURL.isEmpty ? Icon(Icons.person) : null, // Display person icon if imageURL is empty
+                  ),SizedBox(width: 5,),
+            Text(widget.receiverUserName,style: TextStyle(fontWeight: FontWeight.w600),),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -132,17 +141,44 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           crossAxisAlignment: isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            if (!isSender)
-              CircleAvatar(
-                backgroundImage: widget.receiverUserImageURL.isNotEmpty
-                    ? NetworkImage(widget.receiverUserImageURL)
-                    : null, // No need for image if imageURL is empty
-                child: widget.receiverUserImageURL.isEmpty ? Icon(Icons.person) : null, // Display person icon if imageURL is empty
+            SizedBox(height: 5),
+            Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.6, // Limit message box width to 60% of screen width
               ),
-            TextBubble(
-              message: data['message'],
-              timestamp: data['timestamp'].toDate().toString(), // Display timestamp
-              isSender: isSender,
+              padding: EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                color: isSender ? Colors.blue : Colors.grey[300], // Sender message color: Blue, Receiver message color: Grey
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      if (!isSender) // Display sender's information only for receiver's messages
+                        CircleAvatar(
+                          backgroundImage: widget.receiverUserImageURL.isNotEmpty
+                              ? NetworkImage(widget.receiverUserImageURL)
+                              : null, // No need for image if imageURL is empty
+                          child: widget.receiverUserImageURL.isEmpty ? Icon(Icons.person) : null, // Display person icon if imageURL is empty
+                        ),
+                      SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          data['message'],
+                          style: TextStyle(color: isSender ? Colors.white : Colors.black),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    data['timestamp'].toDate().toString(),
+                    style: TextStyle(fontSize: 10.0, color: Colors.grey, fontWeight: FontWeight.w400),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -167,19 +203,19 @@ class TextBubble extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(10.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(20.0),
         color: isSender ? Colors.blue : Colors.grey[300], // Sender message color: Blue, Receiver message color: Grey
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            message,
+            " $message",
             style: TextStyle(color: isSender ? Colors.white : Colors.black),
           ),
           Text(
             timestamp,
-            style: TextStyle(fontSize: 10.0, color: Colors.grey),
+            style: TextStyle(fontSize: 10.0, color: Colors.grey,fontWeight: FontWeight.w400),
           ),
         ],
       ),

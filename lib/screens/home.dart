@@ -87,13 +87,13 @@ Future<void> _getUserData() async {
                   height: 70,
                 ),
                 Positioned(
+                  right: -20,
+                  bottom: -20,
                   child: SvgPicture.asset(
                     "assets/circle_small_filled_icon_200777 (1).svg",
                     color: Colors.green,
                     height: 60,
                   ),
-                  right: -20,
-                  bottom: -20,
                 )
               ],
             )),
@@ -107,6 +107,7 @@ Future<void> _getUserData() async {
             children: [
               Stack(
                 children: [Positioned(
+                  right:7 ,top:10,
                   child: GestureDetector(
                       child:  CircleAvatar(
                         backgroundImage: 
@@ -119,8 +120,7 @@ Future<void> _getUserData() async {
                       onTap: () {
                         Navigator.pushNamed(context, "/profile");
                       },
-                    ),
-                right:7 ,top:10,),
+                    ),),
                   Row(
                     children: [
                       Column(

@@ -40,6 +40,7 @@ class _ChatScreenState extends State<ChatScreen> {
       widget.receiverUserID,
       message,
     );
+    _messageController.clear(); // Clear the text field after sending the message
   }
 
   void sendImage() async {
@@ -237,15 +238,10 @@ class ChatService extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> sendMessage(String senderId, String receiverId, String message) async {
+    // Generate a chat room ID based on sender and receiver IDs
     final String chatRoomId = getChatRoomId(senderId, receiverId);
 
-    // Check if chat room document exists
-    final docRef = _firestore.collection('chat_rooms').doc(chatRoomId);
-    final docSnapshot = await docRef.get();
-
-    // Create a new message document if chat room doesn't exist
-    final String documentId = !docSnapshot.exists ? docRef.id : _firestore.collection('chat_rooms').doc().id;
-
+    // Create a new message document
     Message newMessage = Message(
       senderId: senderId,
       receiverId: receiverId,
@@ -257,11 +253,11 @@ class ChatService extends ChangeNotifier {
         .collection('chat_rooms')
         .doc(chatRoomId)
         .collection('messages')
-        .doc(documentId)
-        .set(newMessage.toMap());
+        .add(newMessage.toMap());
   }
 
   Stream<QuerySnapshot> getMessages(String userId, String otherUserId) {
+    // Generate a chat room ID based on sender and receiver IDs
     final String chatRoomId = getChatRoomId(userId, otherUserId);
 
     return _firestore
@@ -273,9 +269,10 @@ class ChatService extends ChangeNotifier {
   }
 
   String getChatRoomId(String userId, String otherUserId) {
+    // Use the IDs to generate a unique chat room ID
     List<String> ids = [userId, otherUserId];
-    ids.sort();
-    return ids.join("_");
+    ids.sort(); // Sort the IDs to ensure consistency
+    return ids.join("_"); // Join the sorted IDs with an underscore
   }
 }
 

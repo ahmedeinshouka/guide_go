@@ -105,62 +105,68 @@ Future<void> _getUserData() async {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Column(
+              Stack(
+                children: [Positioned(
+                  child: GestureDetector(
+                      child:  CircleAvatar(
+                        backgroundImage: 
+                      _imageUrl.isNotEmpty ? NetworkImage(_imageUrl) : null,
+                  child: _imageUrl.isEmpty
+                      ? Icon(Icons.person, size:40) // Use placeholder icon
+                      : null,
+                        radius: 40,
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, "/profile");
+                      },
+                    ),
+                right:7 ,top:10,),
+                  Row(
                     children: [
-                     Row(
+                      Column(
                         children: [
-                          SizedBox(
-                            width: 20,
+                         Row(
+                            children: [
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text(
+                                "Hello👋 ",
+                                style: TextStyle(
+                                    fontSize: 25, fontWeight: FontWeight.w900),
+                              ),
+                              Text(
+                                _displayName,
+                                style: TextStyle(overflow: TextOverflow.clip,
+                                    fontSize: 25, fontWeight: FontWeight.bold),
+                              )
+                            ],
                           ),
-                          Text(
-                            "Hello👋 ",
-                            style: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.w900),
+                          const SizedBox(
+                            height: 5,
                           ),
-                          Text(
-                            _displayName,
-                            style: TextStyle(overflow: TextOverflow.clip,
-                                fontSize: 25, fontWeight: FontWeight.bold),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.mail,
+                                color: Colors.grey[600],
+                              ),
+                              Text(
+                                _email,
+                                style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w900),
+                              )
+                            ],
                           )
                         ],
                       ),
                       const SizedBox(
-                        height: 5,
+                        width: 85,height: 113,
                       ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.mail,
-                            color: Colors.grey[600],
-                          ),
-                          Text(
-                            _email,
-                            style: TextStyle(
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w900),
-                          )
-                        ],
-                      )
+                      
                     ],
                   ),
-                  const SizedBox(
-                    width: 85,
-                  ),
-                  GestureDetector(
-                    child:  CircleAvatar(
-                      backgroundImage: 
-                    _imageUrl.isNotEmpty ? NetworkImage(_imageUrl) : null,
-                child: _imageUrl.isEmpty
-                    ? Icon(Icons.person, size:40) // Use placeholder icon
-                    : null,
-                      radius: 40,
-                    ),
-                    onTap: () {
-                      Navigator.pushNamed(context, "/profile");
-                    },
-                  )
                 ],
               ),
               const SizedBox(height: 0),

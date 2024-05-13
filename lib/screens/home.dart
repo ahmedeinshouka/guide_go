@@ -4,11 +4,64 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:lottie/lottie.dart';
-
-class home extends StatelessWidget {
+class home extends StatefulWidget {
   const home({super.key});
+
+  @override
+  State<home> createState() => _homeState();
+}
+
+class _homeState extends State<home> {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+  late User? _currentUser;
+  late String _displayName = '';
+  late String _email = '';
+  late String _imageUrl = '';
+  late String _whatsappUrl = '';
+  late String _facebookUrl = '';
+  late String _instagramUrl = '';
+
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUser = _auth.currentUser;
+    if (_currentUser != null) {
+      _getUserData();
+    }
+  }
+
+Future<void> _getUserData() async {
+  try {
+    final DocumentSnapshot<Map<String, dynamic>> userData =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_currentUser!.uid)
+            .get();
+
+    if (userData.exists) {
+      setState(() {
+        _displayName = userData['fullName'] ?? '';
+        _email = userData['email'] ?? '';
+        // Check if 'imageUrl' field exists before accessing it
+        _imageUrl = userData.exists ? userData["imageUrl"] ?? '' : '';
+        _whatsappUrl = userData["whatsappLink"] ?? '';
+        _facebookUrl = userData["facebookLink"] ?? '';
+        _instagramUrl = userData["instagramLink"] ?? '';
+      });
+    } else {
+      // Handle case where 'imageUrl' field is missing
+      print('Error fetching user data: "imageUrl" field does not exist');
+    }
+  } catch (e) {
+    // Handle other errors (show a SnackBar or a dialog)
+    print('Error fetching user data: $e');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +109,7 @@ class home extends StatelessWidget {
                 children: [
                   Column(
                     children: [
-                      const Row(
+                     Row(
                         children: [
                           SizedBox(
                             width: 20,
@@ -67,9 +120,9 @@ class home extends StatelessWidget {
                                 fontSize: 25, fontWeight: FontWeight.w900),
                           ),
                           Text(
-                            "Name",
-                            style: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.w900),
+                            _displayName,
+                            style: TextStyle(overflow: TextOverflow.clip,
+                                fontSize: 25, fontWeight: FontWeight.bold),
                           )
                         ],
                       ),
@@ -83,7 +136,7 @@ class home extends StatelessWidget {
                             color: Colors.grey[600],
                           ),
                           Text(
-                            "email@gmail.com",
+                            _email,
                             style: TextStyle(
                                 color: Colors.grey[600],
                                 fontWeight: FontWeight.w900),
@@ -93,11 +146,15 @@ class home extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(
-                    width: 120,
+                    width: 85,
                   ),
                   GestureDetector(
-                    child: const CircleAvatar(
-                      backgroundImage: AssetImage("assets/DSC_0564 copy.jpg"),
+                    child:  CircleAvatar(
+                      backgroundImage: 
+                    _imageUrl.isNotEmpty ? NetworkImage(_imageUrl) : null,
+                child: _imageUrl.isEmpty
+                    ? Icon(Icons.person, size:40) // Use placeholder icon
+                    : null,
                       radius: 40,
                     ),
                     onTap: () {

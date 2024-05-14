@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:guide_go/screens/Discover.dart';
 
 import 'package:lottie/lottie.dart';
 class home extends StatefulWidget {
@@ -783,12 +784,18 @@ Future<void> _getUserData() async {
                 color: Colors.black,
               ),
               IconButton(
-                  highlightColor: Colors.amber,
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.people_alt_rounded,
-                    size: 40,
-                  )),
+              highlightColor: Colors.amber,
+              onPressed: () {
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DiscoverIndependentsScreen()),
+              );
+            },
+            icon: const Icon(
+              Icons.people_alt_rounded,
+              size: 40,
+               ),
+              ),
               const SizedBox(
                 width: 10,
               ),

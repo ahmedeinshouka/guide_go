@@ -15,10 +15,64 @@ class LoginScreen extends StatelessWidget {
     TextEditingController emailController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
 
-    Future<void> signInWithEmailAndPassword(
-        String email, String password) async {
+    Future<void> signInWithEmailAndPassword(String email, String password) async {
+      if (email.isEmpty || password.isEmpty) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              title: Text("Login Error"),
+              content: Text(
+                'An error occurred during sign in. Please make sure you have entered both email and password.',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
       try {
-        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        // Check if the user exists in Firestore
+        final QuerySnapshot result = await _firestore.collection('users').where('email', isEqualTo: email).get();
+        final List<DocumentSnapshot> documents = result.docs;
+        if (documents.isEmpty) {
+          // Email not found in Firestore
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                backgroundColor: Colors.white,
+                title: Text("Login Error"),
+                content: Text(
+                  'The email entered is not registered. Please check your email address or sign up.',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+          return;
+        }
+
+        // Email found in Firestore, now check password
+        final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
@@ -26,13 +80,16 @@ class LoginScreen extends StatelessWidget {
         // After successful login, navigate to the chat list page
         Navigator.pushReplacementNamed(context, '/');
       } on FirebaseAuthException catch (e) {
-        String errorMessage =
-            'Check Your Email and your Password\n and try again 🫡😁 ';
-        if (e.code == 'user-not-found') {
-          errorMessage = 'No user found with this email. Please sign up.';
-        } else if (e.code == 'wrong-password') {
-          errorMessage = 'Incorrect password. Please try again.';
+        String errorMessage;
+        switch (e.code) {
+          case 'wrong-password':
+            errorMessage = 'The password you entered is incorrect. Please check your password and try again.';
+            break;
+          default:
+            errorMessage = 'An error occurred during sign in. Please check your password.';
+            break;
         }
+        
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -59,20 +116,16 @@ class LoginScreen extends StatelessWidget {
 
     Future<User?> signInWithGoogle() async {
       try {
-        final GoogleSignInAccount? gUser =
-            await GoogleSignIn().signIn(); // أضف علامة '=' بين gUser و await
+        final GoogleSignInAccount? gUser = await GoogleSignIn().signIn(); // أضف علامة '=' بين gUser و await
         // obtain auth details from request
-        final GoogleSignInAuthentication gAuth =
-            await gUser!.authentication; // أضف علامة '=' بين gAuth و await
+        final GoogleSignInAuthentication gAuth = await gUser!.authentication; // أضف علامة '=' بين gAuth و await
         // create a new credential for user
         final credential = GoogleAuthProvider.credential(
           accessToken: gAuth.accessToken!,
           idToken: gAuth.idToken!,
         );
         // finally, let's sign in
-        final UserCredential authResult = await FirebaseAuth.instance
-            .signInWithCredential(
-                credential); // أضف علامة '=' بين authResult و await
+        final UserCredential authResult = await FirebaseAuth.instance.signInWithCredential(credential); // أضف علامة '=' بين authResult و await
         final User? user = authResult.user;
         return user;
       } catch (error) {
@@ -211,7 +264,7 @@ class LoginScreen extends StatelessWidget {
                       icon: SvgPicture.asset("assets/icons8-google-48.svg"),
                       splashRadius: 30,
                       style: ButtonStyle(
-                          shape: MaterialStatePropertyAll(CircleBorder())),
+                          shape: MaterialStateProperty.all(CircleBorder())),
                     ),
                     IconButton(
                         onPressed: () {

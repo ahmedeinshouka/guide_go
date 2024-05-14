@@ -11,7 +11,6 @@ void main() async {
 
   FirebaseApp app = Firebase.app();
   FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.instance;
-      
 
   runApp(MyApp());
 }
@@ -20,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Your App Title',
+      title: 'GUIDE GO',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -37,9 +36,27 @@ class Loginphone extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController phoneNumberController = TextEditingController();
+    String smsCode = ''; // Declare and initialize smsCode variable
+
+    // Default country code for mobile numbers (Egypt: +20)
+    String defaultCountryCode = '+20';
 
     Future<void> signInWithPhoneNumber(String phoneNumber) async {
       try {
+        // Check if user with provided phone number already exists
+        final QuerySnapshot querySnapshot = await _firestore
+            .collection('users')
+            .where('phoneNumber', isEqualTo: phoneNumber)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          // User with provided phone number exists, sign in
+          await _auth.signInWithPhoneNumber(phoneNumber);
+          Navigator.pushReplacementNamed(context, '/'); // Navigate after login
+          return;
+        }
+
+        // User with provided phone number does not exist, send verification code
         await _auth.verifyPhoneNumber(
           phoneNumber: phoneNumber,
           verificationCompleted: (PhoneAuthCredential credential) async {
@@ -65,15 +82,32 @@ class Loginphone extends StatelessWidget {
               },
             );
           },
-          codeSent: (String verificationId, int? resendToken) {
-            Navigator.pushReplacementNamed(
-              context,
-              '/otpVerification',
-              arguments: {
-                'verificationId': verificationId,
-                'phoneNumber': phoneNumber,
+          codeSent: (String verificationId, int? resendToken) async {
+            smsCode = await showDialog( // Use smsCode here
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Enter SMS Code"),
+                  content: TextField(),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, null),
+                      child: Text("Cancel"),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, smsCode),
+                      child: Text("Submit"),
+                    ),
+                  ],
+                );
               },
             );
+
+            PhoneAuthCredential credential = PhoneAuthProvider.credential(
+                verificationId: verificationId, smsCode: smsCode);
+            UserCredential userCredential =
+                await _auth.signInWithCredential(credential);
+            Navigator.pushReplacementNamed(context, '/'); // Navigate after login
           },
           codeAutoRetrievalTimeout: (String verificationId) {},
         );
@@ -84,7 +118,8 @@ class Loginphone extends StatelessWidget {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text("Error"),
-              content: Text("An error occurred during phone authentication."),
+              content: Text(
+                  "An error occurred during phone authentication. Please try again."),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
@@ -125,21 +160,31 @@ class Loginphone extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 50),
-                TextField(
-                  controller: phoneNumberController,
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    labelText: 'Phone Number',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(48),
+                Row(
+                  children: [
+                    Text(defaultCountryCode), // Display default country code
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: phoneNumberController,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelText: 'Phone Number',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(48),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
                     String phoneNumber = phoneNumberController.text.trim();
                     if (phoneNumber.isNotEmpty) {
+                      // Format phone number with default country code
+                      phoneNumber = '$defaultCountryCode$phoneNumber';
                       await signInWithPhoneNumber(phoneNumber);
                     } else {
                       showDialog(
@@ -147,7 +192,8 @@ class Loginphone extends StatelessWidget {
                         builder: (BuildContext context) {
                           return AlertDialog(
                             title: Text("Error"),
-                            content: Text("Please enter a phone number."),
+                            content:
+                                Text("Please enter a phone number."),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
@@ -160,7 +206,8 @@ class Loginphone extends StatelessWidget {
                     }
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Color(0xff003961)),
+                    backgroundColor:
+                        MaterialStateProperty.all(Color(0xff003961)),
                   ),
                   child: SizedBox(
                     child: Text(

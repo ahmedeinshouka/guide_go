@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guide_go/utils/theme/app_colors.dart';
-import 'SignUp.dart';
+import 'package:guide_go/screens/userprofile.dart';
 
 class TourGuideCard extends StatelessWidget {
   final String name;
@@ -76,7 +76,7 @@ class TourGuideCard extends StatelessWidget {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => SignupScreen()),
+                              MaterialPageRoute(builder: (context) => Profile()),
                             );
                           },
                           child: Text(

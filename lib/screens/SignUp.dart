@@ -304,7 +304,20 @@ class _SignupScreenState extends State<SignupScreen> {
       );
     }
   },
-  child: Text('Sign Up'),
+  style: ElevatedButton.styleFrom(
+    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 120), backgroundColor: Color(0xff003961), // تغيير لون الخلفية إلى الأحمر
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20), // تحديد شكل الحواف للزر
+    ),
+  ),
+  child: Text(
+    'Sign Up',
+    style: TextStyle(
+      fontSize: 18, // تحديد حجم النص داخل الزر
+      fontWeight: FontWeight.bold, // تحديد وزن النص
+      color: Colors.white, // تغيير لون النص إلى الأبيض
+    ),
+  ),
 ),
 
                     ],

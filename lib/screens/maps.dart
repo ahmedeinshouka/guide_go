@@ -79,7 +79,7 @@ class _HomePageState extends State<maps> {
               Icons.home,
               color: Colors.white,
             )),
-        backgroundColor: Color.fromARGB(240, 0, 14, 121),
+        backgroundColor: Color(0xff003961),
         // on below line we have given title of app
         title: Text(
           "Places Around You",

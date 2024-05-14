@@ -34,14 +34,13 @@ class _ChatScreenState extends State<ChatScreen> {
     _firebaseAuth = FirebaseAuth.instance;
   }
 
-  void sendMessage() async {
-    if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(
-        widget.receiverUserID,
-        _messageController.text,
-      );
-      _messageController.clear();
-    }
+  void sendMessage(String message) async {
+    await _chatService.sendMessage(
+      _firebaseAuth.currentUser!.uid,
+      widget.receiverUserID,
+      message,
+    );
+    _messageController.clear(); // Clear the text field after sending the message
   }
 
   void sendImage() async {
@@ -56,7 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
       uploadTask.then((res) async {
         String imageUrl = await res.ref.getDownloadURL();
-        sendMessage();
+        sendMessage(imageUrl); // Sending the image URL as a message
       });
     }
   }
@@ -65,7 +64,16 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.receiverUserName),
+        title: Row(
+          children: [CircleAvatar(
+                    backgroundImage: widget.receiverUserImageURL.isNotEmpty
+                        ? NetworkImage(widget.receiverUserImageURL,)
+                        : null, // No need for image if imageURL is empty
+                    child: widget.receiverUserImageURL.isEmpty ? Icon(Icons.person) : null, // Display person icon if imageURL is empty
+                  ),SizedBox(width: 5,),
+            Text(widget.receiverUserName,style: TextStyle(fontWeight: FontWeight.w600),),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -95,10 +103,10 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget buildMessageList() {
-    return StreamBuilder(
+    return StreamBuilder<QuerySnapshot>(
       stream: _chatService.getMessages(
-        widget.receiverUserID,
         _firebaseAuth.currentUser!.uid,
+        widget.receiverUserID,
       ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -109,11 +117,14 @@ class _ChatScreenState extends State<ChatScreen> {
             child: CircularProgressIndicator(),
           );
         }
-        return ListView(
+
+        return ListView.builder(
           reverse: true,
-          children: snapshot.data!.docs.map<Widget>((document) {
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            final DocumentSnapshot document = snapshot.data!.docs[index];
             return buildMessageItem(document);
-          }).toList(),
+          },
         );
       },
     );
@@ -121,7 +132,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget buildMessageItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-
     var isSender = (data['senderId'] == _firebaseAuth.currentUser!.uid);
 
     return Container(
@@ -131,15 +141,48 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           crossAxisAlignment: isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            if (!isSender)
-              CircleAvatar(
-                backgroundImage: NetworkImage(widget.receiverUserImageURL),
+            SizedBox(height: 5),
+            Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.5, // Limit message box width to 60% of screen width
               ),
-            TextBubble(
-              message: data['message'],
-              timestamp: '',
-              isSender: isSender,
-              isReceiver: !isSender,
+              padding: EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(40.0),
+                color: isSender ? Colors.blue : Colors.grey[300], // Sender message color: Blue, Receiver message color: Grey
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      if (!isSender) // Display sender's information only for receiver's messages
+                        CircleAvatar(
+                          backgroundImage: widget.receiverUserImageURL.isNotEmpty
+                              ? NetworkImage(widget.receiverUserImageURL)
+                              : null, // No need for image if imageURL is empty
+                          child: widget.receiverUserImageURL.isEmpty ? Icon(Icons.person) : null, // Display person icon if imageURL is empty
+                        ),
+                      SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          data['message'],
+                          style: TextStyle(color: isSender ? Colors.white : Colors.black,fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                  Row(mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        data['timestamp'].toDate().toString(),
+                        style: TextStyle(fontSize: 10.0, color: Colors.grey, fontWeight: FontWeight.w400),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -152,13 +195,11 @@ class TextBubble extends StatelessWidget {
   final String message;
   final String timestamp;
   final bool isSender;
-  final bool isReceiver;
 
   const TextBubble({
     required this.message,
     required this.timestamp,
     required this.isSender,
-    required this.isReceiver,
   });
 
   @override
@@ -166,19 +207,19 @@ class TextBubble extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(10.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(20.0),
         color: isSender ? Colors.blue : Colors.grey[300], // Sender message color: Blue, Receiver message color: Grey
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            message,
+            " $message",
             style: TextStyle(color: isSender ? Colors.white : Colors.black),
           ),
           Text(
             timestamp,
-            style: TextStyle(fontSize: 10.0, color: Colors.grey),
+            style: TextStyle(fontSize: 10.0, color: Colors.grey,fontWeight: FontWeight.w400),
           ),
         ],
       ),
@@ -188,7 +229,7 @@ class TextBubble extends StatelessWidget {
 
 class ChatInput extends StatelessWidget {
   final TextEditingController controller;
-  final Function() onSendPressed;
+  final Function(String) onSendPressed;
 
   const ChatInput({
     required this.controller,
@@ -203,21 +244,30 @@ class ChatInput extends StatelessWidget {
           child: TextField(
             controller: controller,
             decoration: InputDecoration(
-              suffix: IconButton(
-                onPressed: onSendPressed,
-                icon: Icon(Icons.send),
-              ),
               hintText: 'Type your message',
               border: OutlineInputBorder(
                 gapPadding: 5,
                 borderRadius: BorderRadius.circular(30.0),
               ),
             ),
-            onChanged: (text) {},
+            onChanged: (text) {}, // No need for this, remove if not needed
             onSubmitted: (text) {
-              onSendPressed();
+              if (text.trim().isNotEmpty) {
+                onSendPressed(text);
+                controller.clear(); // Clear the text field after sending the message
+              }
             },
           ),
+        ),
+        IconButton(
+          onPressed: () {
+            final text = controller.text.trim();
+            if (text.isNotEmpty) {
+              onSendPressed(text);
+              controller.clear(); // Clear the text field after sending the message
+            }
+          },
+          icon: Icon(Icons.send),
         ),
       ],
     );
@@ -225,25 +275,19 @@ class ChatInput extends StatelessWidget {
 }
 
 class ChatService extends ChangeNotifier {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> sendMessage(String receiverId, String message) async {
-    final String currentUserId = _firebaseAuth.currentUser!.uid;
-    final String currentUserEmail = _firebaseAuth.currentUser!.email.toString();
-    final Timestamp timestamp = Timestamp.now();
+  Future<void> sendMessage(String senderId, String receiverId, String message) async {
+    // Generate a chat room ID based on sender and receiver IDs
+    final String chatRoomId = getChatRoomId(senderId, receiverId);
 
+    // Create a new message document
     Message newMessage = Message(
-      senderId: currentUserId,
-      senderEmail: currentUserEmail,
+      senderId: senderId,
       receiverId: receiverId,
-      timestamp: timestamp,
       message: message,
+      timestamp: Timestamp.now(),
     );
-
-    List<String> ids = [currentUserId, receiverId];
-    ids.sort();
-    String chatRoomId = ids.join("_");
 
     await _firestore
         .collection('chat_rooms')
@@ -253,29 +297,33 @@ class ChatService extends ChangeNotifier {
   }
 
   Stream<QuerySnapshot> getMessages(String userId, String otherUserId) {
-    List<String> ids = [userId, otherUserId];
-    ids.sort();
-    String chatRoomId = ids.join("_");
+    // Generate a chat room ID based on sender and receiver IDs
+    final String chatRoomId = getChatRoomId(userId, otherUserId);
 
     return _firestore
         .collection('chat_rooms')
         .doc(chatRoomId)
         .collection('messages')
-        .orderBy('timestamp', descending: false)
+        .orderBy('timestamp', descending: true)
         .snapshots();
+  }
+
+  String getChatRoomId(String userId, String otherUserId) {
+    // Use the IDs to generate a unique chat room ID
+    List<String> ids = [userId, otherUserId];
+    ids.sort(); // Sort the IDs to ensure consistency
+    return ids.join("_"); // Join the sorted IDs with an underscore
   }
 }
 
 class Message {
   final String senderId;
-  final String senderEmail;
   final String receiverId;
   final String message;
   final Timestamp timestamp;
 
   const Message({
     required this.senderId,
-    required this.senderEmail,
     required this.receiverId,
     required this.timestamp,
     required this.message,
@@ -284,7 +332,6 @@ class Message {
   Map<String, dynamic> toMap() {
     return {
       'senderId': senderId,
-      'senderEmail': senderEmail,
       'receiverId': receiverId,
       'message': message,
       'timestamp': timestamp,

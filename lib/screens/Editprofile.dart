@@ -237,30 +237,36 @@ class _EditProfileState extends State<EditProfile> {
       imageUrl = await storageRef.getDownloadURL();
     }
 
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(_auth.currentUser!.uid)
-        .set({
-      'fullName': _name,
-      'email': _email,
-      'password': _password,
-      'dateOfBirth': _dateOfBirth,
-      'country': _country,
-      'region': _region,
-      'city': _city,
-      'whatsappLink': _whatsappLink,
-      'instagramLink': _instagramLink,
-      'facebookLink': _facebookLink,
-      'imageUrl': imageUrl,
-    }).then((_) {
+    final userRef = FirebaseFirestore.instance.collection('users').doc(_auth.currentUser!.uid);
+
+    try {
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final userData = await transaction.get(userRef);
+        if (userData.exists) {
+          transaction.update(userRef, {
+            'fullName': _name,
+            'email': _email,
+            'password': _password,
+            'dateOfBirth': _dateOfBirth,
+            'country': _country,
+            'region': _region,
+            'city': _city,
+            'whatsappLink': _whatsappLink,
+            'instagramLink': _instagramLink,
+            'facebookLink': _facebookLink,
+            'imageUrl': imageUrl,
+          });
+        }
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Profile updated successfully')),
       );
-    }).catchError((error) {
+    } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to update profile: $error')),
       );
-    });
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {

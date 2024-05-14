@@ -290,7 +290,7 @@ class _SignupScreenState extends State<SignupScreen> {
       );
 
       // نجاح عملية التسجيل، التعامل مع التنقل إلى الصفحة التالية
-      Navigator.pushReplacementNamed(context, '/yourNextPage'); // استبدلها بالمسار المطلوب
+      Navigator.pushReplacementNamed(context, '/Login'); // استبدلها بالمسار المطلوب
     } catch (e) {
       // فشلت عملية التسجيل (يتم التعامل معها في signUpWithEmailAndPassword)
       ScaffoldMessenger.of(context).showSnackBar(

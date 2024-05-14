@@ -17,10 +17,11 @@ class _SignupScreenState extends State<SignupScreen> {
   // تحقق من صحة البريد الإلكتروني
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your email address.';  // عرض رسالة خطأ إذا كان البريد الإلكتروني فارغًا
+      return 'Please enter your email address.'; // عرض رسالة خطأ إذا كان البريد الإلكتروني فارغًا
     }
-    if (!RegExp(r"^[a-zA-Z0-9.a-z_+]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value)) {
-      return 'Please enter a valid email address.';  // عرض رسالة خطأ إذا كان البريد الإلكتروني غير صالح
+    if (!RegExp(r"^[a-zA-Z0-9.a-z_+]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+        .hasMatch(value)) {
+      return 'Please enter a valid email address.'; // عرض رسالة خطأ إذا كان البريد الإلكتروني غير صالح
     }
     return null;
   }
@@ -28,10 +29,10 @@ class _SignupScreenState extends State<SignupScreen> {
   // تحقق من صحة كلمة المرور
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your password.';  // عرض رسالة خطأ إذا كانت كلمة المرور فارغة
+      return 'Please enter your password.'; // عرض رسالة خطأ إذا كانت كلمة المرور فارغة
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters long.';  // عرض رسالة خطأ إذا كانت كلمة المرور أقل من 6 أحرف
+      return 'Password must be at least 6 characters long.'; // عرض رسالة خطأ إذا كانت كلمة المرور أقل من 6 أحرف
     }
     return null;
   }
@@ -39,7 +40,7 @@ class _SignupScreenState extends State<SignupScreen> {
   // تحقق من صحة الاسم الكامل
   String? validateFullName(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your full name.';  // عرض رسالة خطأ إذا كان الاسم الكامل فارغًا
+      return 'Please enter your full name.'; // عرض رسالة خطأ إذا كان الاسم الكامل فارغًا
     }
     return null;
   }
@@ -52,11 +53,8 @@ class _SignupScreenState extends State<SignupScreen> {
     String city,
     String country,
     String dateOfBirth,
-    String facebookLink,
-    String imageUrl,
-    String instagramLink,
+    String photoUrl,
     String region,
-    String whatsappLink,
     String phoneNumber,
   ) async {
     try {
@@ -72,11 +70,8 @@ class _SignupScreenState extends State<SignupScreen> {
         'city': city,
         'country': country,
         'dateOfBirth': dateOfBirth,
-        'facebookLink': facebookLink,
-        'imageUrl': imageUrl,
-        'instagramLink': instagramLink,
+        'photoUrl': photoUrl,
         'region': region,
-        'whatsappLink': whatsappLink,
         'phoneNumber': phoneNumber,
       });
     } catch (e) {
@@ -108,9 +103,11 @@ class _SignupScreenState extends State<SignupScreen> {
       return userCredential;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print('The password provided is too weak.');  // عرض رسالة خطأ إذا كانت كلمة المرور ضعيفة جدًا
+        print(
+            'The password provided is too weak.'); // عرض رسالة خطأ إذا كانت كلمة المرور ضعيفة جدًا
       } else if (e.code == 'email-already-in-use') {
-        print('The email address is already in use by another account.');  // عرض رسالة خطأ إذا كان البريد الإلكتروني مستخدمًا بالفعل
+        print(
+            'The email address is already in use by another account.'); // عرض رسالة خطأ إذا كان البريد الإلكتروني مستخدمًا بالفعل
       } else {
         print('Error during sign up: $e');
       }
@@ -159,8 +156,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   Text(
                     'Welcome! Please enter your Name, email, and password to create your account.',
-                    style:
-                        TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04),
+                    style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width * 0.04),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                   TextField(
@@ -197,7 +194,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     decoration: InputDecoration(
                       labelText: 'Confirm Password',
                       border: OutlineInputBorder(),
-                      errorText: (confirmPasswordController.text != passwordController.text)
+                      errorText: (confirmPasswordController.text !=
+                              passwordController.text)
                           ? 'Passwords do not match.'
                           : null,
                     ),
@@ -229,97 +227,107 @@ class _SignupScreenState extends State<SignupScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
-  onPressed: () async {
-    String? emailError = validateEmail(emailController.text);
-    String? passwordError = validatePassword(passwordController.text);
-    String? fullNameError = validateFullName(fullNameController.text);
+                        onPressed: () async {
+                          String? emailError =
+                              validateEmail(emailController.text);
+                          String? passwordError =
+                              validatePassword(passwordController.text);
+                          String? fullNameError =
+                              validateFullName(fullNameController.text);
 
-    if (emailError != null || passwordError != null || fullNameError != null) {
-      // عرض رسالة الأخطاء في الواجهة باستخدام SnackBar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '$emailError\n$passwordError\n$fullNameError',
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-    if (selectedType == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Please select user type',
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-    if (passwordController.text != confirmPasswordController.text) {
-      // عرض رسالة خطأ إذا لم تتطابق كلمتا المرور
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Passwords do not match.',
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
+                          if (emailError != null ||
+                              passwordError != null ||
+                              fullNameError != null) {
+                            // عرض رسالة الأخطاء في الواجهة باستخدام SnackBar
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '$emailError\n$passwordError\n$fullNameError',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+                          if (selectedType == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Please select user type',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+                          if (passwordController.text !=
+                              confirmPasswordController.text) {
+                            // عرض رسالة خطأ إذا لم تتطابق كلمتا المرور
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Passwords do not match.',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
 
-    try {
-      await signUpWithEmailAndPassword(
-        emailController.text,
-        passwordController.text,
-        fullNameController.text,
-        "", // City
-        "", // Country
-        "", // Date of Birth
-        "", // Facebook Link
-        "", // Image Url
-        "", // Instagram Link
-        "", // Region
-        "", // Whatsapp Link
-        "", // Phone Number
-      );
+                          try {
+                            await signUpWithEmailAndPassword(
+                              emailController.text,
+                              passwordController.text,
+                              fullNameController.text,
+                              "", // City
+                              "", // Country
+                              "", // Date of Birth
 
-      // نجاح عملية التسجيل، التعامل مع التنقل إلى الصفحة التالية
-      Navigator.pushReplacementNamed(context, '/Login'); // استبدلها بالمسار المطلوب
-    } catch (e) {
-      // فشلت عملية التسجيل (يتم التعامل معها في signUpWithEmailAndPassword)
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Sign up failed: $e',
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  },
-  style: ElevatedButton.styleFrom(
-    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 120), backgroundColor: Color(0xff003961), // تغيير لون الخلفية إلى الأحمر
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(20), // تحديد شكل الحواف للزر
-    ),
-  ),
-  child: Text(
-    'Sign Up',
-    style: TextStyle(
-      fontSize: 18, // تحديد حجم النص داخل الزر
-      fontWeight: FontWeight.bold, // تحديد وزن النص
-      color: Colors.white, // تغيير لون النص إلى الأبيض
-    ),
-  ),
-),
+                              "", // Image Url
 
+                              "", // Region
+
+                              "", // Phone Number
+                            );
+
+                            // نجاح عملية التسجيل، التعامل مع التنقل إلى الصفحة التالية
+                            Navigator.pushReplacementNamed(
+                                context, '/Login'); // استبدلها بالمسار المطلوب
+                          } catch (e) {
+                            // فشلت عملية التسجيل (يتم التعامل معها في signUpWithEmailAndPassword)
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Sign up failed: $e',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 120),
+                          backgroundColor:
+                              Color(0xff003961), // تغيير لون الخلفية إلى الأحمر
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                20), // تحديد شكل الحواف للزر
+                          ),
+                        ),
+                        child: Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            fontSize: 18, // تحديد حجم النص داخل الزر
+                            fontWeight: FontWeight.bold, // تحديد وزن النص
+                            color: Colors.white, // تغيير لون النص إلى الأبيض
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -336,7 +344,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                            MaterialPageRoute(
+                                builder: (context) => LoginScreen()),
                           );
                         },
                         child: Text(

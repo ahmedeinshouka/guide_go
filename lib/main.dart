@@ -35,6 +35,8 @@ import 'screens/chat_screen.dart';
 import 'screens/UserList.dart';
 import 'package:guide_go/screens/Discover.dart';
 
+import 'screens/login_phone.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -75,7 +77,7 @@ class MyApp extends StatelessWidget {
         '/zeeyara': (context) => zeeyara(),
         '/Montaggio': (context) => Montaggio(),
         '/chatList': (context) => ChatListPage(),
-        
+        '/login_phone':(context) => Loginphone(),
       },
     );
   }

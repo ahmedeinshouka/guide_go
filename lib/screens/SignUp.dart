@@ -47,6 +47,7 @@ class _SignupScreenState extends State<SignupScreen> {
     String instagramLink,
     String region,
     String whatsappLink,
+    String phoneNumber,
   ) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
@@ -65,7 +66,8 @@ class _SignupScreenState extends State<SignupScreen> {
         'imageUrl': imageUrl,
         'instagramLink': instagramLink,
         'region': region,
-        'whatsappLink': whatsappLink
+        'whatsappLink': whatsappLink,
+        'phoneNumber':phoneNumber,
       });
       // Sign up successful, handle navigation to next page after sign up
       // Navigator.pushReplacementNamed(context, '/next_page');
@@ -158,6 +160,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         "", // Image Url
                         "", // Instagram Link
                         "", // Region
+                        "",
                         "", // Whatsapp Link);
                       );
                     } else {

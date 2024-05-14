@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:guide_go/screens/SignUp.dart';
+import 'login_phone.dart';
 
 class LoginScreen extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -15,8 +18,7 @@ class LoginScreen extends StatelessWidget {
     Future<void> signInWithEmailAndPassword(
         String email, String password) async {
       try {
-        UserCredential userCredential =
-            await _auth.signInWithEmailAndPassword(
+        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
@@ -24,7 +26,8 @@ class LoginScreen extends StatelessWidget {
         // After successful login, navigate to the chat list page
         Navigator.pushReplacementNamed(context, '/');
       } on FirebaseAuthException catch (e) {
-        String errorMessage = 'Check Your Email and your Password\n and try again 🫡😁 ';
+        String errorMessage =
+            'Check Your Email and your Password\n and try again 🫡😁 ';
         if (e.code == 'user-not-found') {
           errorMessage = 'No user found with this email. Please sign up.';
         } else if (e.code == 'wrong-password') {
@@ -36,7 +39,10 @@ class LoginScreen extends StatelessWidget {
             return AlertDialog(
               backgroundColor: Colors.white,
               title: Text("Login Error"),
-              content: Text(errorMessage, style: TextStyle(fontWeight: FontWeight.bold),),
+              content: Text(
+                errorMessage,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               actions: <Widget>[
                 TextButton(
                   child: Text("OK"),
@@ -48,6 +54,30 @@ class LoginScreen extends StatelessWidget {
             );
           },
         );
+      }
+    }
+
+    Future<User?> signInWithGoogle() async {
+      try {
+        final GoogleSignInAccount? gUser =
+            await GoogleSignIn().signIn(); // أضف علامة '=' بين gUser و await
+        // obtain auth details from request
+        final GoogleSignInAuthentication gAuth =
+            await gUser!.authentication; // أضف علامة '=' بين gAuth و await
+        // create a new credential for user
+        final credential = GoogleAuthProvider.credential(
+          accessToken: gAuth.accessToken!,
+          idToken: gAuth.idToken!,
+        );
+        // finally, let's sign in
+        final UserCredential authResult = await FirebaseAuth.instance
+            .signInWithCredential(
+                credential); // أضف علامة '=' بين authResult و await
+        final User? user = authResult.user;
+        return user;
+      } catch (error) {
+        print(error);
+        return null;
       }
     }
 
@@ -71,7 +101,10 @@ class LoginScreen extends StatelessWidget {
               children: [
                 const Text(
                   'Log in',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 50.0, fontFamily: "LilitaOne"),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 50.0,
+                      fontFamily: "LilitaOne"),
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 50), // add spacing between fields
@@ -79,7 +112,9 @@ class LoginScreen extends StatelessWidget {
                   controller: emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(48)), // to make the text field box-shaped
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                            48)), // to make the text field box-shaped
                   ),
                 ),
                 SizedBox(height: 25),
@@ -88,7 +123,9 @@ class LoginScreen extends StatelessWidget {
                   obscureText: true,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(48)), // to make the text field box-shaped
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                            48)), // to make the text field box-shaped
                   ),
                 ),
                 SizedBox(height: 20),
@@ -105,7 +142,8 @@ class LoginScreen extends StatelessWidget {
                     }
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Color(0xff003961)),
+                    backgroundColor:
+                        MaterialStateProperty.all(Color(0xff003961)),
                   ),
                   child: SizedBox(
                     child: Text(
@@ -117,6 +155,75 @@ class LoginScreen extends StatelessWidget {
                     height: 45,
                   ),
                 ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width /
+                          3, // Adjust the width as needed
+                      child: Divider(
+                        height: 1,
+                        color: Colors.black,
+                        thickness: 5,
+                      ),
+                    ),
+                    Text(
+                      " OR ",
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width /
+                          3, // Adjust the width as needed
+                      child: Divider(
+                        height: 1,
+                        color: Colors.black,
+                        thickness: 5,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        // تسجيل الدخول باستخدام Google
+                        User? user = await signInWithGoogle();
+                        if (user != null) {
+                          // إضافة المستخدم إلى قاعدة البيانات أو تنفيذ إجراءات إضافية هنا
+                          // يمكنك تحديث الرسائل حسب الحاجة
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Google Sign-In Successful'),
+                            ),
+                          );
+                          // الانتقال إلى الصفحة المناسبة بعد تسجيل الدخول
+                          Navigator.pushReplacementNamed(context, '/');
+                        } else {
+                          // فشل تسجيل الدخول باستخدام Google
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Google Sign-In Failed'),
+                            ),
+                          );
+                        }
+                      },
+                      icon: SvgPicture.asset("assets/icons8-google-48.svg"),
+                      splashRadius: 30,
+                      style: ButtonStyle(
+                          shape: MaterialStatePropertyAll(CircleBorder())),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, '/login_phone');
+                        },
+                        icon: Icon(
+                          Icons.phone,
+                          size: 40,
+                        ))
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.center,
+                ),
                 SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -127,12 +234,15 @@ class LoginScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => SignupScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => SignupScreen()),
                         );
                       },
                       child: const Text(
                         'Signup',
-                        style: TextStyle(decoration: TextDecoration.underline, decorationThickness: 1),
+                        style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            decorationThickness: 1),
                       ),
                     ),
                   ],

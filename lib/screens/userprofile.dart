@@ -17,11 +17,8 @@ class _ProfileState extends State<Profile> {
   late User? _currentUser;
   late String _displayName = '';
   late String _email = '';
-  late String _imageUrl = '';
-  late String _whatsappUrl = '';
-  late String _facebookUrl = '';
-  late String _instagramUrl = '';
-  InAppWebViewController? _webViewController;
+  late String _photoUrl = '';
+  
 
   @override
   void initState() {
@@ -44,15 +41,13 @@ Future<void> _getUserData() async {
       setState(() {
         _displayName = userData['fullName'] ?? '';
         _email = userData['email'] ?? '';
-        // Check if 'imageUrl' field exists before accessing it
-        _imageUrl = userData.exists ? userData["imageUrl"] ?? '' : '';
-        _whatsappUrl = userData["whatsappLink"] ?? '';
-        _facebookUrl = userData["facebookLink"] ?? '';
-        _instagramUrl = userData["instagramLink"] ?? '';
+        // Check if 'photoUrl' field exists before accessing it
+        _photoUrl = userData.exists ? userData["photoUrl"] ?? '' : '';
+        
       });
     } else {
-      // Handle case where 'imageUrl' field is missing
-      print('Error fetching user data: "imageUrl" field does not exist');
+      // Handle case where 'photoUrl' field is missing
+      print('Error fetching user data: "photoUrl" field does not exist');
     }
   } catch (e) {
     // Handle other errors (show a SnackBar or a dialog)
@@ -101,8 +96,8 @@ Future<void> _getUserData() async {
               ),
               CircleAvatar(
                 backgroundImage:
-                    _imageUrl.isNotEmpty ? NetworkImage(_imageUrl) : null,
-                child: _imageUrl.isEmpty
+                    _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
+                child: _photoUrl.isEmpty
                     ? Icon(Icons.person, size: 80) // Use placeholder icon
                     : null,
                 radius: 80,
@@ -142,46 +137,7 @@ Future<void> _getUserData() async {
             ],
           ),
         ),
-        floatingActionButton: Row(
-          children: [
-            SizedBox(
-              width: 40,
-            ),
-            IconButton(
-              onPressed: () {
-                _launchURL(_whatsappUrl);
-              },
-              icon: SvgPicture.asset(
-                "assets/icons8-whatsapp.svg",
-                color: Colors.green,
-              ),
-            ),
-            SizedBox(
-              width: 40,
-            ),
-            IconButton(
-              onPressed: () {
-                _launchURL(_facebookUrl);
-              },
-              icon: SvgPicture.asset(
-                "assets/icons8-facebook (2).svg",
-                color: Colors.blue,
-              ),
-            ),
-            SizedBox(
-              width: 40,
-            ),
-            IconButton(
-              onPressed: () {
-                _launchURL(_instagramUrl);
-              },
-              icon: SvgPicture.asset(
-                "assets/icons8-instagram-100.svg",
-              ),
-            )
-          ],
-          mainAxisAlignment: MainAxisAlignment.center,
-        ),
+        
         bottomNavigationBar: BottomAppBar(
           color: Colors.white,
           shadowColor: Colors.white,

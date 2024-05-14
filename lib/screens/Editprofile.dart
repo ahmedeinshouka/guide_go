@@ -22,16 +22,43 @@ class _EditProfileState extends State<EditProfile> {
   String _country = '';
   String _region = '';
   String _city = '';
-  String _whatsappLink = '';
-  String _instagramLink = '';
-  String _facebookLink = '';
+
   File? _imageFile;
   final picker = ImagePicker();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  bool _validateEmail(String email) {
-    RegExp emailRegex = RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-    return emailRegex.hasMatch(email);
+  @override
+  void initState() {
+    super.initState();
+    _auth.authStateChanges().listen((User? user) {
+      if (user != null) {
+        print('User is signed in with Google: ${user.displayName}');
+        // Fetch user data from Firestore based on UID
+        fetchUserData(user.uid);
+      } else {
+        print('User is not signed in');
+      }
+    });
+  }
+
+  // Fetch user data from Firestore based on UID
+  void fetchUserData(String uid) async {
+    try {
+      DocumentSnapshot userData = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      if (userData.exists) {
+        setState(() {
+          _name = userData['fullName'] ?? '';
+          _email = userData['email'] ?? '';
+          _dateOfBirth = userData['dateOfBirth'] ?? '';
+          _country = userData['country'] ?? '';
+          _region = userData['region'] ?? '';
+          _city = userData['city'] ?? '';
+        });
+      }
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -49,7 +76,7 @@ class _EditProfileState extends State<EditProfile> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.popAndPushNamed(context, "/profile"),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SingleChildScrollView(
@@ -84,12 +111,6 @@ class _EditProfileState extends State<EditProfile> {
                 decoration: InputDecoration(
                   labelText: 'Name',
                 ),
-                validator: (value) {
-                  if (value!.trim().isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
                 onSaved: (value) => _name = value!,
               ),
               const SizedBox(height: 16.0),
@@ -98,14 +119,6 @@ class _EditProfileState extends State<EditProfile> {
                 decoration: InputDecoration(
                   labelText: 'Email',
                 ),
-                validator: (value) {
-                  if (value!.trim().isEmpty) {
-                    return 'Please enter your email address';
-                  } else if (!_validateEmail(value.trim())) {
-                    return 'Please enter a valid email address';
-                  }
-                  return null;
-                },
                 onSaved: (value) => _email = value!,
               ),
               const SizedBox(height: 16.0),
@@ -152,29 +165,7 @@ class _EditProfileState extends State<EditProfile> {
                 onChanged: (value) => _city = value,
               ),
               const SizedBox(height: 16.0),
-              TextFormField(
-                initialValue: _whatsappLink,
-                decoration: InputDecoration(
-                  labelText: 'WhatsApp Link',
-                ),
-                onChanged: (value) => _whatsappLink = value,
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                initialValue: _instagramLink,
-                decoration: InputDecoration(
-                  labelText: 'Instagram Link',
-                ),
-                onChanged: (value) => _instagramLink = value,
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                initialValue: _facebookLink,
-                decoration: InputDecoration(
-                  labelText: 'Facebook Link',
-                ),
-                onChanged: (value) => _facebookLink = value,
-              ),
+              
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
@@ -227,44 +218,51 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<void> saveChangesToFirestore() async {
-    String imageUrl = '';
-    if (_imageFile != null) {
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('user_images')
-          .child(_auth.currentUser!.uid + '.jpg');
-      await storageRef.putFile(_imageFile!);
-      imageUrl = await storageRef.getDownloadURL();
-    }
-
-    final userRef = FirebaseFirestore.instance.collection('users').doc(_auth.currentUser!.uid);
-
-    try {
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        final userData = await transaction.get(userRef);
-        if (userData.exists) {
-          transaction.update(userRef, {
-            'fullName': _name,
-            'email': _email,
-            'password': _password,
-            'dateOfBirth': _dateOfBirth,
-            'country': _country,
-            'region': _region,
-            'city': _city,
-            'whatsappLink': _whatsappLink,
-            'instagramLink': _instagramLink,
-            'facebookLink': _facebookLink,
-            'imageUrl': imageUrl,
-          });
+    String photoUrl = '';
+    // Check if the user is authenticated
+    if (_auth.currentUser != null) {
+      try {
+        if (_imageFile != null) {
+          final storageRef = FirebaseStorage.instance
+              .ref()
+              .child('user_images')
+              .child(_auth.currentUser!.uid + '.jpg');
+          await storageRef.putFile(_imageFile!);
+          photoUrl = await storageRef.getDownloadURL();
         }
-      });
 
+        final userRef = FirebaseFirestore.instance.collection('users').doc(_auth.currentUser!.uid);
+
+        await FirebaseFirestore.instance.runTransaction((transaction) async {
+          final userData = await transaction.get(userRef);
+          if (userData.exists) {
+            Map<String, dynamic> dataToUpdate = {};
+
+            if (_name.isNotEmpty) dataToUpdate['fullName'] = _name;
+            if (_email.isNotEmpty) dataToUpdate['email'] = _email;
+            if (_password.isNotEmpty) dataToUpdate['password'] = _password;
+            if (_dateOfBirth.isNotEmpty) dataToUpdate['dateOfBirth'] = _dateOfBirth;
+            if (_country.isNotEmpty) dataToUpdate['country'] = _country;
+            if (_region.isNotEmpty) dataToUpdate['region'] = _region;
+            if (_city.isNotEmpty) dataToUpdate['city'] = _city;
+            if (photoUrl.isNotEmpty) dataToUpdate['photoUrl'] = photoUrl;
+
+            transaction.update(userRef, dataToUpdate);
+          }
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Profile updated successfully')),
+        );
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update profile: $error')),
+        );
+      }
+    } else {
+      // User is not authenticated, handle accordingly
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Profile updated successfully')),
-      );
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update profile: $error')),
+        SnackBar(content: Text('User is not authenticated. Please sign in again.')),
       );
     }
   }

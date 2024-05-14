@@ -181,22 +181,22 @@ class UserSearchDelegate extends SearchDelegate<String> {
 
     Widget leadingWidget;
 
-    // Check if imageUrl is not null or empty
-    if (data['imageUrl'] != null && data['imageUrl'].isNotEmpty) {
+    // Check if photoUrl is not null or empty
+    if (data['photoUrl'] != null && data['photoUrl'].isNotEmpty) {
       // Use container with decoration to make image circular
       leadingWidget = CircleAvatar(
         child: Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             image: DecorationImage(
-              image: NetworkImage(data['imageUrl']),
+              image: NetworkImage(data['photoUrl']),
               fit: BoxFit.cover,
             ),
           ),
         ),
       );
     } else {
-      // If imageUrl is null or empty, use person icon
+      // If photoUrl is null or empty, use person icon
       leadingWidget = CircleAvatar(
         child: Icon(Icons.person),
       );
@@ -213,7 +213,7 @@ class UserSearchDelegate extends SearchDelegate<String> {
               receiverUserID: data['uid'] ?? '',
               receiverUserEmail: data['email'] ?? '',
               receiverUserName: data['fullName'] ?? '',
-              receiverUserImageURL: data['imageUrl'] ?? '', // Pass the user's name
+              receiverUserphotoUrl: data['photoUrl'] ?? '', // Pass the user's name
             ),
           ),
         );

@@ -77,7 +77,7 @@ class LoginScreen extends StatelessWidget {
           password: password,
         );
 
-        // After successful login, navigate to the chat list page
+        // After successful login, navigate to the home page
         Navigator.pushReplacementNamed(context, '/');
       } on FirebaseAuthException catch (e) {
         String errorMessage;
@@ -116,17 +116,47 @@ class LoginScreen extends StatelessWidget {
 
     Future<User?> signInWithGoogle() async {
       try {
-        final GoogleSignInAccount? gUser = await GoogleSignIn().signIn(); // أضف علامة '=' بين gUser و await
-        // obtain auth details from request
-        final GoogleSignInAuthentication gAuth = await gUser!.authentication; // أضف علامة '=' بين gAuth و await
-        // create a new credential for user
-        final credential = GoogleAuthProvider.credential(
-          accessToken: gAuth.accessToken!,
-          idToken: gAuth.idToken!,
+        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        if (googleUser == null) {
+          // Google Sign-In cancelled
+          return null;
+        }
+
+        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
         );
-        // finally, let's sign in
-        final UserCredential authResult = await FirebaseAuth.instance.signInWithCredential(credential); // أضف علامة '=' بين authResult و await
+
+        final UserCredential authResult = await FirebaseAuth.instance.signInWithCredential(credential);
         final User? user = authResult.user;
+
+        // If user is signed in successfully, retrieve additional user information from Google account
+        if (user != null) {
+          // Retrieve user's display name from Google account
+          final String? displayName = googleUser.displayName;
+
+          // Generate UID
+          String uid = user.uid;
+
+          // Check if the user already exists in Firestore
+          final DocumentSnapshot<Map<String, dynamic>> userDoc =
+              await _firestore.collection('users').doc(uid).get();
+
+          if (!userDoc.exists) {
+            // User is signing in for the first time, create a new document
+            await _firestore.collection('users').doc(uid).set({
+              'uid': uid,
+              'email': user.email,
+              'fullName': displayName ?? '', // Use null-aware operator here
+              'photoUrl': googleUser.photoUrl ?? '', // Use null-aware operator here
+            });
+          }
+
+          // Navigate to the home page
+          Navigator.pushReplacementNamed(context, '/');
+        }
+
         return user;
       } catch (error) {
         print(error);
@@ -240,26 +270,8 @@ class LoginScreen extends StatelessWidget {
                   children: [
                     IconButton(
                       onPressed: () async {
-                        // تسجيل الدخول باستخدام Google
-                        User? user = await signInWithGoogle();
-                        if (user != null) {
-                          // إضافة المستخدم إلى قاعدة البيانات أو تنفيذ إجراءات إضافية هنا
-                          // يمكنك تحديث الرسائل حسب الحاجة
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Google Sign-In Successful'),
-                            ),
-                          );
-                          // الانتقال إلى الصفحة المناسبة بعد تسجيل الدخول
-                          Navigator.pushReplacementNamed(context, '/');
-                        } else {
-                          // فشل تسجيل الدخول باستخدام Google
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Google Sign-In Failed'),
-                            ),
-                          );
-                        }
+                        // Sign in with Google
+                        await signInWithGoogle();
                       },
                       icon: SvgPicture.asset("assets/icons8-google-48.svg"),
                       splashRadius: 30,

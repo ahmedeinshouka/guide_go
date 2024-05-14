@@ -6,7 +6,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:guide_go/screens/Discover.dart';
 
 import 'package:lottie/lottie.dart';
 class home extends StatefulWidget {
@@ -21,13 +20,13 @@ class _homeState extends State<home> {
   late User? _currentUser;
   late String _displayName = '';
   late String _email = '';
-  late String _imageUrl = '';
-  late String _whatsappUrl = '';
-  late String _facebookUrl = '';
-  late String _instagramUrl = '';
+  late String _photoUrl = '';
+
+  
 
 
   @override
+  
   void initState() {
     super.initState();
     _currentUser = _auth.currentUser;
@@ -48,15 +47,13 @@ Future<void> _getUserData() async {
       setState(() {
         _displayName = userData['fullName'] ?? '';
         _email = userData['email'] ?? '';
-        // Check if 'imageUrl' field exists before accessing it
-        _imageUrl = userData.exists ? userData["imageUrl"] ?? '' : '';
-        _whatsappUrl = userData["whatsappLink"] ?? '';
-        _facebookUrl = userData["facebookLink"] ?? '';
-        _instagramUrl = userData["instagramLink"] ?? '';
+        // Check if 'photoUrl' field exists before accessing it
+        _photoUrl = userData.exists ? userData["photoUrl"] ?? '' : '';
+        
       });
     } else {
-      // Handle case where 'imageUrl' field is missing
-      print('Error fetching user data: "imageUrl" field does not exist');
+      // Handle case where 'photoUrl' field is missing
+      print('Error fetching user data: "photoUrl" field does not exist');
     }
   } catch (e) {
     // Handle other errors (show a SnackBar or a dialog)
@@ -112,8 +109,8 @@ Future<void> _getUserData() async {
                   child: GestureDetector(
                       child:  CircleAvatar(
                         backgroundImage: 
-                      _imageUrl.isNotEmpty ? NetworkImage(_imageUrl) : null,
-                  child: _imageUrl.isEmpty
+                      _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
+                  child: _photoUrl.isEmpty
                       ? Icon(Icons.person, size:40) // Use placeholder icon
                       : null,
                         radius: 40,
@@ -126,15 +123,15 @@ Future<void> _getUserData() async {
                     children: [
                       Column(
                         children: [
-                         Row(
+                         Row(mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(
-                                width: 20,
+                                width: 5,
                               ),
                               Text(
                                 "Hello👋 ",
                                 style: TextStyle(
-                                    fontSize: 25, fontWeight: FontWeight.w900),
+                                    fontSize: 25, fontWeight: FontWeight.w900),textAlign: TextAlign.left,
                               ),
                               Text(
                                 _displayName,
@@ -144,10 +141,10 @@ Future<void> _getUserData() async {
                             ],
                           ),
                           const SizedBox(
-                            height: 5,
+                            height: 10,
                           ),
-                          Row(
-                            children: [
+                          Row(mainAxisAlignment: MainAxisAlignment.start,
+                            children: [SizedBox(width: 10,),
                               Icon(
                                 Icons.mail,
                                 color: Colors.grey[600],
@@ -784,18 +781,12 @@ Future<void> _getUserData() async {
                 color: Colors.black,
               ),
               IconButton(
-              highlightColor: Colors.amber,
-              onPressed: () {
-              Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => DiscoverIndependentsScreen()),
-              );
-            },
-            icon: const Icon(
-              Icons.people_alt_rounded,
-              size: 40,
-               ),
-              ),
+                  highlightColor: Colors.amber,
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.people_alt_rounded,
+                    size: 40,
+                  )),
               const SizedBox(
                 width: 10,
               ),

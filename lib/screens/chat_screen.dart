@@ -9,13 +9,13 @@ class ChatScreen extends StatefulWidget {
   final String receiverUserID;
   final String receiverUserEmail;
   final String receiverUserName;
-  final String receiverUserImageURL;
+  final String receiverUserphotoUrl;
 
   const ChatScreen({
     required this.receiverUserID,
     required this.receiverUserEmail,
     required this.receiverUserName,
-    required this.receiverUserImageURL,
+    required this.receiverUserphotoUrl,
   });
 
   @override
@@ -54,8 +54,8 @@ class _ChatScreenState extends State<ChatScreen> {
       UploadTask uploadTask = ref.putFile(File(pickedFile.path));
 
       uploadTask.then((res) async {
-        String imageUrl = await res.ref.getDownloadURL();
-        sendMessage(imageUrl); // Sending the image URL as a message
+        String photoUrl = await res.ref.getDownloadURL();
+        sendMessage(photoUrl); // Sending the image URL as a message
       });
     }
   }
@@ -66,10 +66,10 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: Row(
           children: [CircleAvatar(
-                    backgroundImage: widget.receiverUserImageURL.isNotEmpty
-                        ? NetworkImage(widget.receiverUserImageURL,)
-                        : null, // No need for image if imageURL is empty
-                    child: widget.receiverUserImageURL.isEmpty ? Icon(Icons.person) : null, // Display person icon if imageURL is empty
+                    backgroundImage: widget.receiverUserphotoUrl.isNotEmpty
+                        ? NetworkImage(widget.receiverUserphotoUrl,)
+                        : null, // No need for image if photoUrl is empty
+                    child: widget.receiverUserphotoUrl.isEmpty ? Icon(Icons.person) : null, // Display person icon if photoUrl is empty
                   ),SizedBox(width: 5,),
             Text(widget.receiverUserName,style: TextStyle(fontWeight: FontWeight.w600),),
           ],
@@ -158,10 +158,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     children: [
                       if (!isSender) // Display sender's information only for receiver's messages
                         CircleAvatar(
-                          backgroundImage: widget.receiverUserImageURL.isNotEmpty
-                              ? NetworkImage(widget.receiverUserImageURL)
-                              : null, // No need for image if imageURL is empty
-                          child: widget.receiverUserImageURL.isEmpty ? Icon(Icons.person) : null, // Display person icon if imageURL is empty
+                          backgroundImage: widget.receiverUserphotoUrl.isNotEmpty
+                              ? NetworkImage(widget.receiverUserphotoUrl)
+                              : null, // No need for image if photoUrl is empty
+                          child: widget.receiverUserphotoUrl.isEmpty ? Icon(Icons.person) : null, // Display person icon if photoUrl is empty
                         ),
                       SizedBox(width: 10),
                       Flexible(

@@ -14,38 +14,35 @@ class _SignupScreenState extends State<SignupScreen> {
   String? selectedType;
   bool isTourGuide = false;
   bool isTraveler = false;
-  // تحقق من صحة البريد الإلكتروني
+
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your email address.'; // عرض رسالة خطأ إذا كان البريد الإلكتروني فارغًا
+      return 'Please enter your email address.';
     }
     if (!RegExp(r"^[a-zA-Z0-9.a-z_+]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
         .hasMatch(value)) {
-      return 'Please enter a valid email address.'; // عرض رسالة خطأ إذا كان البريد الإلكتروني غير صالح
+      return 'Please enter a valid email address.';
     }
     return null;
   }
 
-  // تحقق من صحة كلمة المرور
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your password.'; // عرض رسالة خطأ إذا كانت كلمة المرور فارغة
+      return 'Please enter your password.';
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters long.'; // عرض رسالة خطأ إذا كانت كلمة المرور أقل من 6 أحرف
+      return 'Password must be at least 6 characters long.';
     }
     return null;
   }
 
-  // تحقق من صحة الاسم الكامل
   String? validateFullName(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your full name.'; // عرض رسالة خطأ إذا كان الاسم الكامل فارغًا
+      return 'Please enter your full name.';
     }
     return null;
   }
 
-  // إنشاء مستخدم جديد بالبريد الإلكتروني وكلمة المرور والمعلومات الإضافية
   Future<void> signUpWithEmailAndPassword(
     String email,
     String password,
@@ -79,7 +76,6 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  // إنشاء مستخدم جديد بالبريد الإلكتروني وكلمة المرور ونوع المستخدم
   Future<UserCredential?> signUpWithEmailandPassword(
       String email, String password, String fullName, String userType) async {
     try {
@@ -89,31 +85,26 @@ class _SignupScreenState extends State<SignupScreen> {
         password: password,
       );
 
-      // بعد إنشاء المستخدم، أنشئ مستندًا جديدًا للمستخدم في مجموعة المستخدمين
       _firestore.collection('users').doc(userCredential.user?.uid).set({
         'uid': userCredential.user?.uid,
         'email': email,
-        'fullName': fullName, // استخدم fullName الممرر كمعلمة
+        'fullName': fullName,
         'isTourGuide': userType == "TourGuide",
         'isTraveler': userType == "Traveler",
         'selectedType': userType,
-        // أضف المزيد من الحقول حسب الحاجة
       });
 
       return userCredential;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print(
-            'The password provided is too weak.'); // عرض رسالة خطأ إذا كانت كلمة المرور ضعيفة جدًا
+        print('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
-        print(
-            'The email address is already in use by another account.'); // عرض رسالة خطأ إذا كان البريد الإلكتروني مستخدمًا بالفعل
+        print('The email address is already in use by another account.');
       } else {
         print('Error during sign up: $e');
       }
-      return null; // إشارة فشل
+      return null;
     } catch (e) {
-      // التعامل مع الاستثناءات الأخرى
       rethrow;
     }
   }
@@ -161,39 +152,74 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                   TextField(
+                    textInputAction: TextInputAction.next,
                     controller: fullNameController,
                     decoration: InputDecoration(
                       labelText: 'Full Name',
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(48),
+                        borderSide: BorderSide(
+                          color:
+                              validateFullName(fullNameController.text) != null
+                                  ? Colors.red
+                                  : Colors.black,
+                        ),
+                      ),
                       errorText: validateFullName(fullNameController.text),
                     ),
                   ),
                   SizedBox(height: 10),
                   TextField(
+                    textInputAction: TextInputAction.next,
                     controller: emailController,
                     decoration: InputDecoration(
                       labelText: 'Email',
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(48),
+                        borderSide: BorderSide(
+                          color: validateEmail(emailController.text) != null
+                              ? Colors.red
+                              : Colors.black,
+                        ),
+                      ),
                       errorText: validateEmail(emailController.text),
                     ),
                   ),
                   SizedBox(height: 10),
                   TextField(
+                    textInputAction: TextInputAction.next,
                     controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Password',
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(48),
+                        borderSide: BorderSide(
+                          color:
+                              validatePassword(passwordController.text) != null
+                                  ? Colors.red
+                                  : Colors.black,
+                        ),
+                      ),
                       errorText: validatePassword(passwordController.text),
                     ),
                   ),
                   SizedBox(height: 10),
                   TextField(
+                    textInputAction: TextInputAction.done,
                     controller: confirmPasswordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Confirm Password',
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(48),
+                        borderSide: BorderSide(
+                          color: (confirmPasswordController.text !=
+                                  passwordController.text)
+                              ? Colors.red
+                              : Colors.black,
+                        ),
+                      ),
                       errorText: (confirmPasswordController.text !=
                               passwordController.text)
                           ? 'Passwords do not match.'
@@ -238,14 +264,14 @@ class _SignupScreenState extends State<SignupScreen> {
                           if (emailError != null ||
                               passwordError != null ||
                               fullNameError != null) {
-                            // عرض رسالة الأخطاء في الواجهة باستخدام SnackBar
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
+                              SnackBar(shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
                                 content: Text(
                                   '$emailError\n$passwordError\n$fullNameError',
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: Colors.black),
                                 ),
-                                backgroundColor: Colors.red,
+                                backgroundColor: Colors.grey[350],
                               ),
                             );
                             return;
@@ -253,25 +279,28 @@ class _SignupScreenState extends State<SignupScreen> {
                           if (selectedType == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
                                 content: Text(
                                   'Please select user type',
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: Colors.black),
                                 ),
-                                backgroundColor: Colors.red,
+                                backgroundColor: Colors.grey[350],
                               ),
                             );
                             return;
                           }
                           if (passwordController.text !=
                               confirmPasswordController.text) {
-                            // عرض رسالة خطأ إذا لم تتطابق كلمتا المرور
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
                                 content: Text(
                                   'Passwords do not match.',
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: Colors.black),
                                 ),
-                                backgroundColor: Colors.red,
+                                backgroundColor: Colors.grey[350],
                               ),
                             );
                             return;
@@ -285,26 +314,23 @@ class _SignupScreenState extends State<SignupScreen> {
                               "", // City
                               "", // Country
                               "", // Date of Birth
-
                               "", // Image Url
-
                               "", // Region
-
                               "", // Phone Number
                             );
 
-                            // نجاح عملية التسجيل، التعامل مع التنقل إلى الصفحة التالية
-                            Navigator.pushReplacementNamed(
-                                context, '/Login'); // استبدلها بالمسار المطلوب
+                            Navigator.pushReplacementNamed(context, '/Login');
                           } catch (e) {
-                            // فشلت عملية التسجيل (يتم التعامل معها في signUpWithEmailAndPassword)
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
                                 content: Text(
                                   'Sign up failed: $e',
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: Colors.black),
                                 ),
-                                backgroundColor: Colors.red,
+                                backgroundColor:
+                                    const Color.fromARGB(255, 163, 160, 159),
                               ),
                             );
                           }
@@ -312,19 +338,17 @@ class _SignupScreenState extends State<SignupScreen> {
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(
                               vertical: 15, horizontal: 120),
-                          backgroundColor:
-                              Color(0xff003961), // تغيير لون الخلفية إلى الأحمر
+                          backgroundColor: Color(0xff003961),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                20), // تحديد شكل الحواف للزر
+                            borderRadius: BorderRadius.circular(20),
                           ),
                         ),
                         child: Text(
                           'Sign Up',
                           style: TextStyle(
-                            fontSize: 18, // تحديد حجم النص داخل الزر
-                            fontWeight: FontWeight.bold, // تحديد وزن النص
-                            color: Colors.white, // تغيير لون النص إلى الأبيض
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
                       ),

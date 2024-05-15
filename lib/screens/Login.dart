@@ -191,7 +191,7 @@ class LoginScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 50), // add spacing between fields
-                TextField(
+                TextField(textInputAction: TextInputAction.next,
                   controller: emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
@@ -201,7 +201,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 25),
-                TextField(
+                TextField(textInputAction: TextInputAction.done,
                   controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(

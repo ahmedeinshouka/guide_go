@@ -53,6 +53,7 @@ class _SignupScreenState extends State<SignupScreen> {
     String photoUrl,
     String region,
     String phoneNumber,
+    String userType,
   ) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
@@ -70,6 +71,7 @@ class _SignupScreenState extends State<SignupScreen> {
         'photoUrl': photoUrl,
         'region': region,
         'phoneNumber': phoneNumber,
+        "userType":userType,
       });
     } catch (e) {
       throw Exception(e.toString());
@@ -316,7 +318,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               "", // Date of Birth
                               "", // Image Url
                               "", // Region
-                              "", // Phone Number
+                              "",
+                              selectedType!,// Phone Number
                             );
 
                             Navigator.pushReplacementNamed(context, '/Login');

@@ -15,6 +15,11 @@ class _SignupScreenState extends State<SignupScreen> {
   bool isTourGuide = false;
   bool isTraveler = false;
 
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController fullNameController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email address.';
@@ -71,53 +76,15 @@ class _SignupScreenState extends State<SignupScreen> {
         'photoUrl': photoUrl,
         'region': region,
         'phoneNumber': phoneNumber,
-        "userType":userType,
+        "userType": userType,
       });
     } catch (e) {
       throw Exception(e.toString());
     }
   }
 
-  Future<UserCredential?> signUpWithEmailandPassword(
-      String email, String password, String fullName, String userType) async {
-    try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      _firestore.collection('users').doc(userCredential.user?.uid).set({
-        'uid': userCredential.user?.uid,
-        'email': email,
-        'fullName': fullName,
-        'isTourGuide': userType == "TourGuide",
-        'isTraveler': userType == "Traveler",
-        'selectedType': userType,
-      });
-
-      return userCredential;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The email address is already in use by another account.');
-      } else {
-        print('Error during sign up: $e');
-      }
-      return null;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    TextEditingController emailController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
-    TextEditingController fullNameController = TextEditingController();
-    TextEditingController confirmPasswordController = TextEditingController();
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -208,7 +175,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   SizedBox(height: 10),
                   TextField(
-                    textInputAction: TextInputAction.done,
                     controller: confirmPasswordController,
                     obscureText: true,
                     decoration: InputDecoration(
@@ -267,7 +233,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               passwordError != null ||
                               fullNameError != null) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(shape: RoundedRectangleBorder(
+                              SnackBar(
+                                shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20)),
                                 content: Text(
                                   '$emailError\n$passwordError\n$fullNameError',
@@ -319,7 +286,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               "", // Image Url
                               "", // Region
                               "",
-                              selectedType!,// Phone Number
+                              selectedType!, // Phone Number
                             );
 
                             Navigator.pushReplacementNamed(context, '/Login');

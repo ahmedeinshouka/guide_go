@@ -134,7 +134,17 @@ class LoginScreen extends StatelessWidget {
         // If user is signed in successfully, retrieve additional user information from Google account
         if (user != null) {
           // Retrieve user's display name from Google account
-          final String? displayName = googleUser.displayName;
+        final String? displayName = googleUser?.displayName ?? '';
+
+
+String city = '';
+String country = '';
+String dateOfBirth = '';
+
+String region = '';
+String phoneNumber = '';
+String userType = '';
+String _phoneNumber = '';
 
           // Generate UID
           String uid = user.uid;
@@ -150,6 +160,12 @@ class LoginScreen extends StatelessWidget {
               'email': user.email,
               'fullName': displayName ?? '', // Use null-aware operator here
               'photoUrl': googleUser.photoUrl ?? '', // Use null-aware operator here
+              'city': city ??'',
+             'region': region??'',
+             'country': country??'',
+             'dateOfBirth': dateOfBirth??'',
+            'phoneNumber':phoneNumber??'',
+            'userType': userType??'',
             });
           }
 

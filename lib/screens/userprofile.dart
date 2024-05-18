@@ -128,16 +128,7 @@ class _ProfileState extends State<Profile> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(
-                      Icons.arrow_back,
-                      size: 35,
-                    ),
-                    highlightColor: Colors.amber,
-                  ),
+                  
                   SizedBox(
                     height: 40,
                   ),

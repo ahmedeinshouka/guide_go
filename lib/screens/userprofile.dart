@@ -15,17 +15,18 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late User? _currentUser;
-  late String _displayName = '';
-  late String _email = '';
-  late String _photoUrl = '';
-  late String _phoneNumber = '';
-  late String _country = '';
-  late String _city = '';
-  late String _dateOfBirth = '';
-  late String _region = '';
-  late String _userType = '';
+  User? _currentUser;
+  String _displayName = '';
+  String _email = '';
+  String _photoUrl = '';
+  String _phoneNumber = '';
+  String _country = '';
+  String _city = '';
+  String _dateOfBirth = '';
+  String _region = '';
+  String _userType = '';
   final ImagePicker _imagePicker = ImagePicker();
+  List<String> _imageUrls = [];
 
   @override
   void initState() {
@@ -33,6 +34,41 @@ class _ProfileState extends State<Profile> {
     _currentUser = _auth.currentUser;
     if (_currentUser != null) {
       _getUserData();
+      _fetchImagesFromFirestore();
+    }
+  }
+
+  Future<void> _fetchImagesFromFirestore() async {
+    try {
+      // Fetch gallery images URLs
+      QuerySnapshot gallerySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .collection('imageGallery')
+          .get();
+      List<String> urls = gallerySnapshot.docs
+          .map((doc) => doc['imageUrl'] as String)
+          .toList();
+      setState(() {
+        _imageUrls = urls;
+      });
+    } catch (e) {
+      print('Error fetching images: $e');
+    }
+  }
+
+  Future<void> _pickImage({required bool isProfileImage}) async {
+    try {
+      final pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        File imageFile = File(pickedFile.path);
+        String downloadURL = await _uploadImageToFirebase(imageFile, isProfileImage: isProfileImage);
+        setState(() {
+          _imageUrls.add(downloadURL);
+        });
+      }
+    } catch (e) {
+      print('Error picking image: $e');
     }
   }
 
@@ -55,63 +91,41 @@ class _ProfileState extends State<Profile> {
           _region = userData['region'] ?? '';
           _userType = userData['userType'] ?? '';
 
-          // Check if 'photoUrl' field exists before accessing it
-          _photoUrl = userData.exists ? userData["photoUrl"] ?? '' : '';
+          _photoUrl = userData['photoUrl'] ?? '';
         });
-      } else {
-        // Handle case where 'photoUrl' field is missing
-        print('Error fetching user data: "photoUrl" field does not exist');
       }
     } catch (e) {
-      // Handle other errors (show a SnackBar or a dialog)
       print('Error fetching user data: $e');
     }
   }
 
   Future<void> _uploadImage(File image) async {
     try {
-      // Check if the user is authenticated
       if (_auth.currentUser == null) {
         print('User is not authenticated. Please sign in.');
         return;
       }
 
-      // Proceed with image upload
       String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      Reference storageReference =
-          FirebaseStorage.instance.ref().child(fileName);
+      Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
       UploadTask uploadTask = storageReference.putFile(image);
       await uploadTask.whenComplete(() => null);
       String downloadURL = await storageReference.getDownloadURL();
 
-      // Update the gallery collection with the new image document
       DocumentReference userRef = FirebaseFirestore.instance
           .collection('users')
           .doc(_auth.currentUser!.uid);
       userRef.collection('imageGallery').add({'imageUrl': downloadURL});
 
       setState(() {
-        // Update UI if necessary
+        _imageUrls.add(downloadURL);
       });
     } catch (e) {
-      // Handle exceptions
       if (e is FirebaseException) {
         print('Firebase Storage Error: ${e.code} - ${e.message}');
       } else {
         print('Error uploading image: $e');
       }
-    }
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    try {
-      final pickedFile = await _imagePicker.pickImage(source: source);
-      if (pickedFile != null) {
-        File imageFile = File(pickedFile.path);
-        _uploadImage(imageFile);
-      }
-    } catch (e) {
-      print('Error picking image: $e');
     }
   }
 
@@ -121,154 +135,159 @@ class _ProfileState extends State<Profile> {
       child: Scaffold(
         body: SizedBox(
           width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  
-                  SizedBox(
-                    height: 40,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(height: 40),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/editprofile');
+                      },
+                      icon: Icon(Icons.settings, size: 35),
+                      highlightColor: Colors.amber,
+                    )
+                  ],
+                ),
+                CircleAvatar(
+                  backgroundColor: Colors.grey[200],
+                  backgroundImage: _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
+                  child: _photoUrl.isEmpty ? Icon(Icons.person, size: 80) : null,
+                  radius: 80,
+                ),
+                SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _displayName,
+                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (_userType.isNotEmpty)
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          image: DecorationImage(
+                            image: AssetImage(_userType == "Traveler"
+                                ? 'assets/tour-guide (1).png'
+                                : 'assets/tour-guide.png'),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    SizedBox(width: 5),
+                    Text(
+                      _userType,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.email_rounded, size: 35),
+                    ),
+                    Text(
+                      _email,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+                if (_country.isNotEmpty && _region.isNotEmpty && _city.isNotEmpty)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [Icon(Icons.location_on),
+                      Text(
+                        "Add: $_country, $_region, $_city",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/editprofile');
+                SizedBox(height: 5),
+                if (_dateOfBirth.isNotEmpty)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.date_range),
+                      Text(
+                        _dateOfBirth,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 4.0,
+                      mainAxisSpacing: 4.0,
+                      childAspectRatio: 1.0,
+                    ),
+                    itemCount: _imageUrls.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.grey),
+                image: DecorationImage(
+                  image: NetworkImage(_imageUrls[index]),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            )
+            ;
                     },
-                    icon: Icon(
-                      Icons.settings,
-                      size: 35,
-                    ),
-                    highlightColor: Colors.amber,
-                  )
-                ],
-              ),
-              CircleAvatar(
-                backgroundColor: Colors.grey[200],
-                backgroundImage:
-                    _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
-                child: _photoUrl.isEmpty
-                    ? Icon(
-                        Icons.person,
-                        size: 80,
-                      ) // Use placeholder icon
-                    : null,
-                radius: 80,
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _displayName,
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  
-                  if (_userType != null && _userType.isNotEmpty)
-      Container(
-        width: 40, // Adjust width and height as needed
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          image: DecorationImage(
-            image: _userType == "Traveler"
-                ? AssetImage('assets/tour-guide (1).png')
-                : AssetImage('assets/tour-guide.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-    SizedBox(width: 5),
-    Text(
-      _userType ?? '', // Use null-aware operator to handle null case
-      style: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: Colors.grey[700],
-      ),
-    ),
-                ],
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.email_rounded,
-                      size: 35,
-                    ),
                   ),
-                  Text(
-                    _email,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  )
-                ],
-                mainAxisAlignment: MainAxisAlignment.center,
-              ),
-            if ( _country.isNotEmpty&& _region.isNotEmpty&& _city.isNotEmpty&&_country!= null&& _region!= null&& _city!= null)
-  Row(
-    children: [
-      Text(
-        "Add:${_country ?? ''},${_region ?? ''},${_city ?? ''}",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-    ],
-    mainAxisAlignment: MainAxisAlignment.center,
-  ),
-
-              SizedBox(
-                height: 5,
-              ),
-                if (_dateOfBirth != null && _dateOfBirth.isNotEmpty)
-              Row(
-                children: [
-                  Icon(Icons.date_range),
-                  Text(
-                    _dateOfBirth,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
-                mainAxisAlignment: MainAxisAlignment.center,
-              ),
-            ],
+                )
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: BottomAppBar(
           color: Colors.white,
           shadowColor: Colors.white,
           elevation: 0,
-          child: Row
-(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const SizedBox(
                 width: 10,
               ),
               IconButton(
-                highlightColor: Colors.amber,
-                onPressed: () {
-                  if (ModalRoute.of(context)?.settings.name != '/') {
-                    Navigator.popUntil(context, ModalRoute.withName('/'));
-                  }
-                },
-                icon: ImageIcon(
-                  AssetImage(
-                    "assets/icons8-home-page-32.png",
-                  ),
-                  size: 40,
-                ),
-              ),
+                  highlightColor: Colors.amber,
+                  onPressed: () {
+                    // Check if the current route is not the home screen
+    if (ModalRoute.of(context)?.settings.name != '/') {
+      Navigator.popAndPushNamed(context, "/");
+    }
+                  },
+                  icon: const ImageIcon(
+                    AssetImage(
+                      "assets/icons8-home-page-32.png",
+                    ),
+                    size: 40,
+                  )),
               const SizedBox(
                 width: 20,
               ),
@@ -276,13 +295,12 @@ class _ProfileState extends State<Profile> {
                 color: Colors.black,
               ),
               IconButton(
-                highlightColor: Colors.amber,
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.people_alt_rounded,
-                  size: 40,
-                ),
-              ),
+                  highlightColor: Colors.amber,
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.people_alt_rounded,
+                    size: 40,
+                  )),
               const SizedBox(
                 width: 10,
               ),
@@ -290,23 +308,27 @@ class _ProfileState extends State<Profile> {
                 width: 10,
               ),
               IconButton(
-                highlightColor: Colors.amber,
-                onPressed: () {},
-                icon: ImageIcon(
-                  AssetImage("assets/chat.png"),
-                  size: 40,
-                ),
-              ),
+                  highlightColor: Colors.amber,
+                  onPressed: () {
+                    // Check if the current route is not the chatList screen
+    if (ModalRoute.of(context)?.settings.name != '/chatList') {
+      Navigator.pushNamed(context, "/chatList");
+    }
+                  },
+                  icon: const ImageIcon(
+                    AssetImage("assets/chat.png"),
+                    size: 40,
+                  )),
               const SizedBox(
                 width: 10,
               ),
               IconButton(
                 highlightColor: Colors.amber,
                 onPressed: () {
-                  // Check if the current route is not the profile screen
-                  if (ModalRoute.of(context)?.settings.name != '/profile') {
-                    Navigator.pushNamed(context, "/profile");
-                  }
+                // Check if the current route is not the profile screen
+    if (ModalRoute.of(context)?.settings.name != '/profile') {
+      Navigator.pushNamed(context, "/profile");
+    }
                 },
                 icon: const Icon(Icons.person),
                 iconSize: 40,
@@ -314,9 +336,8 @@ class _ProfileState extends State<Profile> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: FloatingActionButton(backgroundColor: Colors.grey[100],shape: CircleBorder(),
           onPressed: () {
-            // Show options for picking images
             showModalBottomSheet(
               context: context,
               builder: (BuildContext context) {
@@ -328,13 +349,12 @@ class _ProfileState extends State<Profile> {
                         leading: Icon(Icons.photo_library),
                         title: Text('Choose from gallery'),
                         onTap: () async {
-                          // Pick image from gallery
                           final pickedFile =
                               await _imagePicker.pickImage(source: ImageSource.gallery);
                           if (pickedFile != null) {
                             File imageFile = File(pickedFile.path);
-                            _uploadImage(imageFile); // Upload the picked image
-                            Navigator.pop(context); // Close the bottom sheet
+                            _uploadImage(imageFile);
+                            Navigator.pop(context);
                           }
                         },
                       ),
@@ -342,13 +362,12 @@ class _ProfileState extends State<Profile> {
                         leading: Icon(Icons.camera_alt),
                         title: Text('Take a photo'),
                         onTap: () async {
-                          // Take a photo using the camera
                           final pickedFile =
                               await _imagePicker.pickImage(source: ImageSource.camera);
                           if (pickedFile != null) {
                             File imageFile = File(pickedFile.path);
-                            _uploadImage(imageFile); // Upload the taken photo
-                            Navigator.pop(context); // Close the bottom sheet
+                            _uploadImage(imageFile);
+                            Navigator.pop(context);
                           }
                         },
                       ),
@@ -358,7 +377,7 @@ class _ProfileState extends State<Profile> {
               },
             );
           },
-          child: Icon(Icons.add),
+          child: Icon(Icons.add_a_photo),
         ),
       ),
     );
@@ -374,41 +393,35 @@ class _ProfileState extends State<Profile> {
         }
       } catch (e) {
         print('Error launching URL: $e');
-        // Handle error (show a SnackBar or a dialog)
       }
     } else {
       print('URL is empty');
-      // Handle empty URL case (show a SnackBar or a dialog)
     }
   }
 
   Future<String> _uploadImageToFirebase(File image,
       {bool isProfileImage = false}) async {
     try {
-      // Check if the user is authenticated
       if (_auth.currentUser == null) {
         print('User is not authenticated. Please sign in.');
-        return ''; // Return empty string to indicate failure
+        return '';
       }
 
       String fileName = image.path.split('/').last;
-      Reference storageReference =
-          FirebaseStorage.instance.ref().child(fileName);
+      Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
       UploadTask uploadTask = storageReference.putFile(image);
       TaskSnapshot snapshot = await uploadTask;
       String downloadURL = await snapshot.ref.getDownloadURL();
 
-      // Update the gallery collection with the new image document
       DocumentReference userRef = FirebaseFirestore.instance
           .collection('users')
           .doc(_auth.currentUser!.uid);
       userRef.collection('imageGallery').add({'imageUrl': downloadURL});
 
-      // Return the download URL
       return downloadURL;
     } catch (e) {
       print('Error uploading image: $e');
-      return ''; // Return empty string in case of failure
+      return '';
     }
   }
 }

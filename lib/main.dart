@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:guide_go/firebase_options.dart';
@@ -45,17 +43,27 @@ Future<void> main() async {
   Gemini.init(
     apiKey: GEMINI_API_KEY,
   );
-  runApp(const MyApp());
+
+  // Determine the initial route based on the authentication state
+  FirebaseAuth auth = FirebaseAuth.instance;
+  User? user = auth.currentUser;
+
+  // Use a ternary operator to set the initial route
+  String initialRoute = user != null ? '/' : '/splash';
+
+  runApp(MyApp(initialRoute: initialRoute));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/splash',
+      initialRoute: initialRoute,
       routes: {
         '/': (context) => home(),
         '/ageeba': (context) => ageeba(),
@@ -77,7 +85,7 @@ class MyApp extends StatelessWidget {
         '/zeeyara': (context) => zeeyara(),
         '/Montaggio': (context) => Montaggio(),
         '/chatList': (context) => ChatListPage(),
-        '/login_phone':(context) => Loginphone(),
+        '/login_phone': (context) => Loginphone(),
       },
     );
   }

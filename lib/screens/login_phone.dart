@@ -3,17 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:guide_go/screens/SignUp.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
 
-  FirebaseApp app = Firebase.app();
-  FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.instance;
-
-  runApp(MyApp());
-}
 
 class MyApp extends StatelessWidget {
   @override
@@ -41,6 +34,29 @@ class Loginphone extends StatelessWidget {
     // Default country code for mobile numbers (Egypt: +20)
     String defaultCountryCode = '+20';
 
+    Future<void> createUserDocumentIfNotExists(User user) async {
+      try {
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        if (!userDoc.exists) {
+          await _firestore.collection('users').doc(user.uid).set({
+            'uid': user.uid,
+            'email': user.email ?? '', // Handle case where email might be null
+            'fullName': user.displayName ?? '', // Handle case where displayName might be null
+            'password': '',
+            'city': '',
+            'country': '',
+            'dateOfBirth': '',
+            'photoUrl': '',
+            'region': '',
+            'phoneNumber': user.phoneNumber ?? '',
+            "userType": '',
+          });
+        }
+      } catch (e) {
+        print("Error creating user document: $e");
+      }
+    }
+
     Future<void> signInWithPhoneNumber(String phoneNumber) async {
       try {
         // Check if user with provided phone number already exists
@@ -62,6 +78,7 @@ class Loginphone extends StatelessWidget {
           verificationCompleted: (PhoneAuthCredential credential) async {
             UserCredential userCredential =
                 await _auth.signInWithCredential(credential);
+            await createUserDocumentIfNotExists(userCredential.user!);
             Navigator.pushReplacementNamed(context, '/'); // Navigate after login
           },
           verificationFailed: (FirebaseAuthException e) {
@@ -83,19 +100,24 @@ class Loginphone extends StatelessWidget {
             );
           },
           codeSent: (String verificationId, int? resendToken) async {
-            smsCode = await showDialog( // Use smsCode here
+            String? enteredSmsCode = await showDialog(
               context: context,
               builder: (BuildContext context) {
+                String tempSmsCode = '';
                 return AlertDialog(
                   title: Text("Enter SMS Code"),
-                  content: TextField(),
+                  content: TextField(
+                    onChanged: (value) {
+                      tempSmsCode = value;
+                    },
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, null),
                       child: Text("Cancel"),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.pop(context, smsCode),
+                      onPressed: () => Navigator.pop(context, tempSmsCode),
                       child: Text("Submit"),
                     ),
                   ],
@@ -103,10 +125,33 @@ class Loginphone extends StatelessWidget {
               },
             );
 
+            if (enteredSmsCode == null || enteredSmsCode.isEmpty) {
+              // Handle cancellation case
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text("Verification Canceled"),
+                    content: Text("Phone number verification was canceled."),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text("OK"),
+                      ),
+                    ],
+                  );
+                },
+              );
+              return;
+            }
+
+            smsCode = enteredSmsCode;
+
             PhoneAuthCredential credential = PhoneAuthProvider.credential(
                 verificationId: verificationId, smsCode: smsCode);
             UserCredential userCredential =
                 await _auth.signInWithCredential(credential);
+            await createUserDocumentIfNotExists(userCredential.user!);
             Navigator.pushReplacementNamed(context, '/'); // Navigate after login
           },
           codeAutoRetrievalTimeout: (String verificationId) {},
@@ -150,25 +195,29 @@ class Loginphone extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Log in',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 50.0,
-                    fontFamily: "LilitaOne",
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 50),
-                Row(
+                Row(mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(defaultCountryCode), // Display default country code
+                    const Text(
+                      'Log in',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 50.0,
+                        fontFamily: "LilitaOne",
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  SvgPicture.asset("assets/mobile-phone-authentication-2.svg",fit: BoxFit.cover,height: 50,)  ],
+                ),
+                SizedBox(height: 200),
+                Row(mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                     // Display default country code
                     SizedBox(width: 10),
                     Expanded(
                       child: TextField(
                         controller: phoneNumberController,
                         keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
+                        decoration: InputDecoration(suffixIcon: Icon(Icons.phone),prefix:   Text(defaultCountryCode),
                           labelText: 'Phone Number',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(48),
@@ -178,7 +227,7 @@ class Loginphone extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 100),
                 ElevatedButton(
                   onPressed: () async {
                     String phoneNumber = phoneNumberController.text.trim();
@@ -192,8 +241,7 @@ class Loginphone extends StatelessWidget {
                         builder: (BuildContext context) {
                           return AlertDialog(
                             title: Text("Error"),
-                            content:
-                                Text("Please enter a phone number."),
+                            content: Text("Please enter a phone number."),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
@@ -211,19 +259,18 @@ class Loginphone extends StatelessWidget {
                   ),
                   child: SizedBox(
                     child: Text(
-                      'Login with Phone Number',
-                      style: TextStyle(color: Colors.white, fontSize: 30),
+                      'Login',
+                      style: TextStyle(color: Colors.white, fontSize: 24),
                       textAlign: TextAlign.center,
                     ),
-                    width: 250,
-                    height: 45,
+                    
                   ),
                 ),
                 SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('New to the app?'),
+                    Text('or you need to ?',style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w900),),
                     SizedBox(width: 5),
                     GestureDetector(
                       onTap: () {
@@ -234,7 +281,7 @@ class Loginphone extends StatelessWidget {
                       },
                       child: const Text(
                         'Signup',
-                        style: TextStyle(
+                        style: TextStyle(fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,
                           decorationThickness: 1,
                         ),

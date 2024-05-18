@@ -46,9 +46,8 @@ class _ProfileState extends State<Profile> {
           .doc(_currentUser!.uid)
           .collection('imageGallery')
           .get();
-      List<String> urls = gallerySnapshot.docs
-          .map((doc) => doc['imageUrl'] as String)
-          .toList();
+      List<String> urls =
+          gallerySnapshot.docs.map((doc) => doc['imageUrl'] as String).toList();
       setState(() {
         _imageUrls = urls;
       });
@@ -59,10 +58,12 @@ class _ProfileState extends State<Profile> {
 
   Future<void> _pickImage({required bool isProfileImage}) async {
     try {
-      final pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
+      final pickedFile =
+          await _imagePicker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         File imageFile = File(pickedFile.path);
-        String downloadURL = await _uploadImageToFirebase(imageFile, isProfileImage: isProfileImage);
+        String downloadURL = await _uploadImageToFirebase(imageFile,
+            isProfileImage: isProfileImage);
         setState(() {
           _imageUrls.add(downloadURL);
         });
@@ -107,7 +108,8 @@ class _ProfileState extends State<Profile> {
       }
 
       String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child(fileName);
       UploadTask uploadTask = storageReference.putFile(image);
       await uploadTask.whenComplete(() => null);
       String downloadURL = await storageReference.getDownloadURL();
@@ -143,6 +145,13 @@ class _ProfileState extends State<Profile> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    IconButton(
+          icon: const Icon(Icons.logout),
+          onPressed: () async {
+            await _auth.signOut();
+            Navigator.pushReplacementNamed(context, '/splash');
+          },
+        ),
                     SizedBox(height: 40),
                     IconButton(
                       onPressed: () {
@@ -155,8 +164,10 @@ class _ProfileState extends State<Profile> {
                 ),
                 CircleAvatar(
                   backgroundColor: Colors.grey[200],
-                  backgroundImage: _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
-                  child: _photoUrl.isEmpty ? Icon(Icons.person, size: 80) : null,
+                  backgroundImage:
+                      _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
+                  child:
+                      _photoUrl.isEmpty ? Icon(Icons.person, size: 80) : null,
                   radius: 80,
                 ),
                 SizedBox(height: 30),
@@ -165,7 +176,8 @@ class _ProfileState extends State<Profile> {
                   children: [
                     Text(
                       _displayName,
-                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
@@ -197,23 +209,25 @@ class _ProfileState extends State<Profile> {
                     ),
                   ],
                 ),
+                  if (  _email.isNotEmpty 
+                    )
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.email_rounded, size: 35),
-                    ),
+                    Icon(Icons.email),
                     Text(
                       _email,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
-                if (_country.isNotEmpty && _region.isNotEmpty && _city.isNotEmpty)
+                if (_country.isNotEmpty &&
+                    _region.isNotEmpty &&
+                    _city.isNotEmpty)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [Icon(Icons.location_on),
+                    children: [
+                      Icon(Icons.location_on),
                       Text(
                         "Add: $_country, $_region, $_city",
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -247,16 +261,15 @@ class _ProfileState extends State<Profile> {
                     itemCount: _imageUrls.length,
                     itemBuilder: (context, index) {
                       return Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.grey),
-                image: DecorationImage(
-                  image: NetworkImage(_imageUrls[index]),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            )
-            ;
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.grey),
+                          image: DecorationImage(
+                            image: NetworkImage(_imageUrls[index]),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
                     },
                   ),
                 )
@@ -278,9 +291,9 @@ class _ProfileState extends State<Profile> {
                   highlightColor: Colors.amber,
                   onPressed: () {
                     // Check if the current route is not the home screen
-    if (ModalRoute.of(context)?.settings.name != '/') {
-      Navigator.popAndPushNamed(context, "/");
-    }
+                    if (ModalRoute.of(context)?.settings.name != '/') {
+                      Navigator.popAndPushNamed(context, "/");
+                    }
                   },
                   icon: const ImageIcon(
                     AssetImage(
@@ -311,9 +324,9 @@ class _ProfileState extends State<Profile> {
                   highlightColor: Colors.amber,
                   onPressed: () {
                     // Check if the current route is not the chatList screen
-    if (ModalRoute.of(context)?.settings.name != '/chatList') {
-      Navigator.pushNamed(context, "/chatList");
-    }
+                    if (ModalRoute.of(context)?.settings.name != '/chatList') {
+                      Navigator.pushNamed(context, "/chatList");
+                    }
                   },
                   icon: const ImageIcon(
                     AssetImage("assets/chat.png"),
@@ -325,10 +338,10 @@ class _ProfileState extends State<Profile> {
               IconButton(
                 highlightColor: Colors.amber,
                 onPressed: () {
-                // Check if the current route is not the profile screen
-    if (ModalRoute.of(context)?.settings.name != '/profile') {
-      Navigator.pushNamed(context, "/profile");
-    }
+                  // Check if the current route is not the profile screen
+                  if (ModalRoute.of(context)?.settings.name != '/profile') {
+                    Navigator.pushNamed(context, "/profile");
+                  }
                 },
                 icon: const Icon(Icons.person),
                 iconSize: 40,
@@ -336,7 +349,9 @@ class _ProfileState extends State<Profile> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(backgroundColor: Colors.grey[100],shape: CircleBorder(),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.grey[100],
+          shape: CircleBorder(),
           onPressed: () {
             showModalBottomSheet(
               context: context,
@@ -349,8 +364,8 @@ class _ProfileState extends State<Profile> {
                         leading: Icon(Icons.photo_library),
                         title: Text('Choose from gallery'),
                         onTap: () async {
-                          final pickedFile =
-                              await _imagePicker.pickImage(source: ImageSource.gallery);
+                          final pickedFile = await _imagePicker.pickImage(
+                              source: ImageSource.gallery);
                           if (pickedFile != null) {
                             File imageFile = File(pickedFile.path);
                             _uploadImage(imageFile);
@@ -362,8 +377,8 @@ class _ProfileState extends State<Profile> {
                         leading: Icon(Icons.camera_alt),
                         title: Text('Take a photo'),
                         onTap: () async {
-                          final pickedFile =
-                              await _imagePicker.pickImage(source: ImageSource.camera);
+                          final pickedFile = await _imagePicker.pickImage(
+                              source: ImageSource.camera);
                           if (pickedFile != null) {
                             File imageFile = File(pickedFile.path);
                             _uploadImage(imageFile);
@@ -408,7 +423,8 @@ class _ProfileState extends State<Profile> {
       }
 
       String fileName = image.path.split('/').last;
-      Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child(fileName);
       UploadTask uploadTask = storageReference.putFile(image);
       TaskSnapshot snapshot = await uploadTask;
       String downloadURL = await snapshot.ref.getDownloadURL();

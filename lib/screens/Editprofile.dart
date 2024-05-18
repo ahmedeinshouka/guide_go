@@ -22,6 +22,8 @@ class _EditProfileState extends State<EditProfile> {
   String _country = '';
   String _region = '';
   String _city = '';
+  String userType = '';
+  String? selectedType;
 
   File? _imageFile;
   final picker = ImagePicker();
@@ -33,7 +35,6 @@ class _EditProfileState extends State<EditProfile> {
     _auth.authStateChanges().listen((User? user) {
       if (user != null) {
         print('User is signed in with Google: ${user.displayName}');
-        // Fetch user data from Firestore based on UID
         fetchUserData(user.uid);
       } else {
         print('User is not signed in');
@@ -41,10 +42,10 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
 
-  // Fetch user data from Firestore based on UID
   void fetchUserData(String uid) async {
     try {
-      DocumentSnapshot userData = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      DocumentSnapshot userData =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
       if (userData.exists) {
         setState(() {
@@ -54,6 +55,9 @@ class _EditProfileState extends State<EditProfile> {
           _country = userData['country'] ?? '';
           _region = userData['region'] ?? '';
           _city = userData['city'] ?? '';
+          userType = userData['userType'] ?? '';
+          selectedType = userType;
+          print('Fetched userType: $userType');
         });
       }
     } catch (error) {
@@ -165,7 +169,31 @@ class _EditProfileState extends State<EditProfile> {
                 onChanged: (value) => _city = value,
               ),
               const SizedBox(height: 16.0),
-              
+              RadioListTile(
+                title: Text("I'm a Traveller"),
+                value: "Traveler",
+                groupValue: selectedType,
+                onChanged: (value) {
+                  setState(() {
+                    selectedType = value as String?;
+                    userType = (value as String?)!;
+                    print('Selected userType: $userType');
+                  });
+                },
+              ),
+              SizedBox(height: 1),
+              RadioListTile(
+                title: Text("I'm a Tour guide"),
+                value: "TourGuide",
+                groupValue: selectedType,
+                onChanged: (value) {
+                  setState(() {
+                    selectedType = value as String?;
+                    userType = (value as String?)!;
+                    print('Selected userType: $userType');
+                  });
+                },
+              ),
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
@@ -219,7 +247,6 @@ class _EditProfileState extends State<EditProfile> {
 
   Future<void> saveChangesToFirestore() async {
     String photoUrl = '';
-    // Check if the user is authenticated
     if (_auth.currentUser != null) {
       try {
         if (_imageFile != null) {
@@ -231,7 +258,9 @@ class _EditProfileState extends State<EditProfile> {
           photoUrl = await storageRef.getDownloadURL();
         }
 
-        final userRef = FirebaseFirestore.instance.collection('users').doc(_auth.currentUser!.uid);
+        final userRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(_auth.currentUser!.uid);
 
         await FirebaseFirestore.instance.runTransaction((transaction) async {
           final userData = await transaction.get(userRef);
@@ -241,13 +270,16 @@ class _EditProfileState extends State<EditProfile> {
             if (_name.isNotEmpty) dataToUpdate['fullName'] = _name;
             if (_email.isNotEmpty) dataToUpdate['email'] = _email;
             if (_password.isNotEmpty) dataToUpdate['password'] = _password;
-            if (_dateOfBirth.isNotEmpty) dataToUpdate['dateOfBirth'] = _dateOfBirth;
+            if (_dateOfBirth.isNotEmpty)
+              dataToUpdate['dateOfBirth'] = _dateOfBirth;
             if (_country.isNotEmpty) dataToUpdate['country'] = _country;
             if (_region.isNotEmpty) dataToUpdate['region'] = _region;
             if (_city.isNotEmpty) dataToUpdate['city'] = _city;
             if (photoUrl.isNotEmpty) dataToUpdate['photoUrl'] = photoUrl;
+            if (userType.isNotEmpty) dataToUpdate['userType'] = userType;
 
             transaction.update(userRef, dataToUpdate);
+            print('Updated userType: $userType');
           }
         });
 
@@ -260,9 +292,9 @@ class _EditProfileState extends State<EditProfile> {
         );
       }
     } else {
-      // User is not authenticated, handle accordingly
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User is not authenticated. Please sign in again.')),
+        SnackBar(
+            content: Text('User is not authenticated. Please sign in again.')),
       );
     }
   }

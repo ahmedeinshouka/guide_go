@@ -131,6 +131,46 @@ class _ProfileState extends State<Profile> {
     }
   }
 
+  Future<void> _deleteImage(String imageUrl) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .collection('imageGallery')
+          .where('imageUrl', isEqualTo: imageUrl)
+          .get()
+          .then((snapshot) {
+        for (DocumentSnapshot doc in snapshot.docs) {
+          doc.reference.delete();
+        }
+      });
+      await FirebaseStorage.instance.refFromURL(imageUrl).delete();
+      setState(() {
+        _imageUrls.remove(imageUrl);
+      });
+    } catch (e) {
+      print('Error deleting image: $e');
+    }
+  }
+
+  Future<void> _editImage(String oldImageUrl) async {
+    try {
+      final pickedFile =
+          await _imagePicker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        File newImageFile = File(pickedFile.path);
+        String newDownloadURL = await _uploadImageToFirebase(newImageFile);
+        await _deleteImage(oldImageUrl);
+        setState(() {
+          _imageUrls.remove(oldImageUrl);
+          _imageUrls.add(newDownloadURL);
+        });
+      }
+    } catch (e) {
+      print('Error editing image: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -146,12 +186,12 @@ class _ProfileState extends State<Profile> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-          icon: const Icon(Icons.logout),
-          onPressed: () async {
-            await _auth.signOut();
-            Navigator.pushReplacementNamed(context, '/splash');
-          },
-        ),
+                      icon: const Icon(Icons.logout),
+                      onPressed: () async {
+                        await _auth.signOut();
+                        Navigator.pushReplacementNamed(context, '/splash');
+                      },
+                    ),
                     SizedBox(height: 40),
                     IconButton(
                       onPressed: () {
@@ -209,18 +249,17 @@ class _ProfileState extends State<Profile> {
                     ),
                   ],
                 ),
-                  if (  _email.isNotEmpty 
-                    )
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.email),
-                    Text(
-                      _email,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )
-                  ],
-                ),
+                if (_email.isNotEmpty)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.email),
+                      Text(
+                        _email,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
                 if (_country.isNotEmpty &&
                     _region.isNotEmpty &&
                     _city.isNotEmpty)
@@ -260,13 +299,18 @@ class _ProfileState extends State<Profile> {
                     ),
                     itemCount: _imageUrls.length,
                     itemBuilder: (context, index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.grey),
-                          image: DecorationImage(
-                            image: NetworkImage(_imageUrls[index]),
-                            fit: BoxFit.cover,
+                      return GestureDetector(
+                        onLongPress: () {
+                          _showEditDeleteDialog(_imageUrls[index]);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.grey),
+                            image: DecorationImage(
+                              image: NetworkImage(_imageUrls[index]),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       );
@@ -288,19 +332,20 @@ class _ProfileState extends State<Profile> {
                 width: 10,
               ),
               IconButton(
-                  highlightColor: Colors.amber,
-                  onPressed: () {
-                    // Check if the current route is not the home screen
-                    if (ModalRoute.of(context)?.settings.name != '/') {
-                      Navigator.popAndPushNamed(context, "/");
-                    }
-                  },
-                  icon: const ImageIcon(
-                    AssetImage(
-                      "assets/icons8-home-page-32.png",
-                    ),
-                    size: 40,
-                  )),
+                highlightColor: Colors.amber,
+                onPressed: () {
+                  // Check if the current route is not the home screen
+                  if (ModalRoute.of(context)?.settings.name != '/') {
+                    Navigator.popAndPushNamed(context, "/");
+                  }
+                },
+                icon: const ImageIcon(
+                  AssetImage(
+                    "assets/icons8-home-page-32.png",
+                  ),
+                  size: 40,
+                ),
+              ),
               const SizedBox(
                 width: 20,
               ),
@@ -308,12 +353,13 @@ class _ProfileState extends State<Profile> {
                 color: Colors.black,
               ),
               IconButton(
-                  highlightColor: Colors.amber,
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.people_alt_rounded,
-                    size: 40,
-                  )),
+                highlightColor: Colors.amber,
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.people_alt_rounded,
+                  size: 40,
+                ),
+              ),
               const SizedBox(
                 width: 10,
               ),
@@ -321,17 +367,18 @@ class _ProfileState extends State<Profile> {
                 width: 10,
               ),
               IconButton(
-                  highlightColor: Colors.amber,
-                  onPressed: () {
-                    // Check if the current route is not the chatList screen
-                    if (ModalRoute.of(context)?.settings.name != '/chatList') {
-                      Navigator.pushNamed(context, "/chatList");
-                    }
-                  },
-                  icon: const ImageIcon(
-                    AssetImage("assets/chat.png"),
-                    size: 40,
-                  )),
+                highlightColor: Colors.amber,
+                onPressed: () {
+                  // Check if the current route is not the chatList screen
+                  if (ModalRoute.of(context)?.settings.name != '/chatList') {
+                    Navigator.pushNamed(context, "/chatList");
+                  }
+                },
+                icon: const ImageIcon(
+                  AssetImage("assets/chat.png"),
+                  size: 40,
+                ),
+              ),
               const SizedBox(
                 width: 10,
               ),
@@ -439,5 +486,33 @@ class _ProfileState extends State<Profile> {
       print('Error uploading image: $e');
       return '';
     }
+  }
+
+  void _showEditDeleteDialog(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Edit or Delete Image"),
+          content: Text("Would you like to edit or delete this image?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Edit"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _editImage(imageUrl);
+              },
+            ),
+            TextButton(
+              child: Text("Delete"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteImage(imageUrl);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

@@ -126,7 +126,7 @@ Future<void> _getUserData() async {
                          Row(mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(
-                                width: 5,
+                                width: 10,
                               ),
                               Text(
                                 "Hello👋 ",
@@ -747,7 +747,47 @@ Future<void> _getUserData() async {
                   ],
                 ),
               ),
-            ],
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "   see How is the weather ☁️☀️",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/weather');
+                    },
+                    icon: Image.asset("assets/hot.png",height: 35,),
+                    style: ButtonStyle(
+                      overlayColor: MaterialStatePropertyAll(Colors.amber),
+                      backgroundColor: MaterialStatePropertyAll(const Color.fromARGB(255, 255, 255, 255)),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 1,
+                  )
+                ],
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, '/weather');
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 345,
+                      width: 300,
+                      alignment: Alignment.center,
+                      child: LottieBuilder.network(
+                        "https://lottie.host/405d7bb0-ede3-4d6c-933f-cea247536b4d/dN8tpq77ZR.json",
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                ),
+              )],
           )),
         ),
         bottomNavigationBar: BottomAppBar(

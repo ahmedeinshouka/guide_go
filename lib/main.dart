@@ -32,6 +32,7 @@ import 'screens/chat_list_page.dart';
 import 'screens/chat_screen.dart';
 import 'screens/UserList.dart';
 import 'package:guide_go/screens/Discover.dart';
+import 'screens/weather.dart';
 
 import 'screens/login_phone.dart';
 
@@ -86,6 +87,7 @@ class MyApp extends StatelessWidget {
         '/Montaggio': (context) => Montaggio(),
         '/chatList': (context) => ChatListPage(),
         '/login_phone': (context) => Loginphone(),
+        '/weather':(context) => WeatherScreen(),
       },
     );
   }

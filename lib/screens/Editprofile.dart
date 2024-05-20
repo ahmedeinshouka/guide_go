@@ -205,7 +205,7 @@ class _EditProfileState extends State<EditProfile> {
                 },
               ),
               const SizedBox(height: 16.0),
-              ElevatedButton(
+              ElevatedButton(style: ButtonStyle(backgroundColor:MaterialStatePropertyAll(Color(0xff003961))),
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
@@ -215,7 +215,7 @@ class _EditProfileState extends State<EditProfile> {
                     }
                   }
                 },
-                child: const Text('Save Changes'),
+                child: const Text('Save Changes',style: TextStyle(color: Colors.white),),
               ),
             ],
           ),

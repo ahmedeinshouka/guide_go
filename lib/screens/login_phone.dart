@@ -50,6 +50,7 @@ class Loginphone extends StatelessWidget {
             'region': '',
             'phoneNumber': user.phoneNumber ?? '',
             "userType": '',
+            'rating':0,
           });
         }
       } catch (e) {
@@ -68,7 +69,7 @@ class Loginphone extends StatelessWidget {
         if (querySnapshot.docs.isNotEmpty) {
           // User with provided phone number exists, sign in
           await _auth.signInWithPhoneNumber(phoneNumber);
-          Navigator.pushReplacementNamed(context, '/'); // Navigate after login
+          Navigator.pushReplacementNamed(context, '/editprofile'); // Navigate after login
           return;
         }
 

@@ -14,6 +14,8 @@ class TourGuideCard extends StatelessWidget {
   final String dateOfBirth;
   final String region;
   final String uid;
+  final double rating;
+  
 
   TourGuideCard({
     Key? key,
@@ -28,6 +30,7 @@ class TourGuideCard extends StatelessWidget {
     required this.dateOfBirth,
     required this.region,
     required this.uid,
+    required this.rating,
   }) : super(key: key);
 
   @override
@@ -51,7 +54,8 @@ class TourGuideCard extends StatelessWidget {
                 city: city,
                 dateOfBirth: dateOfBirth,
                 region: region,
-                uid:uid),
+                uid: uid,
+                rating: rating),
           ),
         );
       },
@@ -137,7 +141,8 @@ class TourGuideCard extends StatelessWidget {
                                       city: city,
                                       dateOfBirth: dateOfBirth,
                                       region: region,
-                                      uid: uid,),
+                                      uid: uid,
+                                      rating: rating),
                                 ),
                               );
                             },

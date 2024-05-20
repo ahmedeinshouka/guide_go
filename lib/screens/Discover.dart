@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart';
 import 'TourGuideCard.dart';
 
 class DiscoverIndependentsScreen extends StatefulWidget {
@@ -11,7 +11,7 @@ class DiscoverIndependentsScreen extends StatefulWidget {
 class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchText = "";
-  User? _currentUser; // Variable to hold the current user
+  User? _currentUser;
 
   @override
   void initState() {
@@ -94,6 +94,14 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
                         print("Error fetching imageGallery: $e");
                       }
       
+                      // Parse rating from String to double
+                      double rating = 0.0;
+                      try {
+                        rating = double.parse(user['rating']);
+                      } catch (e) {
+                        print("Error parsing rating: $e");
+                      }
+
                       return TourGuideCard(
                         name: user['fullName'],
                         email: user['email'],
@@ -106,6 +114,7 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
                         dateOfBirth: user['dateOfBirth'],
                         region: user['region'], // Pass the image URLs,
                         uid: user['uid'],
+                        rating: rating,
                       );
                     },
                   );

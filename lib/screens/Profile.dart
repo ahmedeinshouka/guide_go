@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:guide_go/screens/chat_screen.dart';
 
 class Profile extends StatelessWidget {
@@ -13,6 +16,7 @@ class Profile extends StatelessWidget {
   final String city;
   final String dateOfBirth;
   final String region;
+  final double rating;
 
   Profile({
     Key? key,
@@ -27,6 +31,7 @@ class Profile extends StatelessWidget {
     required this.country,
     required this.dateOfBirth,
     required this.region,
+    required this.rating,
   }) : super(key: key);
 
   @override
@@ -41,14 +46,12 @@ class Profile extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Back button
                   IconButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
                     icon: Icon(Icons.arrow_back_ios_new_rounded),
                   ),
-                  // Chat button
                   IconButton(
                     onPressed: () {
                       Navigator.push(
@@ -58,7 +61,7 @@ class Profile extends StatelessWidget {
                             receiverUserID: uid,
                             receiverUserEmail: email,
                             receiverUserName: name,
-                            receiverUserphotoUrl: imageUrl, // Updated parameter name
+                            receiverUserphotoUrl: imageUrl,
                           ),
                         ),
                       );
@@ -70,7 +73,6 @@ class Profile extends StatelessWidget {
                   ),
                 ],
               ),
-              // Profile picture
               CircleAvatar(
                 radius: 50,
                 backgroundImage: imageUrl.isNotEmpty
@@ -78,7 +80,6 @@ class Profile extends StatelessWidget {
                     : AssetImage('assets/man.png') as ImageProvider,
               ),
               SizedBox(height: 16),
-              // User name
               Text(
                 name,
                 style: TextStyle(
@@ -87,7 +88,6 @@ class Profile extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 8),
-              // User type and icon
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -117,7 +117,6 @@ class Profile extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 16),
-              // Email
               if (email.isNotEmpty)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -130,7 +129,6 @@ class Profile extends StatelessWidget {
                     ),
                   ],
                 ),
-              // Address
               if (country.isNotEmpty && region.isNotEmpty && city.isNotEmpty)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -144,7 +142,6 @@ class Profile extends StatelessWidget {
                   ],
                 ),
               SizedBox(height: 5),
-              // Date of birth
               if (dateOfBirth.isNotEmpty)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -158,13 +155,68 @@ class Profile extends StatelessWidget {
                   ],
                 ),
               SizedBox(height: 8),
-              // Bio
               Text(
-                bio,
+                "“$bio”",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
+              SizedBox(height: 4),
+              StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance.collection('ratings').doc(uid).snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (!snapshot.hasData || !snapshot.data!.exists) {
+                    return Text("No ratings yet.");
+                  }
+                  final ratings = snapshot.data!['ratings'] as List<dynamic>;
+                  double totalRating = 0;
+                  final uniqueRaters = <String, double>{};
+                  for (var rating in ratings) {
+                    uniqueRaters[rating['userId']] = rating['rating'];
+                  }
+                  for (var rating in uniqueRaters.values) {
+                    totalRating += rating;
+                  }
+                  double averageRating = uniqueRaters.isEmpty ? 0 : totalRating / uniqueRaters.length;
+                  return Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.star, color: Colors.amber),
+                          SizedBox(width: 5),
+                          Text(
+                            averageRating.toStringAsFixed(1),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        "${uniqueRaters.length} people rated",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  );
+                },
+              ),
               SizedBox(height: 16),
-              // Gallery of images
+              RatingBar.builder(itemSize: 30,
+                initialRating: rating,
+                minRating: 1,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (newRating) async {
+                  await _updateUserRating(uid, newRating);
+                },
+              ),
+              SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: GridView.builder(
@@ -179,9 +231,7 @@ class Profile extends StatelessWidget {
                   itemCount: imageUrls.length,
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                      onLongPress: () {
-                        // Handle long press if needed
-                      },
+                      onLongPress: () {},
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
@@ -201,5 +251,48 @@ class Profile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _updateUserRating(String uid, double newRating) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      final ratingDoc = FirebaseFirestore.instance.collection('ratings').doc(uid);
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(ratingDoc);
+
+        if (snapshot.exists) {
+          final currentRatings = snapshot.data()!['ratings'] as List<dynamic>;
+          bool ratingExists = false;
+
+          for (var i = 0; i < currentRatings.length; i++) {
+            if (currentRatings[i]['userId'] == currentUser.uid) {
+              currentRatings[i]['rating'] = newRating;
+              ratingExists = true;
+              break;
+            }
+          }
+
+          if (!ratingExists) {
+            currentRatings.add({
+              'userId': currentUser.uid,
+              'rating': newRating,
+            });
+          }
+
+          transaction.update(ratingDoc, {'ratings': currentRatings});
+        } else {
+          transaction.set(ratingDoc, {
+            'ratings': [
+              {
+                'userId': currentUser.uid,
+                'rating': newRating,
+              },
+            ],
+          });
+        }
+      });
+    }
   }
 }

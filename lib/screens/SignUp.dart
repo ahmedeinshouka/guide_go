@@ -59,6 +59,7 @@ class _SignupScreenState extends State<SignupScreen> {
     String region,
     String phoneNumber,
     String userType,
+    double rating,
   ) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
@@ -77,6 +78,7 @@ class _SignupScreenState extends State<SignupScreen> {
         'region': region,
         'phoneNumber': phoneNumber,
         "userType": userType,
+        "rating":rating,
       });
     } catch (e) {
       throw Exception(e.toString());
@@ -287,6 +289,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               "", // Region
                               "",
                               selectedType!, // Phone Number
+                              0,
                             );
 
                             Navigator.pushReplacementNamed(context, '/Login');

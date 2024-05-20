@@ -15,7 +15,8 @@ class LoginScreen extends StatelessWidget {
     TextEditingController emailController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
 
-    Future<void> signInWithEmailAndPassword(String email, String password) async {
+    Future<void> signInWithEmailAndPassword(
+        String email, String password) async {
       if (email.isEmpty || password.isEmpty) {
         showDialog(
           context: context,
@@ -43,7 +44,10 @@ class LoginScreen extends StatelessWidget {
 
       try {
         // Check if the user exists in Firestore
-        final QuerySnapshot result = await _firestore.collection('users').where('email', isEqualTo: email).get();
+        final QuerySnapshot result = await _firestore
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .get();
         final List<DocumentSnapshot> documents = result.docs;
         if (documents.isEmpty) {
           // Email not found in Firestore
@@ -72,7 +76,8 @@ class LoginScreen extends StatelessWidget {
         }
 
         // Email found in Firestore, now check password
-        final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        final UserCredential userCredential =
+            await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
@@ -83,13 +88,15 @@ class LoginScreen extends StatelessWidget {
         String errorMessage;
         switch (e.code) {
           case 'wrong-password':
-            errorMessage = 'The password you entered is incorrect. Please check your password and try again.';
+            errorMessage =
+                'The password you entered is incorrect. Please check your password and try again.';
             break;
           default:
-            errorMessage = 'An error occurred during sign in. Please check your password.';
+            errorMessage =
+                'An error occurred during sign in. Please check your password.';
             break;
         }
-        
+
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -122,30 +129,31 @@ class LoginScreen extends StatelessWidget {
           return null;
         }
 
-        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
         final AuthCredential credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
 
-        final UserCredential authResult = await FirebaseAuth.instance.signInWithCredential(credential);
+        final UserCredential authResult =
+            await FirebaseAuth.instance.signInWithCredential(credential);
         final User? user = authResult.user;
 
         // If user is signed in successfully, retrieve additional user information from Google account
         if (user != null) {
           // Retrieve user's display name from Google account
-        final String? displayName = googleUser?.displayName ?? '';
+          final String? displayName = googleUser?.displayName ?? '';
 
+          String city = '';
+          String country = '';
+          String dateOfBirth = '';
 
-String city = '';
-String country = '';
-String dateOfBirth = '';
-
-String region = '';
-String phoneNumber = '';
-String userType = '';
-String _phoneNumber = '';
-
+          String region = '';
+          String phoneNumber = '';
+          String userType = '';
+          String _phoneNumber = '';
+          double rating = 0;
           // Generate UID
           String uid = user.uid;
 
@@ -159,13 +167,15 @@ String _phoneNumber = '';
               'uid': uid,
               'email': user.email,
               'fullName': displayName ?? '', // Use null-aware operator here
-              'photoUrl': googleUser.photoUrl ?? '', // Use null-aware operator here
-              'city': city ??'',
-             'region': region??'',
-             'country': country??'',
-             'dateOfBirth': dateOfBirth??'',
-            'phoneNumber':phoneNumber??'',
-            'userType': userType??'',
+              'photoUrl':
+                  googleUser.photoUrl ?? '', // Use null-aware operator here
+              'city': city ?? '',
+              'region': region ?? '',
+              'country': country ?? '',
+              'dateOfBirth': dateOfBirth ?? '',
+              'phoneNumber': phoneNumber ?? '',
+              'userType': userType ?? '',
+              'rating':rating??0,
             });
           }
 
@@ -207,7 +217,8 @@ String _phoneNumber = '';
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 50), // add spacing between fields
-                TextField(textInputAction: TextInputAction.next,
+                TextField(
+                  textInputAction: TextInputAction.next,
                   controller: emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
@@ -217,7 +228,8 @@ String _phoneNumber = '';
                   ),
                 ),
                 SizedBox(height: 25),
-                TextField(textInputAction: TextInputAction.done,
+                TextField(
+                  textInputAction: TextInputAction.done,
                   controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
@@ -296,7 +308,8 @@ String _phoneNumber = '';
                     ),
                     IconButton(
                         onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/login_phone');
+                          Navigator.pushReplacementNamed(
+                              context, '/login_phone');
                         },
                         icon: Icon(
                           Icons.phone,

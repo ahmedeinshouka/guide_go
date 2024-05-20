@@ -1,52 +1,114 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'dart:async';
-
-import 'package:flutter/material.dart';
-import 'package:url_launcher/link.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class siwa extends StatefulWidget {
-  const siwa({super.key});
+class Siwa extends StatefulWidget {
+  const Siwa({super.key});
 
   @override
-  State<siwa> createState() => _ageebaState();
+  State<Siwa> createState() => _SiwaState();
 }
 
-class _ageebaState extends State<siwa> {
+class _SiwaState extends State<Siwa> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final TextEditingController _reviewController = TextEditingController();
   Future<void>? _launched;
+  String? _editingReviewId;
+
   Future<void> _launchInBrowserView(Uri url) async {
-    if (!await launchUrl(url, mode: LaunchMode.inAppBrowserView)) {
+    if (!await launchUrl(url, mode: LaunchMode.inAppWebView)) {
       throw Exception('Could not launch $url');
     }
   }
+
+  void _addReview() async {
+    if (_reviewController.text.isNotEmpty) {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await _firestore.collection('Siwa_reviews').add({
+          'review': _reviewController.text,
+          'timestamp': FieldValue.serverTimestamp(),
+          'userId': user.uid,
+          'userName': user.email,
+          'photoUrl': user.photoURL,
+          'likes': [],
+        });
+        _reviewController.clear();
+      }
+    }
+  }
+
+  void _updateReview(String reviewId) async {
+    if (_reviewController.text.isNotEmpty) {
+      await _firestore.collection('Siwa_reviews').doc(reviewId).update({
+        'review': _reviewController.text,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      _reviewController.clear();
+      setState(() {
+        _editingReviewId = null;
+      });
+    }
+  }
+
+  void _deleteReview(String reviewId) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await _firestore.collection('Siwa_reviews').doc(reviewId).delete();
+    }
+  }
+
+  void _toggleLike(String reviewId, List likes) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userId = user.uid;
+      final isLiked = likes.contains(userId);
+
+      if (isLiked) {
+        _firestore.collection('Siwa_reviews').doc(reviewId).update({
+          'likes': FieldValue.arrayRemove([userId])
+        });
+      } else {
+        _firestore.collection('Siwa_reviews').doc(reviewId).update({
+          'likes': FieldValue.arrayUnion([userId])
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Uri toLaunch =
-        Uri(scheme: 'https', host: 'egyptopia.com', path: '/en/articles/Egypt/natural-parks/Siwa-Oasis.s.29.13942/');
-    return SafeArea(child: Scaffold(
-      body: SizedBox(
-            width: double.infinity,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Column(
+    final Uri toLaunch = Uri(
+      scheme: 'https',
+      host: 'egyptopia.com',
+      path: '/en/articles/Egypt/natural-parks/Siwa-Oasis.s.29.13942/',
+    );
+
+    return SafeArea(
+      child: Scaffold(
+        body: SizedBox(
+          width: double.infinity,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              SingleChildScrollView(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(
-                      height: 47,
-                    ),
+                    const SizedBox(height: 47),
                     Stack(
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(34),
-                              image: const DecorationImage(
-                                  image: AssetImage(
-                                    "assets/z_siwaoasis-_2787.jpg",
-                                  ),
-                                  fit: BoxFit.cover)),
+                            borderRadius: BorderRadius.circular(34),
+                            image: const DecorationImage(
+                              image: AssetImage(
+                                "assets/z_siwaoasis-_2787.jpg",
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                           width: 341,
                           height: 363,
                         ),
@@ -55,8 +117,9 @@ class _ageebaState extends State<siwa> {
                           left: 24,
                           child: Container(
                             decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(40)),
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(40),
+                            ),
                             height: 45.74,
                             width: 46.0,
                             child: IconButton(
@@ -71,21 +134,43 @@ class _ageebaState extends State<siwa> {
                             ),
                           ),
                         ),
+                        Positioned(
+                          bottom: 0,
+                          right: -20,
+                          child: ElevatedButton(
+                            onPressed: () => setState(() {
+                              _launched = _launchInBrowserView(toLaunch);
+                            }),
+                            style: const ButtonStyle(
+                              overlayColor: MaterialStatePropertyAll(Colors.amber),
+                              backgroundColor: MaterialStatePropertyAll(
+                                Color.fromARGB(255, 255, 255, 255),
+                              ),
+                              shadowColor: MaterialStatePropertyAll(Colors.grey),
+                              shape: MaterialStatePropertyAll(CircleBorder()),
+                              iconSize: MaterialStatePropertyAll(50),
+                              iconColor: MaterialStatePropertyAll(Colors.black),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(5.0),
+                              child: Icon(
+                                Icons.info_rounded,
+                                size: 50,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 35,
-                    ),
+                    const SizedBox(height: 35),
                     Row(
                       children: [
-                        SizedBox(
-                          width: 28,
-                        ),
+                        const SizedBox(width: 28),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              children: [
+                              children: const [
                                 Icon(
                                   Icons.location_on,
                                   size: 33,
@@ -93,13 +178,12 @@ class _ageebaState extends State<siwa> {
                                 Text(
                                   "Siwa Oasis, Egypt",
                                   style: TextStyle(
-                                      fontSize: 15,
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.bold),
+                                    fontSize: 15,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                SizedBox(
-                                  width: 30,
-                                ),
+                                SizedBox(width: 30),
                                 Icon(
                                   Icons.star,
                                   color: Colors.amber,
@@ -107,74 +191,139 @@ class _ageebaState extends State<siwa> {
                                 Text(
                                   "5.0",
                                   style: TextStyle(fontSize: 19),
-                                )
+                                ),
                               ],
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
+                            const SizedBox(height: 5),
+                            const Text(
                               "Siwa Oasis",
                               style: TextStyle(
-                                  fontSize: 30, fontWeight: FontWeight.w900),
+                                fontSize: 30,
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
-                            Text(
-                              "“Siwa Oasis is a major protectorate in Egypt that will \ncharm you with its natural beauty. It is situated around\n 50 milometers from Libyan borders in Egypt. Siwa \nOasis contains several lakes and springs and is filled\n with olive and palm trees. It also houses various \n species of animals like the Gazella leptoceros, \nVulpes zerda,Fennec Fox and other endangered \nanimals including jubatus and more. “ ",
+                            const Text(
+                              "“Siwa Oasis is a major protectorate in Egypt that\nwill charm you with its natural beauty."
+                              "It is situated\n around 50 kilometers from Libyan borders in Egypt.\n "
+                              "Siwa Oasis contains several lakes and springs\n and is filled with olive and palm trees. "
+                              "It also houses \nvarious species of animals like the Gazella leptoceros\n, Vulpes zerda, "
+                              "Fennec Fox, and other endangered \nanimals including jubatus and more.”",
                               maxLines: 20,
                               softWrap: true,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(color: Colors.grey),
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            
-                          
+                            const SizedBox(height: 5),
                           ],
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 5,
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Reviews:",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 25,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22.0),
+                      child: TextField(
+                        controller: _reviewController,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            onPressed: _editingReviewId == null
+                                ? _addReview
+                                : () => _updateReview(_editingReviewId!),
+                            icon: const Icon(Icons.send),
+                          ),
+                          hintText: "Add a review",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(40),
+                          ),
                         ),
-                      ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      height: 200, // Set a specific height for the reviews section
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: _firestore
+                            .collection('Siwa_reviews')
+                            .orderBy('timestamp', descending: true)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          final reviews = snapshot.data!.docs;
+                          User? user = FirebaseAuth.instance.currentUser;
+                          return ListView.builder(
+                            itemCount: reviews.length,
+                            itemBuilder: (context, index) {
+                              final review = reviews[index];
+                              final likes = review['likes'] as List;
+                              final isLiked = user != null && likes.contains(user.uid);
+                              return ListTile(
+                                title: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: review['photoUrl'] != null
+                                          ? NetworkImage(review['photoUrl'])
+                                          : const AssetImage("assets/man.png") as ImageProvider,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(child: Text(review['review'])),
+                                  ],
+                                ),
+                                subtitle: Text(review['userName']),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (review['userId'] == user?.uid) ...[
+                                      IconButton(
+                                        icon: const Icon(Icons.edit),
+                                        onPressed: () {
+                                          setState(() {
+                                            _editingReviewId = review.id;
+                                            _reviewController.text = review['review'];
+                                          });
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        onPressed: () {
+                                          _deleteReview(review.id);
+                                        },
+                                      ),
+                                    ],
+                                    IconButton(
+                                      icon: Icon(
+                                        isLiked ? Icons.thumb_up : Icons.thumb_up_alt_outlined,
+                                        color: isLiked ? Colors.blue : Colors.grey,
+                                      ),
+                                      onPressed: () {
+                                        _toggleLike(review.id, likes);
+                                      },
+                                    ),
+                                    Text(likes.length.toString()),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
-                Positioned(
-                  bottom: 339,
-                  right: 15,
-                  child: ElevatedButton(
-                    onPressed: () => setState(() {
-                  _launched = _launchInBrowserView(toLaunch);
-                }),
-                    style: const ButtonStyle(overlayColor: MaterialStatePropertyAll(Colors.amber),
-                      backgroundColor: MaterialStatePropertyAll(
-                          Color.fromARGB(255, 255, 255, 255)),
-                      shadowColor: MaterialStatePropertyAll(Colors.grey),
-                      shape: MaterialStatePropertyAll(CircleBorder()),
-                      iconSize: MaterialStatePropertyAll(50),
-                      iconColor: MaterialStatePropertyAll(Colors.black),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(5.0),
-                      child: Icon(
-                        Icons.info_rounded,
-                        size: 50,
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            )),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
-
-    

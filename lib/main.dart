@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
       initialRoute: initialRoute,
       routes: {
         '/': (context) => home(),
-        '/ageeba': (context) => ageeba(),
+        '/ageeba': (context) => Ageeba(),
         '/splash': (context) => SplashScreen(),
         '/Homepage': (context) => Intro(),
         '/Login': (context) => LoginScreen(),
@@ -75,7 +75,7 @@ class MyApp extends StatelessWidget {
         '/manial': (context) => Manial(),
         '/komona': (context) => komona(),
         '/cookdoor': (context) => cookdoor(),
-        "/siwa": (context) => siwa(),
+        "/siwa": (context) => Siwa(),
         '/maps': (context) => maps(),
         '/profile': (context) => Profile(),
         '/editprofile': (context) => EditProfile(),

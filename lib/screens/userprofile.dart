@@ -48,6 +48,13 @@ class _ProfileState extends State<Profile> {
           .get();
       List<String> urls =
           gallerySnapshot.docs.map((doc) => doc['imageUrl'] as String).toList();
+
+      // Update Firestore document with image URLs array
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .update({'imageGallery': urls});
+
       setState(() {
         _imageUrls = urls;
       });
@@ -91,7 +98,6 @@ class _ProfileState extends State<Profile> {
           _dateOfBirth = userData['dateOfBirth'] ?? '';
           _region = userData['region'] ?? '';
           _userType = userData['userType'] ?? '';
-
           _photoUrl = userData['photoUrl'] ?? '';
         });
       }
@@ -122,6 +128,9 @@ class _ProfileState extends State<Profile> {
       setState(() {
         _imageUrls.add(downloadURL);
       });
+
+      // Update Firestore document with image URLs array
+      await _fetchImagesFromFirestore();
     } catch (e) {
       if (e is FirebaseException) {
         print('Firebase Storage Error: ${e.code} - ${e.message}');
@@ -148,6 +157,9 @@ class _ProfileState extends State<Profile> {
       setState(() {
         _imageUrls.remove(imageUrl);
       });
+
+      // Update Firestore document with image URLs array
+      await _fetchImagesFromFirestore();
     } catch (e) {
       print('Error deleting image: $e');
     }
@@ -165,6 +177,9 @@ class _ProfileState extends State<Profile> {
           _imageUrls.remove(oldImageUrl);
           _imageUrls.add(newDownloadURL);
         });
+
+        // Update Firestore document with image URLs array
+        await _fetchImagesFromFirestore();
       }
     } catch (e) {
       print('Error editing image: $e');
@@ -206,8 +221,7 @@ class _ProfileState extends State<Profile> {
                   backgroundColor: Colors.grey[200],
                   backgroundImage:
                       _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
-                  child:
-                      _photoUrl.isEmpty ? Icon(Icons.person, size: 80) : null,
+                  child: _photoUrl.isEmpty ? Icon(Icons.person, size: 80) : null,
                   radius: 80,
                 ),
                 SizedBox(height: 30),
@@ -216,8 +230,7 @@ class _ProfileState extends State<Profile> {
                   children: [
                     Text(
                       _displayName,
-                      style:
-                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
@@ -260,9 +273,7 @@ class _ProfileState extends State<Profile> {
                       )
                     ],
                   ),
-                if (_country.isNotEmpty &&
-                    _region.isNotEmpty &&
-                    _city.isNotEmpty)
+                if (_country.isNotEmpty && _region.isNotEmpty && _city.isNotEmpty)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -340,9 +351,7 @@ class _ProfileState extends State<Profile> {
                   }
                 },
                 icon: const ImageIcon(
-                  AssetImage(
-                    "assets/icons8-home-page-32.png",
-                  ),
+                  AssetImage("assets/icons8-home-page-32.png"),
                   size: 40,
                 ),
               ),
@@ -354,7 +363,9 @@ class _ProfileState extends State<Profile> {
               ),
               IconButton(
                 highlightColor: Colors.amber,
-                onPressed: () {},
+                onPressed: () {  if (ModalRoute.of(context)?.settings.name != '/discover') {
+      Navigator.pushNamed(context, '/discover');
+    }},
                 icon: const Icon(
                   Icons.people_alt_rounded,
                   size: 40,

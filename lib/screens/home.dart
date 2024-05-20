@@ -120,51 +120,57 @@ Future<void> _getUserData() async {
                       },
                     ),),
                   Row(
-                    children: [
-                      Column(
-                        children: [
-                         Row(mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                "Hello👋 ",
-                                style: TextStyle(
-                                    fontSize: 25, fontWeight: FontWeight.w900),textAlign: TextAlign.left,
-                              ),
-                              Text(
-                                _displayName,
-                                style: TextStyle(overflow: TextOverflow.clip,
-                                    fontSize: 25, fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Row(mainAxisAlignment: MainAxisAlignment.start,
-                            children: [SizedBox(width: 10,),
-                              Icon(
-                                Icons.mail,
-                                color: Colors.grey[600],
-                              ),
-                              Text(
-                                _email,
-                                style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontWeight: FontWeight.w900),
-                              )
-                            ],
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        width: 85,height: 113,
-                      ),
-                      
-                    ],
-                  ),
+  children: [
+    Column(
+      crossAxisAlignment: CrossAxisAlignment.start, // Align start for Column
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(width: 10),
+            Text(
+              "Hello👋 ",
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
+              textAlign: TextAlign.left,
+            ),
+            Text(
+              _displayName,
+              style: TextStyle(
+                overflow: TextOverflow.clip,
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center, // Align items in the center vertically
+          children: [
+            SizedBox(width: 10),
+            Icon(
+              Icons.mail,
+              color: Colors.grey[600],
+            ),
+            SizedBox(width: 5), // Add some space between the icon and the text
+            Text(
+              _email,
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w900,
+              ),
+              textAlign: TextAlign.left, // Align text to the left
+            ),
+          ],
+        ),
+      ],
+    ),
+    const SizedBox(width: 85, height: 113),
+  ],
+)
+,
                 ],
               ),
               const SizedBox(height: 0),
@@ -822,7 +828,11 @@ Future<void> _getUserData() async {
               ),
               IconButton(
                   highlightColor: Colors.amber,
-                  onPressed: () {},
+                  onPressed: () {
+                      if (ModalRoute.of(context)?.settings.name != '/discover') {
+      Navigator.pushNamed(context, '/discover');
+    }
+                  },
                   icon: const Icon(
                     Icons.people_alt_rounded,
                     size: 40,
@@ -841,7 +851,7 @@ Future<void> _getUserData() async {
       Navigator.pushNamed(context, "/chatList");
     }
                   },
-                  icon: const ImageIcon(
+                  icon:  ImageIcon(
                     AssetImage("assets/chat.png"),
                     size: 40,
                   )),

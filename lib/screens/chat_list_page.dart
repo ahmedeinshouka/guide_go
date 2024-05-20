@@ -60,7 +60,9 @@ class _ChatListPageState extends State<ChatListPage> {
             ),
             IconButton(
               highlightColor: Colors.amber,
-              onPressed: () {},
+              onPressed: () {  if (ModalRoute.of(context)?.settings.name != '/discover') {
+      Navigator.pushNamed(context, '/discover');
+    }},
               icon: const Icon(
                 Icons.people_alt_rounded,
                 size: 40,

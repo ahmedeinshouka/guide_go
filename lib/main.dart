@@ -50,7 +50,7 @@ Future<void> main() async {
   User? user = auth.currentUser;
 
   // Use a ternary operator to set the initial route
-  String initialRoute = user != null ? '/' : '/splash';
+  String initialRoute = user != null ? '/discover' : '/splash';
 
   runApp(MyApp(initialRoute: initialRoute));
 }
@@ -88,6 +88,7 @@ class MyApp extends StatelessWidget {
         '/chatList': (context) => ChatListPage(),
         '/login_phone': (context) => Loginphone(),
         '/weather':(context) => WeatherScreen(),
+        '/discover':(context) =>  DiscoverIndependentsScreen(),
       },
     );
   }

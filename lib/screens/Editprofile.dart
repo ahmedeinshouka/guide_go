@@ -22,6 +22,7 @@ class _EditProfileState extends State<EditProfile> {
   String _country = '';
   String _region = '';
   String _city = '';
+  String _bio = ''; // Add this line for the bio
   String userType = '';
   String? selectedType;
 
@@ -55,6 +56,7 @@ class _EditProfileState extends State<EditProfile> {
           _country = userData['country'] ?? '';
           _region = userData['region'] ?? '';
           _city = userData['city'] ?? '';
+          _bio = userData['bio'] ?? ''; // Fetch the bio
           userType = userData['userType'] ?? '';
           selectedType = userType;
           print('Fetched userType: $userType');
@@ -169,6 +171,14 @@ class _EditProfileState extends State<EditProfile> {
                 onChanged: (value) => _city = value,
               ),
               const SizedBox(height: 16.0),
+              TextFormField(
+                initialValue: _bio, // Add this field for bio
+                decoration: InputDecoration(
+                  labelText: 'Bio',
+                ),
+                onChanged: (value) => _bio = value,
+              ),
+              const SizedBox(height: 16.0),
               RadioListTile(
                 title: Text("I'm a Traveller"),
                 value: "Traveler",
@@ -275,6 +285,7 @@ class _EditProfileState extends State<EditProfile> {
             if (_country.isNotEmpty) dataToUpdate['country'] = _country;
             if (_region.isNotEmpty) dataToUpdate['region'] = _region;
             if (_city.isNotEmpty) dataToUpdate['city'] = _city;
+            if (_bio.isNotEmpty) dataToUpdate['bio'] = _bio; // Save the bio
             if (photoUrl.isNotEmpty) dataToUpdate['photoUrl'] = photoUrl;
             if (userType.isNotEmpty) dataToUpdate['userType'] = userType;
 

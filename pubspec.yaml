@@ -65,13 +65,19 @@ dependencies:
   firebase_app_check: ^0.2.2+5
   weather: ^3.1.1
   flutter_rating_bar: ^4.0.1
+  flutter_launcher_icons: ^0.13.1
  
 
   
 
 dev_dependencies:
   flutter_test:
-    sdk: flutter
+    sdk: flutter  
+  flutter_launcher_icons: "^0.13.1"
+  
+
+
+
     
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -80,6 +86,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
+flutter_icons:
+  image_path: "assets/Untitled-1.png"
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -98,6 +107,7 @@ flutter:
     - assets/DSC_0564 copy.jpg
     - assets/c9871822e93c31e18b16aa95a1944ae6.jpg
     - assets/hot.png
+    - assets/background.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

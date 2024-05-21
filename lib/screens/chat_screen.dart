@@ -65,13 +65,15 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          children: [CircleAvatar(
-                    backgroundImage: widget.receiverUserphotoUrl.isNotEmpty
-                        ? NetworkImage(widget.receiverUserphotoUrl,)
-                        : null, // No need for image if photoUrl is empty
-                    child: widget.receiverUserphotoUrl.isEmpty ? Icon(Icons.person) : null, // Display person icon if photoUrl is empty
-                  ),SizedBox(width: 5,),
-            Text(widget.receiverUserName,style: TextStyle(fontWeight: FontWeight.w600),),
+          children: [
+            CircleAvatar(
+              backgroundImage: widget.receiverUserphotoUrl.isNotEmpty
+                  ? NetworkImage(widget.receiverUserphotoUrl)
+                  : null, // No need for image if photoUrl is empty
+              child: widget.receiverUserphotoUrl.isEmpty ? Icon(Icons.person) : null, // Display person icon if photoUrl is empty
+            ),
+            SizedBox(width: 5),
+            Text(widget.receiverUserName, style: TextStyle(fontWeight: FontWeight.w600)),
           ],
         ),
       ),
@@ -142,47 +144,52 @@ class _ChatScreenState extends State<ChatScreen> {
           crossAxisAlignment: isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             SizedBox(height: 5),
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.5, // Limit message box width to 60% of screen width
-              ),
-              padding: EdgeInsets.all(10.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(40.0),
-                color: isSender ? Colors.blue : Colors.grey[300], // Sender message color: Blue, Receiver message color: Grey
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            Row(
+              mainAxisAlignment: isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+              children: [
+                if (!isSender) // Display receiver's avatar only for receiver's messages
+                  CircleAvatar(
+                    backgroundImage: widget.receiverUserphotoUrl.isNotEmpty
+                        ? NetworkImage(widget.receiverUserphotoUrl)
+                        : null, // No need for image if photoUrl is empty
+                    child: widget.receiverUserphotoUrl.isEmpty ? Icon(Icons.person) : null, // Display person icon if photoUrl is empty
+                  ),
+                SizedBox(width: 10),
+                Flexible(
+                  child: Stack(
                     children: [
-                      if (!isSender) // Display sender's information only for receiver's messages
-                        CircleAvatar(
-                          backgroundImage: widget.receiverUserphotoUrl.isNotEmpty
-                              ? NetworkImage(widget.receiverUserphotoUrl)
-                              : null, // No need for image if photoUrl is empty
-                          child: widget.receiverUserphotoUrl.isEmpty ? Icon(Icons.person) : null, // Display person icon if photoUrl is empty
+                      Container(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.5, // Limit message box width to 50% of screen width
                         ),
-                      SizedBox(width: 10),
-                      Flexible(
-                        child: Text(
-                          data['message'],
-                          style: TextStyle(color: isSender ? Colors.white : Colors.black,fontWeight: FontWeight.w600),
+                        padding: data['message'].toString().startsWith('http') ? null : EdgeInsets.all(10.0),
+                        decoration: data['message'].toString().startsWith('http') ? null : BoxDecoration(
+                          borderRadius: BorderRadius.circular(20.0),
+                          color: isSender ? Colors.blue : Colors.grey[300], // Sender message color: Blue, Receiver message color: Grey
                         ),
+                        child: data['message'].toString().startsWith('http')
+                            ? Container(width: 170,height: 200,decoration:BoxDecoration(image:DecorationImage(image:NetworkImage(data['message'],),fit: BoxFit.cover),borderRadius: BorderRadius.circular(40)),) // Display image if the message is a URL
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    data['message'],
+                                    style: TextStyle(color: isSender ? Colors.white : Colors.black, fontWeight: FontWeight.w600),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    data['timestamp'].toDate().toString(),
+                                    style: TextStyle(fontSize: 10.0, color: Colors.grey, fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
                       ),
+                      
+                        
                     ],
                   ),
-                  SizedBox(height: 5),
-                  Row(mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        data['timestamp'].toDate().toString(),
-                        style: TextStyle(fontSize: 10.0, color: Colors.grey, fontWeight: FontWeight.w400),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
@@ -214,12 +221,12 @@ class TextBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            " $message",
+            message,
             style: TextStyle(color: isSender ? Colors.white : Colors.black),
           ),
           Text(
             timestamp,
-            style: TextStyle(fontSize: 10.0, color: Colors.grey,fontWeight: FontWeight.w400),
+            style: TextStyle(fontSize: 10.0, color: Colors.grey, fontWeight: FontWeight.w400),
           ),
         ],
       ),
@@ -250,7 +257,6 @@ class ChatInput extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30.0),
               ),
             ),
-            onChanged: (text) {}, // No need for this, remove if not needed
             onSubmitted: (text) {
               if (text.trim().isNotEmpty) {
                 onSendPressed(text);
@@ -278,10 +284,8 @@ class ChatService extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> sendMessage(String senderId, String receiverId, String message) async {
-    // Generate a chat room ID based on sender and receiver IDs
     final String chatRoomId = getChatRoomId(senderId, receiverId);
 
-    // Create a new message document
     Message newMessage = Message(
       senderId: senderId,
       receiverId: receiverId,
@@ -297,7 +301,6 @@ class ChatService extends ChangeNotifier {
   }
 
   Stream<QuerySnapshot> getMessages(String userId, String otherUserId) {
-    // Generate a chat room ID based on sender and receiver IDs
     final String chatRoomId = getChatRoomId(userId, otherUserId);
 
     return _firestore
@@ -309,10 +312,9 @@ class ChatService extends ChangeNotifier {
   }
 
   String getChatRoomId(String userId, String otherUserId) {
-    // Use the IDs to generate a unique chat room ID
     List<String> ids = [userId, otherUserId];
-    ids.sort(); // Sort the IDs to ensure consistency
-    return ids.join("_"); // Join the sorted IDs with an underscore
+    ids.sort();
+    return ids.join("_");
   }
 }
 

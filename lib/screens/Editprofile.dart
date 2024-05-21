@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image/image.dart' as img;
 
 class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);
@@ -22,7 +24,7 @@ class _EditProfileState extends State<EditProfile> {
   String _country = '';
   String _region = '';
   String _city = '';
-  String _bio = ''; // Add this line for the bio
+  String _bio = '';
   String userType = '';
   String? selectedType;
 
@@ -56,7 +58,7 @@ class _EditProfileState extends State<EditProfile> {
           _country = userData['country'] ?? '';
           _region = userData['region'] ?? '';
           _city = userData['city'] ?? '';
-          _bio = userData['bio'] ?? ''; // Fetch the bio
+          _bio = userData['bio'] ?? '';
           userType = userData['userType'] ?? '';
           selectedType = userType;
           print('Fetched userType: $userType');
@@ -74,6 +76,12 @@ class _EditProfileState extends State<EditProfile> {
         _imageFile = File(pickedFile.path);
       });
     }
+  }
+
+  Future<Uint8List> _resizeImage(File imageFile) async {
+    final img.Image originalImage = img.decodeImage(imageFile.readAsBytesSync())!;
+    final img.Image resizedImage = img.copyResize(originalImage, width: 600); // Resize to a max width of 600px
+    return Uint8List.fromList(img.encodeJpg(resizedImage));
   }
 
   @override
@@ -172,7 +180,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
               const SizedBox(height: 16.0),
               TextFormField(
-                initialValue: _bio, // Add this field for bio
+                initialValue: _bio,
                 decoration: InputDecoration(
                   labelText: 'Bio',
                 ),
@@ -205,7 +213,9 @@ class _EditProfileState extends State<EditProfile> {
                 },
               ),
               const SizedBox(height: 16.0),
-              ElevatedButton(style: ButtonStyle(backgroundColor:MaterialStatePropertyAll(Color(0xff003961))),
+              ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(Color(0xff003961))),
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
@@ -215,7 +225,10 @@ class _EditProfileState extends State<EditProfile> {
                     }
                   }
                 },
-                child: const Text('Save Changes',style: TextStyle(color: Colors.white),),
+                child: const Text(
+                  'Save Changes',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
@@ -260,11 +273,12 @@ class _EditProfileState extends State<EditProfile> {
     if (_auth.currentUser != null) {
       try {
         if (_imageFile != null) {
+          Uint8List resizedImage = await _resizeImage(_imageFile!);
           final storageRef = FirebaseStorage.instance
               .ref()
               .child('user_images')
               .child(_auth.currentUser!.uid + '.jpg');
-          await storageRef.putFile(_imageFile!);
+          await storageRef.putData(resizedImage);
           photoUrl = await storageRef.getDownloadURL();
         }
 
@@ -285,7 +299,7 @@ class _EditProfileState extends State<EditProfile> {
             if (_country.isNotEmpty) dataToUpdate['country'] = _country;
             if (_region.isNotEmpty) dataToUpdate['region'] = _region;
             if (_city.isNotEmpty) dataToUpdate['city'] = _city;
-            if (_bio.isNotEmpty) dataToUpdate['bio'] = _bio; // Save the bio
+            if (_bio.isNotEmpty) dataToUpdate['bio'] = _bio;
             if (photoUrl.isNotEmpty) dataToUpdate['photoUrl'] = photoUrl;
             if (userType.isNotEmpty) dataToUpdate['userType'] = userType;
 

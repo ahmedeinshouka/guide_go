@@ -66,6 +66,7 @@ dependencies:
   weather: ^3.1.1
   flutter_rating_bar: ^4.0.1
   flutter_launcher_icons: ^0.13.1
+  image: ^4.1.7
  
 
   

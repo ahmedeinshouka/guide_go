@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:guide_go/screens/ImageViewScreen';
 import 'package:guide_go/screens/chat_screen.dart';
+import 'package:photo_view/photo_view.dart';
 
 class Profile extends StatelessWidget {
   final String uid;
@@ -73,11 +75,23 @@ class Profile extends StatelessWidget {
                   ),
                 ],
               ),
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: imageUrl.isNotEmpty
-                    ? NetworkImage(imageUrl)
-                    : AssetImage('assets/man.png') as ImageProvider,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ImageViewScreen(
+                        imageUrl: imageUrl,
+                      ),
+                    ),
+                  );
+                },
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: imageUrl.isNotEmpty
+                      ? NetworkImage(imageUrl)
+                      : AssetImage('assets/man.png') as ImageProvider,
+                ),
               ),
               SizedBox(height: 16),
               Text(
@@ -156,13 +170,16 @@ class Profile extends StatelessWidget {
                 ),
               SizedBox(height: 8),
               if (bio.isNotEmpty)
-              Text(
-                "“$bio”",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+                Text(
+                  "“$bio”",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               SizedBox(height: 4),
               StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance.collection('ratings').doc(uid).snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('ratings')
+                    .doc(uid)
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
@@ -179,7 +196,9 @@ class Profile extends StatelessWidget {
                   for (var rating in uniqueRaters.values) {
                     totalRating += rating;
                   }
-                  double averageRating = uniqueRaters.isEmpty ? 0 : totalRating / uniqueRaters.length;
+                  double averageRating = uniqueRaters.isEmpty
+                      ? 0
+                      : totalRating / uniqueRaters.length;
                   return Column(
                     children: [
                       Row(
@@ -189,21 +208,24 @@ class Profile extends StatelessWidget {
                           SizedBox(width: 5),
                           Text(
                             averageRating.toStringAsFixed(1),
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                       SizedBox(height: 5),
                       Text(
                         "${uniqueRaters.length} people rated",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ],
                   );
                 },
               ),
               SizedBox(height: 16),
-              RatingBar.builder(itemSize: 30,
+              RatingBar.builder(
+                itemSize: 30,
                 initialRating: rating,
                 minRating: 1,
                 direction: Axis.horizontal,
@@ -232,7 +254,16 @@ class Profile extends StatelessWidget {
                   itemCount: imageUrls.length,
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                      onLongPress: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ImageViewScreen(
+                              imageUrl: imageUrls[index],
+                            ),
+                          ),
+                        );
+                      },
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
@@ -258,7 +289,8 @@ class Profile extends StatelessWidget {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser != null) {
-      final ratingDoc = FirebaseFirestore.instance.collection('ratings').doc(uid);
+      final ratingDoc =
+          FirebaseFirestore.instance.collection('ratings').doc(uid);
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final snapshot = await transaction.get(ratingDoc);
@@ -286,11 +318,8 @@ class Profile extends StatelessWidget {
         } else {
           transaction.set(ratingDoc, {
             'ratings': [
-              {
-                'userId': currentUser.uid,
-                'rating': newRating,
-              },
-            ],
+              {'userId': currentUser.uid, 'rating': newRating}
+            ]
           });
         }
       });

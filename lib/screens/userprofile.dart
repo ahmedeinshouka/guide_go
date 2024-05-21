@@ -4,8 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:guide_go/screens/ImageViewScreen';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image/image.dart' as img;
+
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -287,12 +290,24 @@ class _ProfileState extends State<Profile> {
                     )
                   ],
                 ),
-                CircleAvatar(
-                  backgroundColor: Colors.grey[200],
-                  backgroundImage:
-                      _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
-                  child: _photoUrl.isEmpty ? Icon(Icons.person, size: 80) : null,
-                  radius: 80,
+                GestureDetector(
+                  onTap: () {
+                    if (_photoUrl.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ImageViewScreen(imageUrl: _photoUrl),
+                        ),
+                      );
+                    }
+                  },
+                  child: CircleAvatar(
+                    backgroundColor: Colors.grey[200],
+                    backgroundImage:
+                        _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
+                    child: _photoUrl.isEmpty ? Icon(Icons.person, size: 80) : null,
+                    radius: 80,
+                  ),
                 ),
                 SizedBox(height: 30),
                 Row(
@@ -381,6 +396,15 @@ class _ProfileState extends State<Profile> {
                     itemCount: _imageUrls.length,
                     itemBuilder: (context, index) {
                       return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ImageViewScreen(imageUrl: _imageUrls[index]),
+                            ),
+                          );
+                        },
                         onLongPress: () {
                           _showEditDeleteDialog(_imageUrls[index]);
                         },
@@ -432,9 +456,11 @@ class _ProfileState extends State<Profile> {
               ),
               IconButton(
                 highlightColor: Colors.amber,
-                onPressed: () {  if (ModalRoute.of(context)?.settings.name != '/discover') {
-      Navigator.pushNamed(context, '/discover');
-    }},
+                onPressed: () {
+                  if (ModalRoute.of(context)?.settings.name != '/discover') {
+                    Navigator.pushNamed(context, '/discover');
+                  }
+                },
                 icon: const Icon(
                   Icons.people_alt_rounded,
                   size: 40,

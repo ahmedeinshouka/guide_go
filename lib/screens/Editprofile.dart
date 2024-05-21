@@ -324,76 +324,30 @@ class _EditProfileState extends State<EditProfile> {
             transaction.update(userRef, dataToUpdate);
             print('Updated userType: $userType');
 
-            // Update reviews collection with the new name and photoUrl
-            if (_name.isNotEmpty || photoUrl.isNotEmpty) {
-              final reviews = await FirebaseFirestore.instance
-                  .collection('reviews')
-                  .where('userId', isEqualTo: _auth.currentUser!.uid)
-                  .get();
+            // Update reviews collections with the new name and photoUrl
+            List<String> reviewCollections = [
+              'reviews',
+              'Siwa_reviews',
+              'manial_reviews',
+              'romanamphitheatre_reviews',
+              'ageeba_reviews'
+            ];
 
-              for (var review in reviews.docs) {
-                Map<String, dynamic> reviewDataToUpdate = {};
-                if (_name.isNotEmpty) reviewDataToUpdate['userName'] = _name;
-                if (photoUrl.isNotEmpty) reviewDataToUpdate['photoUrl'] = photoUrl;
-
-                transaction.update(review.reference, reviewDataToUpdate);
-              }
-            }
+            for (String collection in reviewCollections) {
               if (_name.isNotEmpty || photoUrl.isNotEmpty) {
-              final reviews = await FirebaseFirestore.instance
-                  .collection('Siwa_reviews')
-                  .where('userId', isEqualTo: _auth.currentUser!.uid)
-                  .get();
+                final reviews = await FirebaseFirestore.instance
+                    .collection(collection)
+                    .where('userId', isEqualTo: _auth.currentUser!.uid)
+                    .get();
 
-              for (var review in reviews.docs) {
-                Map<String, dynamic> reviewDataToUpdate = {};
-                if (_name.isNotEmpty) reviewDataToUpdate['userName'] = _name;
-                if (photoUrl.isNotEmpty) reviewDataToUpdate['photoUrl'] = photoUrl;
+                for (var review in reviews.docs) {
+                  Map<String, dynamic> reviewDataToUpdate = {};
+                  if (_name.isNotEmpty) reviewDataToUpdate['userName'] = _name;
+                  if (photoUrl.isNotEmpty)
+                    reviewDataToUpdate['photoUrl'] = photoUrl;
 
-                transaction.update(review.reference, reviewDataToUpdate);
-              }
-            }
-              if (_name.isNotEmpty || photoUrl.isNotEmpty) {
-              final reviews = await FirebaseFirestore.instance
-                  .collection('manial_reviews')
-                  .where('userId', isEqualTo: _auth.currentUser!.uid)
-                  .get();
-
-              for (var review in reviews.docs) {
-                Map<String, dynamic> reviewDataToUpdate = {};
-                if (_name.isNotEmpty) reviewDataToUpdate['userName'] = _name;
-                if (photoUrl.isNotEmpty) reviewDataToUpdate['photoUrl'] = photoUrl;
-
-                transaction.update(review.reference, reviewDataToUpdate);
-              }
-            }
-              if (_name.isNotEmpty || photoUrl.isNotEmpty) {
-              final reviews = await FirebaseFirestore.instance
-                  .collection('romanamphitheatre_reviews')
-                  .where('userId', isEqualTo: _auth.currentUser!.uid)
-                  .get();
-
-              for (var review in reviews.docs) {
-                Map<String, dynamic> reviewDataToUpdate = {};
-                if (_name.isNotEmpty) reviewDataToUpdate['userName'] = _name;
-                if (photoUrl.isNotEmpty) reviewDataToUpdate['photoUrl'] = photoUrl;
-
-                transaction.update(review.reference, reviewDataToUpdate);
-              }
-            }
-            //ageeba_reviews
-              if (_name.isNotEmpty || photoUrl.isNotEmpty) {
-              final reviews = await FirebaseFirestore.instance
-                  .collection('ageeba_reviews')
-                  .where('userId', isEqualTo: _auth.currentUser!.uid)
-                  .get();
-
-              for (var review in reviews.docs) {
-                Map<String, dynamic> reviewDataToUpdate = {};
-                if (_name.isNotEmpty) reviewDataToUpdate['userName'] = _name;
-                if (photoUrl.isNotEmpty) reviewDataToUpdate['photoUrl'] = photoUrl;
-
-                transaction.update(review.reference, reviewDataToUpdate);
+                  transaction.update(review.reference, reviewDataToUpdate);
+                }
               }
             }
           }

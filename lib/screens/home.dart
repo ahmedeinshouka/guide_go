@@ -126,7 +126,7 @@ Future<void> _getUserData() async {
   children: [
     Column(
       crossAxisAlignment: CrossAxisAlignment.start, // Align start for Column
-      children: [SizedBox(height:17,),
+      children: [SizedBox(height:12,),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,

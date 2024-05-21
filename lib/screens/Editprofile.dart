@@ -198,14 +198,7 @@ class _EditProfileState extends State<EditProfile> {
                 ),
                 onSaved: (value) => _phoneNumber = value!,
                 onChanged: (value) => _phoneNumber = value!,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your phone number';
-                  } else if (!RegExp(r'^\+?[0-9]{10,15}$').hasMatch(value)) {
-                    return 'Please enter a valid phone number';
-                  }
-                  return null;
-                },
+                
               ),
               const SizedBox(height: 16.0),
               RadioListTile(

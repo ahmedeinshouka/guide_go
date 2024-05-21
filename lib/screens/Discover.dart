@@ -115,6 +115,7 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
                         region: user['region'], // Pass the image URLs,
                         uid: user['uid'],
                         rating: rating,
+                        phoneNumber:user['phoneNumber'],
                       );
                     },
                   );

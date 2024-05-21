@@ -368,7 +368,7 @@ class _ProfileState extends State<Profile> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
-                  ),
+                  ),SizedBox(height: 5,),if (_phoneNumber.isNotEmpty) Row(mainAxisAlignment: MainAxisAlignment.center,children: [Icon(Icons.phone),Text(_phoneNumber,  style: TextStyle(fontWeight: FontWeight.bold),)],),
                 SizedBox(height: 5),
                 if (_dateOfBirth.isNotEmpty)
                   Row(

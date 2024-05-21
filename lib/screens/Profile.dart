@@ -19,6 +19,7 @@ class Profile extends StatelessWidget {
   final String dateOfBirth;
   final String region;
   final double rating;
+  final String phoneNumber ;
 
   Profile({
     Key? key,
@@ -34,6 +35,7 @@ class Profile extends StatelessWidget {
     required this.dateOfBirth,
     required this.region,
     required this.rating,
+    required this.phoneNumber,
   }) : super(key: key);
 
   @override
@@ -154,7 +156,7 @@ class Profile extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
-                ),
+                ),SizedBox(height: 5,),if (phoneNumber.isNotEmpty) Row(mainAxisAlignment: MainAxisAlignment.center,children: [Icon(Icons.phone),Text(phoneNumber,  style: TextStyle(fontWeight: FontWeight.bold),)],),
               SizedBox(height: 5),
               if (dateOfBirth.isNotEmpty)
                 Row(

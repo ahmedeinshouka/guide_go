@@ -25,6 +25,7 @@ class _EditProfileState extends State<EditProfile> {
   String _region = '';
   String _city = '';
   String _bio = '';
+  String _phoneNumber = '';
   String userType = '';
   String? selectedType;
 
@@ -61,6 +62,7 @@ class _EditProfileState extends State<EditProfile> {
           _bio = userData['bio'] ?? '';
           userType = userData['userType'] ?? '';
           selectedType = userType;
+          _phoneNumber = userData['phoneNumber'] ?? '';
           print('Fetched userType: $userType');
         });
       }
@@ -79,8 +81,10 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<Uint8List> _resizeImage(File imageFile) async {
-    final img.Image originalImage = img.decodeImage(imageFile.readAsBytesSync())!;
-    final img.Image resizedImage = img.copyResize(originalImage, width: 600); // Resize to a max width of 600px
+    final img.Image originalImage =
+        img.decodeImage(imageFile.readAsBytesSync())!;
+    final img.Image resizedImage = img.copyResize(originalImage,
+        width: 600); // Resize to a max width of 600px
     return Uint8List.fromList(img.encodeJpg(resizedImage));
   }
 
@@ -187,6 +191,23 @@ class _EditProfileState extends State<EditProfile> {
                 onChanged: (value) => _bio = value,
               ),
               const SizedBox(height: 16.0),
+              TextFormField(
+                initialValue: _phoneNumber,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                ),
+                onSaved: (value) => _phoneNumber = value!,
+                onChanged: (value) => _phoneNumber = value!,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your phone number';
+                  } else if (!RegExp(r'^\+?[0-9]{10,15}$').hasMatch(value)) {
+                    return 'Please enter a valid phone number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
               RadioListTile(
                 title: Text("I'm a Traveller"),
                 value: "Traveler",
@@ -215,7 +236,8 @@ class _EditProfileState extends State<EditProfile> {
               const SizedBox(height: 16.0),
               ElevatedButton(
                 style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(Color(0xff003961))),
+                    backgroundColor:
+                        MaterialStatePropertyAll(Color(0xff003961))),
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
@@ -304,6 +326,7 @@ class _EditProfileState extends State<EditProfile> {
             if (_bio.isNotEmpty) dataToUpdate['bio'] = _bio;
             if (photoUrl.isNotEmpty) dataToUpdate['photoUrl'] = photoUrl;
             if (userType.isNotEmpty) dataToUpdate['userType'] = userType;
+            if (_phoneNumber.isNotEmpty) dataToUpdate['phoneNumber'] = _phoneNumber;
 
             transaction.update(userRef, dataToUpdate);
             print('Updated userType: $userType');

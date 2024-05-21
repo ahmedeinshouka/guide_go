@@ -219,10 +219,12 @@ class _EditProfileState extends State<EditProfile> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
-                    saveChangesToFirestore();
-                    if (_password.isNotEmpty) {
-                      _auth.currentUser!.updatePassword(_password);
-                    }
+                    saveChangesToFirestore().then((_) {
+                      if (_password.isNotEmpty) {
+                        _auth.currentUser!.updatePassword(_password);
+                      }
+                      Navigator.pushNamed(context, '/profile');
+                    });
                   }
                 },
                 child: const Text(

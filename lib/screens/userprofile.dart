@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:image/image.dart' as img;
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -40,7 +41,6 @@ class _ProfileState extends State<Profile> {
 
   Future<void> _fetchImagesFromFirestore() async {
     try {
-      // Fetch gallery images URLs
       QuerySnapshot gallerySnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(_currentUser!.uid)
@@ -49,7 +49,6 @@ class _ProfileState extends State<Profile> {
       List<String> urls =
           gallerySnapshot.docs.map((doc) => doc['imageUrl'] as String).toList();
 
-      // Update Firestore document with image URLs array
       await FirebaseFirestore.instance
           .collection('users')
           .doc(_currentUser!.uid)
@@ -129,7 +128,6 @@ class _ProfileState extends State<Profile> {
         _imageUrls.add(downloadURL);
       });
 
-      // Update Firestore document with image URLs array
       await _fetchImagesFromFirestore();
     } catch (e) {
       if (e is FirebaseException) {
@@ -158,7 +156,6 @@ class _ProfileState extends State<Profile> {
         _imageUrls.remove(imageUrl);
       });
 
-      // Update Firestore document with image URLs array
       await _fetchImagesFromFirestore();
     } catch (e) {
       print('Error deleting image: $e');
@@ -178,12 +175,85 @@ class _ProfileState extends State<Profile> {
           _imageUrls.add(newDownloadURL);
         });
 
-        // Update Firestore document with image URLs array
         await _fetchImagesFromFirestore();
       }
     } catch (e) {
       print('Error editing image: $e');
     }
+  }
+
+  Future<String> _resizeImage(File image) async {
+    try {
+      img.Image? originalImage = img.decodeImage(await image.readAsBytes());
+      if (originalImage == null) {
+        throw Exception('Unable to decode image');
+      }
+      img.Image resizedImage = img.copyResize(originalImage, width: 600);
+      File resizedFile = File(image.path)
+        ..writeAsBytesSync(img.encodeJpg(resizedImage, quality: 85));
+      return resizedFile.path;
+    } catch (e) {
+      print('Error resizing image: $e');
+      return '';
+    }
+  }
+
+  Future<String> _uploadImageToFirebase(File image,
+      {bool isProfileImage = false}) async {
+    try {
+      if (_auth.currentUser == null) {
+        print('User is not authenticated. Please sign in.');
+        return '';
+      }
+
+      String resizedImagePath = await _resizeImage(image);
+      File resizedImage = File(resizedImagePath);
+
+      String fileName = resizedImage.path.split('/').last;
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child(fileName);
+      UploadTask uploadTask = storageReference.putFile(resizedImage);
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadURL = await snapshot.ref.getDownloadURL();
+
+      DocumentReference userRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(_auth.currentUser!.uid);
+      userRef.collection('imageGallery').add({'imageUrl': downloadURL});
+
+      return downloadURL;
+    } catch (e) {
+      print('Error uploading image: $e');
+      return '';
+    }
+  }
+
+  void _showEditDeleteDialog(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Edit or Delete Image"),
+          content: Text("Would you like to edit or delete this image?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Edit"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _editImage(imageUrl);
+              },
+            ),
+            TextButton(
+              child: Text("Delete"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteImage(imageUrl);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -345,7 +415,6 @@ class _ProfileState extends State<Profile> {
               IconButton(
                 highlightColor: Colors.amber,
                 onPressed: () {
-                  // Check if the current route is not the home screen
                   if (ModalRoute.of(context)?.settings.name != '/') {
                     Navigator.popAndPushNamed(context, "/");
                   }
@@ -380,7 +449,6 @@ class _ProfileState extends State<Profile> {
               IconButton(
                 highlightColor: Colors.amber,
                 onPressed: () {
-                  // Check if the current route is not the chatList screen
                   if (ModalRoute.of(context)?.settings.name != '/chatList') {
                     Navigator.pushNamed(context, "/chatList");
                   }
@@ -396,7 +464,6 @@ class _ProfileState extends State<Profile> {
               IconButton(
                 highlightColor: Colors.amber,
                 onPressed: () {
-                  // Check if the current route is not the profile screen
                   if (ModalRoute.of(context)?.settings.name != '/profile') {
                     Navigator.pushNamed(context, "/profile");
                   }
@@ -470,60 +537,5 @@ class _ProfileState extends State<Profile> {
     } else {
       print('URL is empty');
     }
-  }
-
-  Future<String> _uploadImageToFirebase(File image,
-      {bool isProfileImage = false}) async {
-    try {
-      if (_auth.currentUser == null) {
-        print('User is not authenticated. Please sign in.');
-        return '';
-      }
-
-      String fileName = image.path.split('/').last;
-      Reference storageReference =
-          FirebaseStorage.instance.ref().child(fileName);
-      UploadTask uploadTask = storageReference.putFile(image);
-      TaskSnapshot snapshot = await uploadTask;
-      String downloadURL = await snapshot.ref.getDownloadURL();
-
-      DocumentReference userRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(_auth.currentUser!.uid);
-      userRef.collection('imageGallery').add({'imageUrl': downloadURL});
-
-      return downloadURL;
-    } catch (e) {
-      print('Error uploading image: $e');
-      return '';
-    }
-  }
-
-  void _showEditDeleteDialog(String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Edit or Delete Image"),
-          content: Text("Would you like to edit or delete this image?"),
-          actions: <Widget>[
-            TextButton(
-              child: Text("Edit"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _editImage(imageUrl);
-              },
-            ),
-            TextButton(
-              child: Text("Delete"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _deleteImage(imageUrl);
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 }

@@ -22,7 +22,10 @@ class _homeState extends State<home> {
   late String _email = '';
   late String _photoUrl = '';
 
-  
+  String firstWord(String text) {
+  return text.split(' ').first;
+}
+
 
 
   @override
@@ -123,25 +126,25 @@ Future<void> _getUserData() async {
   children: [
     Column(
       crossAxisAlignment: CrossAxisAlignment.start, // Align start for Column
-      children: [
+      children: [SizedBox(height:17,),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(width: 10),
             Text(
-              "Hello👋 ",
+              "Hello👋",
               style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
               textAlign: TextAlign.left,
             ),
             Text(
-              _displayName,
-              style: TextStyle(
-                overflow: TextOverflow.clip,
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+  firstWord(_displayName),
+  style: TextStyle(
+    overflow: TextOverflow.clip,
+    fontSize: 25,
+    fontWeight: FontWeight.bold,
+  ),
+),
           ],
         ),
         const SizedBox(height: 10),

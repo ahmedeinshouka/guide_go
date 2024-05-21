@@ -50,7 +50,7 @@ Future<void> main() async {
   User? user = auth.currentUser;
 
   // Use a ternary operator to set the initial route
-  String initialRoute = user != null ? '/discover' : '/splash';
+  String initialRoute = user != null ? '/' : '/splash';
 
   runApp(MyApp(initialRoute: initialRoute));
 }

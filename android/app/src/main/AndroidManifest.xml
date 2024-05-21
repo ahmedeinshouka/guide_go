@@ -4,7 +4,7 @@ package="com.example.google_maps_in_flutter">
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <application
-        android:label="guide_go"
+        android:label="GuideGo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         >

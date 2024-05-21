@@ -156,6 +156,7 @@ class LoginScreen extends StatelessWidget {
           double rating = 0;
           // Generate UID
           String uid = user.uid;
+          String bio = '';
 
           // Check if the user already exists in Firestore
           final DocumentSnapshot<Map<String, dynamic>> userDoc =
@@ -175,7 +176,8 @@ class LoginScreen extends StatelessWidget {
               'dateOfBirth': dateOfBirth ?? '',
               'phoneNumber': phoneNumber ?? '',
               'userType': userType ?? '',
-              'rating':rating??0,
+              'rating': rating ?? 0,
+              'bio':bio??"",
             });
           }
 

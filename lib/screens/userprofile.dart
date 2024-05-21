@@ -2,13 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:guide_go/screens/ImageViewScreen';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:photo_view/photo_view.dart';
-
+import 'package:guide_go/screens/ImageViewScreen';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image/image.dart' as img;
+
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -51,6 +51,11 @@ class _ProfileState extends State<Profile> {
           .get();
       List<String> urls =
           gallerySnapshot.docs.map((doc) => doc['imageUrl'] as String).toList();
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .update({'imageGallery': urls});
 
       setState(() {
         _imageUrls = urls;
@@ -291,8 +296,7 @@ class _ProfileState extends State<Profile> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              ImageViewScreen(imageUrl: _photoUrl),
+                          builder: (context) => ImageViewScreen(imageUrl: _photoUrl),
                         ),
                       );
                     }
@@ -364,19 +368,7 @@ class _ProfileState extends State<Profile> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
-                  ),
-                SizedBox(height: 5),
-                if (_phoneNumber.isNotEmpty)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.phone),
-                      Text(
-                        _phoneNumber,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
+                  ),SizedBox(height: 5,),if (_phoneNumber.isNotEmpty) Row(mainAxisAlignment: MainAxisAlignment.center,children: [Icon(Icons.phone),Text(_phoneNumber,  style: TextStyle(fontWeight: FontWeight.bold),)],),
                 SizedBox(height: 5),
                 if (_dateOfBirth.isNotEmpty)
                   Row(
@@ -429,7 +421,7 @@ class _ProfileState extends State<Profile> {
                       );
                     },
                   ),
-                ),
+                )
               ],
             ),
           ),
@@ -527,7 +519,7 @@ class _ProfileState extends State<Profile> {
                               source: ImageSource.gallery);
                           if (pickedFile != null) {
                             File imageFile = File(pickedFile.path);
-                            await _uploadImage(imageFile);
+                            _uploadImage(imageFile);
                             Navigator.pop(context);
                           }
                         },
@@ -540,7 +532,7 @@ class _ProfileState extends State<Profile> {
                               source: ImageSource.camera);
                           if (pickedFile != null) {
                             File imageFile = File(pickedFile.path);
-                            await _uploadImage(imageFile);
+                            _uploadImage(imageFile);
                             Navigator.pop(context);
                           }
                         },

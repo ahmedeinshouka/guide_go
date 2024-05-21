@@ -323,6 +323,22 @@ class _EditProfileState extends State<EditProfile> {
 
             transaction.update(userRef, dataToUpdate);
             print('Updated userType: $userType');
+
+            // Update reviews collection with the new name and photoUrl
+            if (_name.isNotEmpty || photoUrl.isNotEmpty) {
+              final reviews = await FirebaseFirestore.instance
+                  .collection('reviews')
+                  .where('userId', isEqualTo: _auth.currentUser!.uid)
+                  .get();
+
+              for (var review in reviews.docs) {
+                Map<String, dynamic> reviewDataToUpdate = {};
+                if (_name.isNotEmpty) reviewDataToUpdate['userName'] = _name;
+                if (photoUrl.isNotEmpty) reviewDataToUpdate['photoUrl'] = photoUrl;
+
+                transaction.update(review.reference, reviewDataToUpdate);
+              }
+            }
           }
         });
 

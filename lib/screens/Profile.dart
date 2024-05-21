@@ -155,6 +155,7 @@ class Profile extends StatelessWidget {
                   ],
                 ),
               SizedBox(height: 8),
+              if (bio.isNotEmpty)
               Text(
                 "“$bio”",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

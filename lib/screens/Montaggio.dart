@@ -1,8 +1,10 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Montaggio extends StatefulWidget {

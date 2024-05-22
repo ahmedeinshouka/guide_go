@@ -138,6 +138,32 @@ class _KomonaState extends State<Komona> {
                             ),
                           ),
                         ),
+                        Positioned(
+                          bottom: 0,
+                          right: -20,
+                          child: ElevatedButton(
+                            onPressed: () => setState(() {
+                              _launched = _launchInBrowserView(toLaunch);
+                            }),
+                            style: const ButtonStyle(
+                              overlayColor: MaterialStatePropertyAll(Colors.amber),
+                              backgroundColor: MaterialStatePropertyAll(
+                                Color.fromARGB(255, 255, 255, 255),
+                              ),
+                              shadowColor: MaterialStatePropertyAll(Colors.grey),
+                              shape: MaterialStatePropertyAll(CircleBorder()),
+                              iconSize: MaterialStatePropertyAll(50),
+                              iconColor: MaterialStatePropertyAll(Colors.black),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(5.0),
+                              child: Icon(
+                                Icons.info_rounded,
+                                size: 50,
+                              ),
+                            ),
+                          ),
+                        )
                       ],
                     ),
                     const SizedBox(height: 35),
@@ -307,30 +333,7 @@ class _KomonaState extends State<Komona> {
                   ],
                 ),
               ),
-              Positioned(
-                bottom: 339,
-                right: 15,
-                child: ElevatedButton(
-                  onPressed: () => setState(() {
-                    _launched = _launchInBrowserView(toLaunch);
-                  }),
-                  style: const ButtonStyle(
-                    overlayColor: MaterialStatePropertyAll(Colors.amber),
-                    backgroundColor: MaterialStatePropertyAll(Color.fromARGB(255, 255, 255, 255)),
-                    shadowColor: MaterialStatePropertyAll(Colors.grey),
-                    shape: MaterialStatePropertyAll(CircleBorder()),
-                    iconSize: MaterialStatePropertyAll(50),
-                    iconColor: MaterialStatePropertyAll(Colors.black),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(5.0),
-                    child: Icon(
-                      Icons.info_rounded,
-                      size: 50,
-                    ),
-                  ),
-                ),
-              ),
+            
             ],
           ),
         ),

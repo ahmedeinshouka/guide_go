@@ -9,7 +9,6 @@ import 'package:guide_go/screens/ImageViewScreen';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image/image.dart' as img;
 
-
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
 
@@ -31,6 +30,8 @@ class _ProfileState extends State<Profile> {
   String _userType = '';
   final ImagePicker _imagePicker = ImagePicker();
   List<String> _imageUrls = [];
+  bool _isUploading = false;
+  double _uploadProgress = 0.0;
 
   @override
   void initState() {
@@ -115,10 +116,23 @@ class _ProfileState extends State<Profile> {
         return;
       }
 
+      setState(() {
+        _isUploading = true;
+        _uploadProgress = 0.0;
+      });
+
       String fileName = DateTime.now().millisecondsSinceEpoch.toString();
       Reference storageReference =
           FirebaseStorage.instance.ref().child(fileName);
       UploadTask uploadTask = storageReference.putFile(image);
+
+      uploadTask.snapshotEvents.listen((event) {
+        setState(() {
+          _uploadProgress =
+              (event.bytesTransferred.toDouble() / event.totalBytes.toDouble());
+        });
+      });
+
       await uploadTask.whenComplete(() => null);
       String downloadURL = await storageReference.getDownloadURL();
 
@@ -129,10 +143,14 @@ class _ProfileState extends State<Profile> {
 
       setState(() {
         _imageUrls.add(downloadURL);
+        _isUploading = false;
       });
 
       await _fetchImagesFromFirestore();
     } catch (e) {
+      setState(() {
+        _isUploading = false;
+      });
       if (e is FirebaseException) {
         print('Firebase Storage Error: ${e.code} - ${e.message}');
       } else {
@@ -296,7 +314,8 @@ class _ProfileState extends State<Profile> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ImageViewScreen(imageUrl: _photoUrl),
+                          builder: (context) =>
+                              ImageViewScreen(imageUrl: _photoUrl),
                         ),
                       );
                     }
@@ -421,7 +440,18 @@ class _ProfileState extends State<Profile> {
                       );
                     },
                   ),
-                )
+                ),
+                if (_isUploading)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Text("Uploading Image..."),
+                        SizedBox(height: 10),
+                        LinearProgressIndicator(value: _uploadProgress),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),

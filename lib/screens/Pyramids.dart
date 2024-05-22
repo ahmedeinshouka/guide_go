@@ -15,6 +15,33 @@ class _PyramidsState extends State<Pyramids> {
   final TextEditingController _reviewController = TextEditingController();
   Future<void>? _launched;
   String? _editingReviewId;
+  String? _userName;
+  String? _photoUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        setState(() {
+          _userName = userDoc['fullName'];
+          _photoUrl = userDoc['photoUrl'];
+        });
+      } else {
+        setState(() {
+          _userName = user.email;
+          _photoUrl = user.photoURL;
+        });
+      }
+    }
+  }
 
   Future<void> _launchInBrowserView(Uri url) async {
     if (!await launchUrl(url, mode: LaunchMode.inAppWebView)) {
@@ -23,15 +50,15 @@ class _PyramidsState extends State<Pyramids> {
   }
 
   void _addReview() async {
-    if (_reviewController.text.isNotEmpty) {
+    if (_reviewController.text.isNotEmpty && _userName != null) {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         await _firestore.collection('reviews').add({
           'review': _reviewController.text,
           'timestamp': FieldValue.serverTimestamp(),
           'userId': user.uid,
-          'userName': user.email,
-          'photoUrl': user.photoURL,
+          'userName': _userName,
+          'photoUrl': _photoUrl,
           'likes': [],
         });
         _reviewController.clear();

@@ -26,12 +26,16 @@ class _SiwaState extends State<Siwa> {
     if (_reviewController.text.isNotEmpty) {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        String userName = userDoc['fullName'];
+        String? photoUrl = userDoc['photoUrl'];
+        
         await _firestore.collection('Siwa_reviews').add({
           'review': _reviewController.text,
           'timestamp': FieldValue.serverTimestamp(),
           'userId': user.uid,
-          'userName': user.email,
-          'photoUrl': user.photoURL,
+          'userName': userName,
+          'photoUrl': photoUrl,
           'likes': [],
         });
         _reviewController.clear();

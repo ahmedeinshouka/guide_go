@@ -15,6 +15,33 @@ class _AgeebaState extends State<Ageeba> {
   final TextEditingController _reviewController = TextEditingController();
   Future<void>? _launched;
   String? _editingReviewId;
+  String? _userName;
+  String? _photoUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        setState(() {
+          _userName = userDoc['fullName'];
+          _photoUrl = userDoc['photoUrl'];
+        });
+      } else {
+        setState(() {
+          _userName = user.email;
+          _photoUrl = user.photoURL;
+        });
+      }
+    }
+  }
 
   Future<void> _launchInBrowserView(Uri url) async {
     if (!await launchUrl(url, mode: LaunchMode.inAppWebView)) {
@@ -23,15 +50,15 @@ class _AgeebaState extends State<Ageeba> {
   }
 
   void _addReview() async {
-    if (_reviewController.text.isNotEmpty) {
+    if (_reviewController.text.isNotEmpty && _userName != null) {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         await _firestore.collection('ageeba_reviews').add({
           'review': _reviewController.text,
           'timestamp': FieldValue.serverTimestamp(),
           'userId': user.uid,
-          'userName': user.email,
-          'photoUrl': user.photoURL,
+          'userName': _userName,
+          'photoUrl': _photoUrl,
           'likes': [],
         });
         _reviewController.clear();
@@ -132,32 +159,35 @@ class _AgeebaState extends State<Ageeba> {
                             ),
                           ),
                         ),
-                      Positioned(
-                bottom: 0,
-                right: -20,
-                child: ElevatedButton(
-                  onPressed: () => setState(() {
-                    _launched = _launchInBrowserView(toLaunch);
-                  }),
-                  style: const ButtonStyle(
-                    overlayColor: MaterialStatePropertyAll(Colors.amber),
-                    backgroundColor: MaterialStatePropertyAll(
-                      Color.fromARGB(255, 255, 255, 255),
-                    ),
-                    shadowColor: MaterialStatePropertyAll(Colors.grey),
-                    shape: MaterialStatePropertyAll(CircleBorder()),
-                    iconSize: MaterialStatePropertyAll(50),
-                    iconColor: MaterialStatePropertyAll(Colors.black),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(5.0),
-                    child: Icon(
-                      Icons.info_rounded,
-                      size: 50,
-                    ),
-                  ),
-                ),
-              )],
+                        Positioned(
+                          bottom: 0,
+                          right: -20,
+                          child: ElevatedButton(
+                            onPressed: () => setState(() {
+                              _launched = _launchInBrowserView(toLaunch);
+                            }),
+                            style: const ButtonStyle(
+                              overlayColor:
+                                  MaterialStatePropertyAll(Colors.amber),
+                              backgroundColor: MaterialStatePropertyAll(
+                                Color.fromARGB(255, 255, 255, 255),
+                              ),
+                              shadowColor:
+                                  MaterialStatePropertyAll(Colors.grey),
+                              shape: MaterialStatePropertyAll(CircleBorder()),
+                              iconSize: MaterialStatePropertyAll(50),
+                              iconColor: MaterialStatePropertyAll(Colors.black),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(5.0),
+                              child: Icon(
+                                Icons.info_rounded,
+                                size: 50,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                     const SizedBox(height: 35),
                     Row(
@@ -199,17 +229,16 @@ class _AgeebaState extends State<Ageeba> {
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
-                            Text(
-  "“There's no words can describe that place\n"
-  "than its name (Ageeba) that mean amazing because\n"
-  "it is God's gift and gave it all the beauty that\n"
-  "has never been in another place.”",
-  maxLines: 4,
-  softWrap: true,
-  overflow: TextOverflow.ellipsis,
-  style: TextStyle(color: Colors.grey),
-)
-,
+                            const Text(
+                              "“There's no words can describe that place\n"
+                              "than its name (Ageeba) that mean amazing because\n"
+                              "it is God's gift and gave it all the beauty that\n"
+                              "has never been in another place.”",
+                              maxLines: 4,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: Colors.grey),
+                            ),
                             const SizedBox(height: 5),
                             const Text(
                               "Services in Ageeba Mountains",
@@ -225,7 +254,8 @@ class _AgeebaState extends State<Ageeba> {
                                 Container(
                                   decoration: BoxDecoration(
                                     image: const DecorationImage(
-                                      image: AssetImage("assets/414462087_668597158763555_1544068293350259189_n.jpg"),
+                                      image: AssetImage(
+                                          "assets/414462087_668597158763555_1544068293350259189_n.jpg"),
                                       fit: BoxFit.cover,
                                     ),
                                     borderRadius: BorderRadius.circular(14),
@@ -250,8 +280,10 @@ class _AgeebaState extends State<Ageeba> {
                                         const SizedBox(width: 5),
                                         DecoratedBox(
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(32),
-                                            color: const Color.fromRGBO(234, 232, 232, 0.759),
+                                            borderRadius:
+                                                BorderRadius.circular(32),
+                                            color: const Color.fromRGBO(
+                                                234, 232, 232, 0.759),
                                           ),
                                           child: Padding(
                                             padding: const EdgeInsets.all(5),
@@ -434,7 +466,6 @@ class _AgeebaState extends State<Ageeba> {
                   ],
                 ),
               ),
-              
             ],
           ),
         ),

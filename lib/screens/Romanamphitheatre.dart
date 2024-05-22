@@ -15,6 +15,32 @@ class _RomanamphitheatreState extends State<Romanamphitheatre> {
   final TextEditingController _reviewController = TextEditingController();
   Future<void>? _launched;
   String? _editingReviewId;
+  String? _userName;
+  String? _userPhotoUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        setState(() {
+          _userName = userDoc['fullName'];
+          _userPhotoUrl = userDoc['photoUrl'];
+        });
+      } else {
+        setState(() {
+          _userName = user.email;
+          _userPhotoUrl = user.photoURL;
+        });
+      }
+    }
+  }
 
   Future<void> _launchInBrowserView(Uri url) async {
     if (!await launchUrl(url, mode: LaunchMode.inAppWebView)) {
@@ -30,8 +56,8 @@ class _RomanamphitheatreState extends State<Romanamphitheatre> {
           'review': _reviewController.text,
           'timestamp': FieldValue.serverTimestamp(),
           'userId': user.uid,
-          'userName': user.email,
-          'photoUrl': user.photoURL,
+          'userName': _userName ?? user.email,
+          'photoUrl': _userPhotoUrl ?? user.photoURL,
           'likes': [],
         });
         _reviewController.clear();
@@ -134,32 +160,33 @@ class _RomanamphitheatreState extends State<Romanamphitheatre> {
                             ),
                           ),
                         ),
-                      Positioned(
-                        bottom: 0,
-                        right: -20,
-                        child: ElevatedButton(
-                          onPressed: () => setState(() {
-                            _launched = _launchInBrowserView(toLaunch);
-                          }),
-                          style: const ButtonStyle(
-                            overlayColor: MaterialStatePropertyAll(Colors.amber),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Color.fromARGB(255, 255, 255, 255),
+                        Positioned(
+                          bottom: 0,
+                          right: -20,
+                          child: ElevatedButton(
+                            onPressed: () => setState(() {
+                              _launched = _launchInBrowserView(toLaunch);
+                            }),
+                            style: const ButtonStyle(
+                              overlayColor: MaterialStatePropertyAll(Colors.amber),
+                              backgroundColor: MaterialStatePropertyAll(
+                                Color.fromARGB(255, 255, 255, 255),
+                              ),
+                              shadowColor: MaterialStatePropertyAll(Colors.grey),
+                              shape: MaterialStatePropertyAll(CircleBorder()),
+                              iconSize: MaterialStatePropertyAll(50),
+                              iconColor: MaterialStatePropertyAll(Colors.black),
                             ),
-                            shadowColor: MaterialStatePropertyAll(Colors.grey),
-                            shape: MaterialStatePropertyAll(CircleBorder()),
-                            iconSize: MaterialStatePropertyAll(50),
-                            iconColor: MaterialStatePropertyAll(Colors.black),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(5.0),
-                            child: Icon(
-                              Icons.info_rounded,
-                              size: 50,
+                            child: const Padding(
+                              padding: EdgeInsets.all(5.0),
+                              child: Icon(
+                                Icons.info_rounded,
+                                size: 50,
+                              ),
                             ),
                           ),
                         ),
-                      )],
+                      ],
                     ),
                     const SizedBox(height: 35),
                     Row(
@@ -202,16 +229,15 @@ class _RomanamphitheatreState extends State<Romanamphitheatre> {
                               ),
                             ),
                             const Text(
-  "“Alexandria was founded by Alexander the great in\n"
-  "332 B.C on the site of an old fishing village. It has\nthrived"
-  " for more than 500 years and was the capital\ncity"
-  "of Egypt during important eras.“",
-  maxLines: 4,
-  softWrap: true,
-  overflow: TextOverflow.ellipsis,
-  style: TextStyle(color: Colors.grey),
-)
-,
+                              "“Alexandria was founded by Alexander the great in\n"
+                              "332 B.C on the site of an old fishing village. It has\nthrived"
+                              " for more than 500 years and was the capital\ncity"
+                              "of Egypt during important eras.“",
+                              maxLines: 4,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: Colors.grey),
+                            ),
                             const SizedBox(height: 5),
                             const Text(
                               "Services in Roman amphitheatre",
@@ -344,7 +370,8 @@ class _RomanamphitheatreState extends State<Romanamphitheatre> {
                           ),
                         ),
                       ],
-                    ),Padding(
+                    ),
+                    Padding(
                       padding: const EdgeInsets.fromLTRB(22.0, 0, 22.0, 0),
                       child: TextField(
                         controller: _reviewController,
@@ -361,7 +388,8 @@ class _RomanamphitheatreState extends State<Romanamphitheatre> {
                           ),
                         ),
                       ),
-                    ),  Container(
+                    ),
+                    Container(
                       height: 200, // Set a specific height for the reviews section
                       child: StreamBuilder<QuerySnapshot>(
                         stream: _firestore
@@ -433,7 +461,6 @@ class _RomanamphitheatreState extends State<Romanamphitheatre> {
                         },
                       ),
                     ),
-                  
                   ],
                 ),
               ),

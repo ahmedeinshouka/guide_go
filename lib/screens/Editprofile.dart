@@ -196,9 +196,7 @@ class _EditProfileState extends State<EditProfile> {
                 decoration: InputDecoration(
                   labelText: 'Phone Number',
                 ),
-                onSaved: (value) => _phoneNumber = value!,
                 onChanged: (value) => _phoneNumber = value!,
-                
               ),
               const SizedBox(height: 16.0),
               RadioListTile(
@@ -234,10 +232,12 @@ class _EditProfileState extends State<EditProfile> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
+                    _showLoadingDialog();
                     saveChangesToFirestore().then((_) {
                       if (_password.isNotEmpty) {
                         _auth.currentUser!.updatePassword(_password);
                       }
+                      Navigator.pop(context); // Close loading dialog
                       Navigator.pushNamed(context, '/profile');
                     });
                   }
@@ -319,7 +319,8 @@ class _EditProfileState extends State<EditProfile> {
             if (_bio.isNotEmpty) dataToUpdate['bio'] = _bio;
             if (photoUrl.isNotEmpty) dataToUpdate['photoUrl'] = photoUrl;
             if (userType.isNotEmpty) dataToUpdate['userType'] = userType;
-            if (_phoneNumber.isNotEmpty) dataToUpdate['phoneNumber'] = _phoneNumber;
+            if (_phoneNumber.isNotEmpty)
+              dataToUpdate['phoneNumber'] = _phoneNumber;
 
             transaction.update(userRef, dataToUpdate);
             print('Updated userType: $userType');
@@ -360,6 +361,8 @@ class _EditProfileState extends State<EditProfile> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update profile: $error')),
         );
+      } finally {
+        Navigator.pop(context); // Hide loading dialog
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -381,5 +384,27 @@ class _EditProfileState extends State<EditProfile> {
         _dateOfBirth = DateFormat('yyyy-MM-dd').format(picked);
       });
     }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 16),
+                Text("Saving changes..."),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

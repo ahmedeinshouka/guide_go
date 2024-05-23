@@ -33,6 +33,8 @@ class _EditProfileState extends State<EditProfile> {
   final picker = ImagePicker();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  double _uploadProgress = 0;
+
   @override
   void initState() {
     super.initState();
@@ -76,7 +78,51 @@ class _EditProfileState extends State<EditProfile> {
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
+        _uploadProgress = 0;
       });
+      await _uploadImage();
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    if (_imageFile != null) {
+      try {
+        Uint8List resizedImage = await _resizeImage(_imageFile!);
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('user_images')
+            .child(_auth.currentUser!.uid + '.jpg');
+
+        UploadTask uploadTask = storageRef.putData(resizedImage);
+
+        uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+          setState(() {
+            _uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
+          });
+        });
+
+        TaskSnapshot taskSnapshot = await uploadTask;
+        String photoUrl = await taskSnapshot.ref.getDownloadURL();
+        await savePhotoUrl(photoUrl);
+      } catch (e) {
+        print('Error uploading image: $e');
+      }
+    }
+  }
+
+  Future<void> savePhotoUrl(String photoUrl) async {
+    try {
+      final userRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(_auth.currentUser!.uid);
+      await userRef.update({'photoUrl': photoUrl});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Profile picture updated successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update profile picture: $e')),
+      );
     }
   }
 
@@ -112,15 +158,22 @@ class _EditProfileState extends State<EditProfile> {
               const SizedBox(height: 16.0),
               GestureDetector(
                 onTap: () => _showImagePicker(context),
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage:
-                      _imageFile != null && _imageFile!.existsSync()
-                          ? FileImage(_imageFile!)
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage:
+                          _imageFile != null && _imageFile!.existsSync()
+                              ? FileImage(_imageFile!)
+                              : null,
+                      child: _imageFile == null || !_imageFile!.existsSync()
+                          ? Icon(Icons.person, size: 50)
                           : null,
-                  child: _imageFile == null || !_imageFile!.existsSync()
-                      ? Icon(Icons.person, size: 50)
-                      : null,
+                    ),
+                    if (_uploadProgress > 0 && _uploadProgress < 1)
+                      CircularProgressIndicator(value: _uploadProgress),
+                  ],
                 ),
               ),
               const SizedBox(height: 16.0),

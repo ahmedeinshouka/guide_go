@@ -223,12 +223,18 @@ class _SiwaState extends State<Siwa> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      "Reviews:",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  
+                    Row(
+                      children: [
+                        const SizedBox(width: 25),
+                        const Text(
+                          "Reviews:",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 22.0),

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:guide_go/screens/ImageViewScreen';
-import 'package:guide_go/screens/chat_screen.dart';
+import 'chat_screen.dart';
 import 'package:photo_view/photo_view.dart';
 
 class Profile extends StatelessWidget {
@@ -19,7 +19,7 @@ class Profile extends StatelessWidget {
   final String dateOfBirth;
   final String region;
   final double rating;
-  final String phoneNumber ;
+  final String phoneNumber;
 
   Profile({
     Key? key,
@@ -156,7 +156,19 @@ class Profile extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
-                ),SizedBox(height: 5,),if (phoneNumber.isNotEmpty) Row(mainAxisAlignment: MainAxisAlignment.center,children: [Icon(Icons.phone),Text(phoneNumber,  style: TextStyle(fontWeight: FontWeight.bold),)],),
+                ),
+              SizedBox(height: 5),
+              if (phoneNumber.isNotEmpty)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.phone),
+                    Text(
+                      phoneNumber,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               SizedBox(height: 5),
               if (dateOfBirth.isNotEmpty)
                 Row(
@@ -172,9 +184,13 @@ class Profile extends StatelessWidget {
                 ),
               SizedBox(height: 8),
               if (bio.isNotEmpty)
-                Text(
-                  "“$bio”",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    "“$bio”",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
               SizedBox(height: 4),
               StreamBuilder<DocumentSnapshot>(
@@ -201,6 +217,7 @@ class Profile extends StatelessWidget {
                   double averageRating = uniqueRaters.isEmpty
                       ? 0
                       : totalRating / uniqueRaters.length;
+
                   return Column(
                     children: [
                       Row(
@@ -325,6 +342,40 @@ class Profile extends StatelessWidget {
           });
         }
       });
+
+      // Update the overall rating in the user's document
+      await _updateOverallRating(uid);
+    }
+  }
+
+  Future<void> _updateOverallRating(String uid) async {
+    final ratingDoc =
+        FirebaseFirestore.instance.collection('ratings').doc(uid);
+
+    final snapshot = await ratingDoc.get();
+
+    if (snapshot.exists) {
+      final ratings = snapshot.data()!['ratings'] as List<dynamic>;
+      double totalRating = 0;
+      final uniqueRaters = <String, double>{};
+
+      for (var rating in ratings) {
+        uniqueRaters[rating['userId']] = rating['rating'];
+      }
+
+      for (var rating in uniqueRaters.values) {
+        totalRating += rating;
+      }
+
+      double averageRating = uniqueRaters.isEmpty
+          ? 0
+          : totalRating / uniqueRaters.length;
+
+      // Update the user's overall rating in the user's document
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .update({'rating': averageRating});
     }
   }
 }

@@ -32,6 +32,28 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
     super.dispose();
   }
 
+  Future<double> _getUserRating(String uid) async {
+    final ratingsSnapshot = await FirebaseFirestore.instance
+        .collection('ratings')
+        .doc(uid)
+        .get();
+
+    if (!ratingsSnapshot.exists) {
+      return 0.0;
+    }
+
+    final ratings = ratingsSnapshot.data()!['ratings'] as List<dynamic>;
+    double totalRating = 0;
+    final uniqueRaters = <String, double>{};
+    for (var rating in ratings) {
+      uniqueRaters[rating['userId']] = rating['rating'];
+    }
+    for (var rating in uniqueRaters.values) {
+      totalRating += rating;
+    }
+    return uniqueRaters.isEmpty ? 0.0 : totalRating / uniqueRaters.length;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -66,7 +88,7 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
                   }
-      
+
                   final users = snapshot.data!.docs;
                   final filteredUsers = users.where((user) {
                     final fullName = user['fullName'].toLowerCase();
@@ -80,12 +102,12 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
 
                     return fullName.contains(searchLower) || email.contains(searchLower);
                   }).toList();
-      
+
                   return ListView.builder(
                     itemCount: filteredUsers.length,
                     itemBuilder: (context, index) {
                       final user = filteredUsers[index];
-      
+
                       // Fetch imageGallery field from user document
                       List<String> imageUrls = [];
                       try {
@@ -93,29 +115,35 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
                       } catch (e) {
                         print("Error fetching imageGallery: $e");
                       }
-      
-                      // Parse rating from String to double
-                      double rating = 0.0;
-                      try {
-                        rating = double.parse(user['rating']);
-                      } catch (e) {
-                        print("Error parsing rating: $e");
-                      }
 
-                      return TourGuideCard(
-                        name: user['fullName'],
-                        email: user['email'],
-                        imageUrl: user['photoUrl'] ?? '', // Handle null imageUrl
-                        bio: user['bio'],
-                        usrtype: user['userType'],
-                        imageUrls: imageUrls,
-                        country: user['country'],
-                        city: user['city'],
-                        dateOfBirth: user['dateOfBirth'],
-                        region: user['region'], // Pass the image URLs,
-                        uid: user['uid'],
-                        rating: rating,
-                        phoneNumber:user['phoneNumber'],
+                      return FutureBuilder<double>(
+                        future: _getUserRating(user['uid']),
+                        builder: (context, ratingSnapshot) {
+                          if (ratingSnapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          if (ratingSnapshot.hasError) {
+                            return Center(child: Text('Error: ${ratingSnapshot.error}'));
+                          }
+
+                          double rating = ratingSnapshot.data ?? 0.0;
+
+                          return TourGuideCard(
+                            name: user['fullName'],
+                            email: user['email'],
+                            imageUrl: user['photoUrl'] ?? '', // Handle null imageUrl
+                            bio: user['bio'] ?? '', // Handle null bio
+                            usrtype: user['userType'],
+                            imageUrls: imageUrls,
+                            country: user['country'],
+                            city: user['city'],
+                            dateOfBirth: user['dateOfBirth'],
+                            region: user['region'], // Pass the image URLs
+                            uid: user['uid'],
+                            rating: double.parse(rating.toStringAsFixed(1)),
+                            phoneNumber: user['phoneNumber'],
+                          );
+                        },
                       );
                     },
                   );

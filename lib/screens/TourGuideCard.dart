@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:guide_go/utils/theme/app_colors.dart';
 import 'Profile.dart';
 
-class TourGuideCard extends StatelessWidget {
+class TourGuideCard extends StatefulWidget {
   final String name;
   final String email;
   final String imageUrl;
   final String bio;
   final String usrtype;
-  List<String> imageUrls = [];
+  final List<String> imageUrls;
   final String country;
   final String city;
   final String dateOfBirth;
@@ -16,7 +16,6 @@ class TourGuideCard extends StatelessWidget {
   final String uid;
   final double rating;
   final String phoneNumber;
-  
 
   TourGuideCard({
     Key? key,
@@ -36,6 +35,11 @@ class TourGuideCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _TourGuideCardState createState() => _TourGuideCardState();
+}
+
+class _TourGuideCardState extends State<TourGuideCard> {
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -46,26 +50,26 @@ class TourGuideCard extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => Profile(
-                name: name,
-                email: email,
-                imageUrl: imageUrl,
-                bio: bio,
-                usrtype: usrtype,
-                imageUrls: imageUrls,
-                country: country,
-                city: city,
-                dateOfBirth: dateOfBirth,
-                region: region,
-                uid: uid,
-                rating: rating,
-                phoneNumber:phoneNumber),
+              name: widget.name,
+              email: widget.email,
+              imageUrl: widget.imageUrl,
+              bio: widget.bio,
+              usrtype: widget.usrtype,
+              imageUrls: widget.imageUrls,
+              country: widget.country,
+              city: widget.city,
+              dateOfBirth: widget.dateOfBirth,
+              region: widget.region,
+              uid: widget.uid,
+              rating: widget.rating,
+              phoneNumber: widget.phoneNumber,
+            ),
           ),
         );
       },
       child: Container(
         width: double.infinity,
-        margin: EdgeInsets.only(
-            bottom: screenHeight * 0.02), // Add space between cards
+        margin: EdgeInsets.only(bottom: screenHeight * 0.02), // Add space between cards
         padding: EdgeInsets.all(screenWidth * 0.05),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -87,26 +91,43 @@ class TourGuideCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: screenWidth * 0.1,
-                  backgroundImage: imageUrl.isNotEmpty
-                      ? NetworkImage(imageUrl)
-                      : AssetImage('assets/man.png')
-                          as ImageProvider, // Use default icon if no image
+                  backgroundImage: widget.imageUrl.isNotEmpty
+                      ? NetworkImage(widget.imageUrl)
+                      : AssetImage('assets/man.png') as ImageProvider, // Use default icon if no image
                 ),
                 SizedBox(width: screenWidth * 0.05),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        name,
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.06,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        children: [
+                          Text(
+                            widget.name,
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.06,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),SizedBox(width: 11,),
+                          if (widget.usrtype.isNotEmpty)
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                image: DecorationImage(
+                                  image: AssetImage(widget.usrtype == "Traveler"
+                                      ? 'assets/tour-guide (1).png'
+                                      : 'assets/tour-guide.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                       SizedBox(height: screenHeight * 0.01),
                       Text(
-                        email,
+                        widget.email,
                         style: TextStyle(
                           fontSize: screenWidth * 0.04,
                           color: Colors.grey,
@@ -114,11 +135,13 @@ class TourGuideCard extends StatelessWidget {
                       ),
                       SizedBox(height: screenHeight * 0.01),
                       Text(
-                        bio,
+                        widget.bio,
                         style: TextStyle(
                           fontSize: screenWidth * 0.04,
                           color: Colors.grey,
                         ),
+                        maxLines: null, // Allow the text to wrap to multiple lines
+                        overflow: TextOverflow.visible,
                       ),
                       SizedBox(height: screenHeight * 0.01),
                       Row(
@@ -134,19 +157,20 @@ class TourGuideCard extends StatelessWidget {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => Profile(
-                                      name: name,
-                                      email: email,
-                                      imageUrl: imageUrl,
-                                      bio: bio,
-                                      usrtype: usrtype,
-                                      imageUrls: imageUrls,
-                                      country: country,
-                                      city: city,
-                                      dateOfBirth: dateOfBirth,
-                                      region: region,
-                                      uid: uid,
-                                      rating: rating,
-                                      phoneNumber:phoneNumber),
+                                    name: widget.name,
+                                    email: widget.email,
+                                    imageUrl: widget.imageUrl,
+                                    bio: widget.bio,
+                                    usrtype: widget.usrtype,
+                                    imageUrls: widget.imageUrls,
+                                    country: widget.country,
+                                    city: widget.city,
+                                    dateOfBirth: widget.dateOfBirth,
+                                    region: widget.region,
+                                    uid: widget.uid,
+                                    rating: widget.rating,
+                                    phoneNumber: widget.phoneNumber,
+                                  ),
                                 ),
                               );
                             },
@@ -157,6 +181,13 @@ class TourGuideCard extends StatelessWidget {
                                 color: AppColors.primaryColor,
                               ),
                             ),
+                          ),
+                          SizedBox(width: 5),
+                          Row(
+                            children: [
+                              Icon(Icons.star, color: Colors.amber),
+                              Text('${widget.rating.toStringAsFixed(1)}')
+                            ],
                           ),
                         ],
                       ),

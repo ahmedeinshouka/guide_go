@@ -51,6 +51,7 @@ class Loginphone extends StatelessWidget {
             'phoneNumber': user.phoneNumber ?? '',
             "userType": '',
             'rating':0,
+            'bio':'',
           });
         }
       } catch (e) {

@@ -181,6 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
             'userType': userType ?? '',
             'rating': rating ?? 0,
             'bio': bio ?? "",
+            'password': '',
           });
         }
 

@@ -20,11 +20,11 @@ class UserList extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Text('Loading...');
         }
-        final currentUserEmail = _auth.currentUser?.email;
+        final currentUserEmail = _auth.currentUser?.uid;
         List<DocumentSnapshot> users = snapshot.data!.docs
             .where((doc) =>
                 (doc.data() as Map<String, dynamic>).containsKey('email') &&
-                doc['email'] != currentUserEmail)
+                doc['uid'] != currentUserEmail)
             .toList();
 
         // Filter users based on searchText
@@ -73,7 +73,7 @@ class UserList extends StatelessWidget {
 
     return ListTile(
       leading: leadingWidget,
-      title: Text(data['fullName'] ?? ''), // Display the user's name instead of email
+      title: Text(data['fullName'] ?? '',style: TextStyle(fontWeight: FontWeight.w700,),), // Display the user's name instead of email
       onTap: () {
         Navigator.push(
           context,
@@ -90,4 +90,3 @@ class UserList extends StatelessWidget {
     );
   }
 }
-

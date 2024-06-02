@@ -16,7 +16,7 @@ class _ChatListPageState extends State<ChatListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Messages',style: TextStyle(fontWeight: FontWeight.w900),),
+        title: const Text('Messages'),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -153,11 +153,11 @@ class UserSearchDelegate extends SearchDelegate<String> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Text('Loading...');
         }
-        final currentUserEmail = _auth.currentUser?.uid;
+        final currentUserEmail = _auth.currentUser?.email;
         List<DocumentSnapshot> users = snapshot.data!.docs
             .where((doc) =>
-                (doc.data() as Map<String, dynamic>).containsKey('uid') &&
-                doc['uid'] != currentUserEmail)
+                (doc.data() as Map<String, dynamic>).containsKey('email') &&
+                doc['email'] != currentUserEmail)
             .toList();
 
         // Filter users based on query
@@ -206,7 +206,7 @@ class UserSearchDelegate extends SearchDelegate<String> {
 
     return ListTile(
       leading: leadingWidget,
-      title: Text(data['fullName'] ?? '',style: TextStyle(fontWeight: FontWeight.w500),), // Display the user's name instead of email
+      title: Text(data['fullName'] ?? ''), // Display the user's name instead of email
       onTap: () {
         Navigator.push(
           context,

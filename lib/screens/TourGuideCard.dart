@@ -97,100 +97,112 @@ class _TourGuideCardState extends State<TourGuideCard> {
                 ),
                 SizedBox(width: screenWidth * 0.05),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Stack(
                     children: [
-                      Row(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            widget.name,
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.06,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),SizedBox(width: 11,),
-                          if (widget.usrtype.isNotEmpty)
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                image: DecorationImage(
-                                  image: AssetImage(widget.usrtype == "Traveler"
-                                      ? 'assets/tour-guide (1).png'
-                                      : 'assets/tour-guide.png'),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      SizedBox(height: screenHeight * 0.01),
-                      Text(
-                        widget.email,
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.04,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.01),
-                      Text(
-                        widget.bio,
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.04,
-                          color: Colors.grey,
-                        ),
-                        maxLines: null, // Allow the text to wrap to multiple lines
-                        overflow: TextOverflow.visible,
-                      ),
-                      SizedBox(height: screenHeight * 0.01),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.account_box_outlined,
-                            color: AppColors.primaryColor,
-                          ),
-                          SizedBox(width: screenWidth * 0.01),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Profile(
-                                    name: widget.name,
-                                    email: widget.email,
-                                    imageUrl: widget.imageUrl,
-                                    bio: widget.bio,
-                                    usrtype: widget.usrtype,
-                                    imageUrls: widget.imageUrls,
-                                    country: widget.country,
-                                    city: widget.city,
-                                    dateOfBirth: widget.dateOfBirth,
-                                    region: widget.region,
-                                    uid: widget.uid,
-                                    rating: widget.rating,
-                                    phoneNumber: widget.phoneNumber,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'View profile',
-                              style: TextStyle(
-                                fontSize: screenWidth * 0.035,
-                                color: AppColors.primaryColor,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 5),
                           Row(
                             children: [
-                              Icon(Icons.star, color: Colors.amber),
-                              Text('${widget.rating.toStringAsFixed(1)}')
+                              Text(
+                                widget.name,
+                                style: TextStyle(
+                                  fontSize: screenWidth * 0.05,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              SizedBox(width: 11),
+                            ],
+                          ),
+                          SizedBox(height: screenHeight * 0.011),
+                          Divider(),
+                          Text(
+                            widget.email,
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.04,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          SizedBox(height: screenHeight * 0.01),
+                          Text(
+                            widget.bio,
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.04,
+                              color: Colors.grey,
+                            ),
+                            maxLines: null, // Allow the text to wrap to multiple lines
+                            overflow: TextOverflow.visible,
+                          ),
+                          SizedBox(height: screenHeight * 0.01),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.account_box_outlined,
+                                color: AppColors.primaryColor,
+                              ),
+                              SizedBox(width: screenWidth * 0.01),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Profile(
+                                        name: widget.name,
+                                        email: widget.email,
+                                        imageUrl: widget.imageUrl,
+                                        bio: widget.bio,
+                                        usrtype: widget.usrtype,
+                                        imageUrls: widget.imageUrls,
+                                        country: widget.country,
+                                        city: widget.city,
+                                        dateOfBirth: widget.dateOfBirth,
+                                        region: widget.region,
+                                        uid: widget.uid,
+                                        rating: widget.rating,
+                                        phoneNumber: widget.phoneNumber,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  'View profile',
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.035,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ),
+                              ),
+                              if (widget.usrtype != "Traveler") ...[
+                                SizedBox(width: 5),
+                                Row(
+                                  children: [
+                                    Icon(Icons.star, color: Colors.amber),
+                                    Text('${widget.rating.toStringAsFixed(1)}')
+                                  ],
+                                ),
+                              ],
                             ],
                           ),
                         ],
                       ),
+                      if (widget.usrtype.isNotEmpty)
+                        Positioned(
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              image: DecorationImage(
+                                image: AssetImage(widget.usrtype == "Traveler"
+                                    ? 'assets/tour-guide (1).png'
+                                    : 'assets/tour-guide.png'),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          right: 0,
+                          top: 0,
+                        ),
                     ],
                   ),
                 ),

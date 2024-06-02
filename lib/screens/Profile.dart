@@ -193,71 +193,73 @@ class Profile extends StatelessWidget {
                   ),
                 ),
               SizedBox(height: 4),
-              StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('ratings')
-                    .doc(uid)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (!snapshot.hasData || !snapshot.data!.exists) {
-                    return Text("No ratings yet.");
-                  }
-                  final ratings = snapshot.data!['ratings'] as List<dynamic>;
-                  double totalRating = 0;
-                  final uniqueRaters = <String, double>{};
-                  for (var rating in ratings) {
-                    uniqueRaters[rating['userId']] = rating['rating'];
-                  }
-                  for (var rating in uniqueRaters.values) {
-                    totalRating += rating;
-                  }
-                  double averageRating = uniqueRaters.isEmpty
-                      ? 0
-                      : totalRating / uniqueRaters.length;
+              if (usrtype != "Traveler")
+                StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('ratings')
+                      .doc(uid)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      return Text("No ratings yet.");
+                    }
+                    final ratings = snapshot.data!['ratings'] as List<dynamic>;
+                    double totalRating = 0;
+                    final uniqueRaters = <String, double>{};
+                    for (var rating in ratings) {
+                      uniqueRaters[rating['userId']] = rating['rating'];
+                    }
+                    for (var rating in uniqueRaters.values) {
+                      totalRating += rating;
+                    }
+                    double averageRating = uniqueRaters.isEmpty
+                        ? 0
+                        : totalRating / uniqueRaters.length;
 
-                  return Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.star, color: Colors.amber),
-                          SizedBox(width: 5),
-                          Text(
-                            averageRating.toStringAsFixed(1),
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "${uniqueRaters.length} people rated",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  );
-                },
-              ),
-              SizedBox(height: 16),
-              RatingBar.builder(
-                itemSize: 30,
-                initialRating: rating,
-                minRating: 1,
-                direction: Axis.horizontal,
-                allowHalfRating: true,
-                itemCount: 5,
-                itemBuilder: (context, _) => Icon(
-                  Icons.star,
-                  color: Colors.amber,
+                    return Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.star, color: Colors.amber),
+                            SizedBox(width: 5),
+                            Text(
+                              averageRating.toStringAsFixed(1),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "${uniqueRaters.length} people rated",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-                onRatingUpdate: (newRating) async {
-                  await _updateUserRating(uid, newRating);
-                },
-              ),
+              if (usrtype != "Traveler") SizedBox(height: 16),
+              if (usrtype != "Traveler")
+                RatingBar.builder(
+                  itemSize: 30,
+                  initialRating: rating,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: true,
+                  itemCount: 5,
+                  itemBuilder: (context, _) => Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                  onRatingUpdate: (newRating) async {
+                    await _updateUserRating(uid, newRating);
+                  },
+                ),
               SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),

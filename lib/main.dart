@@ -14,12 +14,7 @@ import 'screens/Siwa.dart';
 import 'screens/maps.dart';
 import 'screens/userprofile.dart';
 import 'screens/Editprofile.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dash_chat_2/dash_chat_2.dart';
-import 'package:image_picker/image_picker.dart';
 import 'screens/Gemini.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'screens/consts.dart';
@@ -29,8 +24,6 @@ import 'screens/Romanamphitheatre.dart';
 import 'screens/zeeyarapyramidselite.dart';
 import 'screens/Montaggio.dart';
 import 'screens/chat_list_page.dart';
-import 'screens/chat_screen.dart';
-import 'screens/UserList.dart';
 import 'package:guide_go/screens/Discover.dart';
 import 'screens/weather.dart';
 
@@ -66,28 +59,28 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: initialRoute,
       routes: {
-        '/': (context) => home(),
-        '/ageeba': (context) => Ageeba(),
-        '/splash': (context) => SplashScreen(),
-        '/Homepage': (context) => Intro(),
+        '/': (context) => const home(),
+        '/ageeba': (context) => const Ageeba(),
+        '/splash': (context) => const SplashScreen(),
+        '/Homepage': (context) => const Intro(),
         '/Login': (context) => LoginScreen(),
         '/SignUp': (context) => SignupScreen(),
-        '/manial': (context) => Manial(),
-        '/komona': (context) => Komona(),
-        '/cookdoor': (context) => CookDoor(),
-        "/siwa": (context) => Siwa(),
-        '/maps': (context) => maps(),
-        '/profile': (context) => Profile(),
-        '/editprofile': (context) => EditProfile(),
-        '/Chatbot': (context) => HomePage(),
-        '/Chatbot_intro': (context) => Chatbot_intro(),
-        '/Pyramids': (context) => Pyramids(),
-        '/Roman': (context) => Romanamphitheatre(),
-        '/zeeyara': (context) =>  Zeeyara (),
-        '/Montaggio': (context) => Montaggio(),
+        '/manial': (context) => const Manial(),
+        '/komona': (context) => const Komona(),
+        '/cookdoor': (context) => const CookDoor(),
+        "/siwa": (context) => const Siwa(),
+        '/maps': (context) => const maps(),
+        '/profile': (context) => const Profile(),
+        '/editprofile': (context) => const EditProfile(),
+        '/Chatbot': (context) => const HomePage(),
+        '/Chatbot_intro': (context) => const Chatbot_intro(),
+        '/Pyramids': (context) => const Pyramids(),
+        '/Roman': (context) => const Romanamphitheatre(),
+        '/zeeyara': (context) =>  const Zeeyara (),
+        '/Montaggio': (context) => const Montaggio(),
         '/chatList': (context) => ChatListPage(),
         '/login_phone': (context) => Loginphone(),
-        '/weather':(context) => WeatherScreen(),
+        '/weather':(context) => const WeatherScreen(),
         '/discover':(context) =>  DiscoverIndependentsScreen(),
       },
     );

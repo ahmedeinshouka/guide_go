@@ -11,6 +11,9 @@ class DiscoverIndependentsScreen extends StatefulWidget {
 class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchText = "";
+  String _ratingText = "";
+  String _addressText = "";
+  String _interestText = "";
   User? _currentUser;
 
   @override
@@ -54,6 +57,61 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
     return uniqueRaters.isEmpty ? 0.0 : totalRating / uniqueRaters.length;
   }
 
+  void _showFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final ratingController = TextEditingController(text: _ratingText);
+        final addressController = TextEditingController(text: _addressText);
+        final interestController = TextEditingController(text: _interestText);
+
+        return AlertDialog(
+          title: Text('Filters'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: ratingController,
+                decoration: InputDecoration(
+                  hintText: 'Minimum Rating',
+                  prefixIcon: Icon(Icons.star),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: addressController,
+                decoration: InputDecoration(
+                  hintText: 'Address (City or Country)',
+                  prefixIcon: Icon(Icons.location_on),
+                ),
+              ),
+              TextField(
+                controller: interestController,
+                decoration: InputDecoration(
+                  hintText: 'Interests',
+                  prefixIcon: Icon(Icons.interests),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _ratingText = ratingController.text;
+                  _addressText = addressController.text;
+                  _interestText = interestController.text;
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text('Apply'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -66,16 +124,58 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
             SizedBox(height: screenHeight * 0.02), // Add space above the search bar
             Padding(
               padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search for tour guides and services offers',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(MediaQuery.of(context).size.width * 0.1),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search for tour guides and services offers',
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.of(context).size.width * 0.1),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  IconButton(
+                    icon: Icon(Icons.filter_list),
+                    onPressed: _showFilterDialog,
+                  ),
+                ],
               ),
+            ),
+            Wrap(
+              spacing: 8.0,
+              children: [
+                if (_ratingText.isNotEmpty)
+                  Chip(
+                    label: Text('Rating: $_ratingText'),
+                    onDeleted: () {
+                      setState(() {
+                        _ratingText = "";
+                      });
+                    },
+                  ),
+                if (_addressText.isNotEmpty)
+                  Chip(
+                    label: Text('Address: $_addressText'),
+                    onDeleted: () {
+                      setState(() {
+                        _addressText = "";
+                      });
+                    },
+                  ),
+                if (_interestText.isNotEmpty)
+                  Chip(
+                    label: Text('Interests: $_interestText'),
+                    onDeleted: () {
+                      setState(() {
+                        _interestText = "";
+                      });
+                    },
+                  ),
+              ],
             ),
             SizedBox(height: screenHeight * 0.02), // Add space between search bar and container
             Expanded(
@@ -93,40 +193,56 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
                   final filteredUsers = users.where((user) {
                     final fullName = user['fullName'].toLowerCase();
                     final email = user['email'].toLowerCase();
+                    final city = user['city'].toLowerCase();
+                    final country = user['country'].toLowerCase();
+                    final bio = user['bio'].toLowerCase();
                     final searchLower = _searchText.toLowerCase();
+                    final addressLower = _addressText.toLowerCase();
+                    final interestLower = _interestText.toLowerCase();
 
                     // Filter out the current user
                     if (user['uid'] == _currentUser?.uid) {
                       return false;
                     }
 
-                    return fullName.contains(searchLower) || email.contains(searchLower);
+                    bool matchesSearch = fullName.contains(searchLower) || email.contains(searchLower);
+                    bool matchesAddress = city.contains(addressLower) || country.contains(addressLower);
+                    bool matchesInterest = bio.contains(interestLower);
+
+                    return matchesSearch && matchesAddress && matchesInterest;
                   }).toList();
 
-                  return ListView.builder(
-                    itemCount: filteredUsers.length,
-                    itemBuilder: (context, index) {
-                      final user = filteredUsers[index];
-
-                      // Fetch imageGallery field from user document
-                      List<String> imageUrls = [];
-                      try {
-                        imageUrls = List<String>.from(user['imageGallery']);
-                      } catch (e) {
-                        print("Error fetching imageGallery: $e");
+                  return FutureBuilder<List<Map<String, dynamic>>>(
+                    future: _fetchAndSortUsersByRating(filteredUsers),
+                    builder: (context, futureSnapshot) {
+                      if (futureSnapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      if (futureSnapshot.hasError) {
+                        return Center(child: Text('Error: ${futureSnapshot.error}'));
                       }
 
-                      return FutureBuilder<double>(
-                        future: _getUserRating(user['uid']),
-                        builder: (context, ratingSnapshot) {
-                          if (ratingSnapshot.connectionState == ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                          if (ratingSnapshot.hasError) {
-                            return Center(child: Text('Error: ${ratingSnapshot.error}'));
+                      final sortedUsers = futureSnapshot.data ?? [];
+
+                      return ListView.builder(
+                        itemCount: sortedUsers.length,
+                        itemBuilder: (context, index) {
+                          final user = sortedUsers[index];
+
+                          // Fetch imageGallery field from user document
+                          List<String> imageUrls = [];
+                          try {
+                            imageUrls = List<String>.from(user['imageGallery']);
+                          } catch (e) {
+                            print("Error fetching imageGallery: $e");
                           }
 
-                          double rating = ratingSnapshot.data ?? 0.0;
+                          double rating = user['rating'];
+
+                          // Apply rating filter
+                          if (_ratingText.isNotEmpty && rating < double.parse(_ratingText)) {
+                            return SizedBox.shrink(); // Skip this user if the rating is lower than the filter
+                          }
 
                           return TourGuideCard(
                             name: user['fullName'],
@@ -219,5 +335,32 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
         ),
       ),
     );
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchAndSortUsersByRating(List<QueryDocumentSnapshot> users) async {
+    List<Map<String, dynamic>> userList = [];
+
+    for (var user in users) {
+      double rating = await _getUserRating(user['uid']);
+      userList.add({
+        'uid': user['uid'],
+        'fullName': user['fullName'],
+        'email': user['email'],
+        'photoUrl': user['photoUrl'],
+        'bio': user['bio'],
+        'userType': user['userType'],
+        'imageGallery': user['imageGallery'],
+        'country': user['country'],
+        'city': user['city'],
+        'dateOfBirth': user['dateOfBirth'],
+        'region': user['region'],
+        'phoneNumber': user['phoneNumber'],
+        'rating': rating,
+      });
+    }
+
+    userList.sort((a, b) => b['rating'].compareTo(a['rating']));
+
+    return userList;
   }
 }

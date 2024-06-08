@@ -1,9 +1,12 @@
 import 'dart:io';
+import 'dart:ui'; // Add this import for the BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:photo_view/photo_view.dart'; // Add this import
+import 'ImageViewScreen.dart'; // Add this import
 
 class ChatScreen extends StatefulWidget {
   final String receiverUserID;
@@ -58,6 +61,15 @@ class _ChatScreenState extends State<ChatScreen> {
         sendMessage(photoUrl); // Sending the image URL as a message
       });
     }
+  }
+
+  void showImage(BuildContext context, String imageUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageViewScreen(imageUrl: imageUrl),
+      ),
+    );
   }
 
   @override
@@ -168,7 +180,20 @@ class _ChatScreenState extends State<ChatScreen> {
                           color: isSender ? Colors.blue : Colors.grey[300], // Sender message color: Blue, Receiver message color: Grey
                         ),
                         child: data['message'].toString().startsWith('http')
-                            ? Container(width: 170,height: 200,decoration:BoxDecoration(image:DecorationImage(image:NetworkImage(data['message'],),fit: BoxFit.cover),borderRadius: BorderRadius.circular(40)),) // Display image if the message is a URL
+                            ? GestureDetector(
+                                onTap: () => showImage(context, data['message']),
+                                child: Container(
+                                  width: 150, // Fixed width for the image
+                                  height: 150, // Fixed height for the image
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: NetworkImage(data['message']),
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ) // Display image if the message is a URL
                             : Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -184,8 +209,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                 ],
                               ),
                       ),
-                      
-                        
                     ],
                   ),
                 ),

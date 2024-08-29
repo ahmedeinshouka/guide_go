@@ -25,7 +25,6 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
       });
     });
 
-    // Get the current user
     _currentUser = FirebaseAuth.instance.currentUser;
   }
 
@@ -45,7 +44,7 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
       return 0.0;
     }
 
-    final ratings = ratingsSnapshot.data()!['ratings'] as List<dynamic>;
+    final ratings = ratingsSnapshot.data()?['ratings'] as List<dynamic>? ?? [];
     double totalRating = 0;
     final uniqueRaters = <String, double>{};
     for (var rating in ratings) {
@@ -121,7 +120,7 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: screenHeight * 0.02), // Add space above the search bar
+            SizedBox(height: screenHeight * 0.02),
             Padding(
               padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
               child: Row(
@@ -177,7 +176,7 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
                   ),
               ],
             ),
-            SizedBox(height: screenHeight * 0.02), // Add space between search bar and container
+            SizedBox(height: screenHeight * 0.02),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance.collection('users').snapshots(),
@@ -191,11 +190,11 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
 
                   final users = snapshot.data!.docs;
                   final filteredUsers = users.where((user) {
-                    final fullName = user['fullName'].toLowerCase();
-                    final email = user['email'].toLowerCase();
-                    final city = user['city'].toLowerCase();
-                    final country = user['country'].toLowerCase();
-                    final bio = user['bio'].toLowerCase();
+                    final fullName = (user['fullName'] as String?)?.toLowerCase() ?? '';
+                    final email = (user['email'] as String?)?.toLowerCase() ?? '';
+                    final city = (user['city'] as String?)?.toLowerCase() ?? '';
+                    final country = (user['country'] as String?)?.toLowerCase() ?? '';
+                  
                     final searchLower = _searchText.toLowerCase();
                     final addressLower = _addressText.toLowerCase();
                     final interestLower = _interestText.toLowerCase();
@@ -207,9 +206,9 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
 
                     bool matchesSearch = fullName.contains(searchLower) || email.contains(searchLower);
                     bool matchesAddress = city.contains(addressLower) || country.contains(addressLower);
-                    bool matchesInterest = bio.contains(interestLower);
+                
 
-                    return matchesSearch && matchesAddress && matchesInterest;
+                    return matchesSearch && matchesAddress ;
                   }).toList();
 
                   return FutureBuilder<List<Map<String, dynamic>>>(
@@ -229,35 +228,37 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
                         itemBuilder: (context, index) {
                           final user = sortedUsers[index];
 
-                          // Fetch imageGallery field from user document
+                          if (user.isEmpty) {
+                            return SizedBox.shrink();
+                          }
+
                           List<String> imageUrls = [];
                           try {
-                            imageUrls = List<String>.from(user['imageGallery']);
+                            imageUrls = List<String>.from(user['imageGallery'] ?? []);
                           } catch (e) {
                             print("Error fetching imageGallery: $e");
                           }
 
-                          double rating = user['rating'];
+                          double rating = user['rating'] ?? 0.0;
 
-                          // Apply rating filter
                           if (_ratingText.isNotEmpty && rating < double.parse(_ratingText)) {
-                            return SizedBox.shrink(); // Skip this user if the rating is lower than the filter
+                            return SizedBox.shrink();
                           }
 
                           return TourGuideCard(
-                            name: user['fullName'],
-                            email: user['email'],
-                            imageUrl: user['photoUrl'] ?? '', // Handle null imageUrl
-                            bio: user['bio'] ?? '', // Handle null bio
-                            usrtype: user['userType'],
+                            name: user['fullName'] ?? '', // Handle missing fullName
+                            email: user['email'] ?? '', // Handle missing email
+                            imageUrl: user['photoUrl'] ?? '', // Handle missing photoUrl
+                            bio: user['bio'] ?? '', // Handle missing bio
+                            usrtype: user['userType'] ?? '', // Handle missing userType
                             imageUrls: imageUrls,
-                            country: user['country'],
-                            city: user['city'],
-                            dateOfBirth: user['dateOfBirth'],
-                            region: user['region'], // Pass the image URLs
-                            uid: user['uid'],
+                            country: user['country'] ?? '', // Handle missing country
+                            city: user['city'] ?? '', // Handle missing city
+                            dateOfBirth: user['dateOfBirth'] ?? '', // Handle missing dateOfBirth
+                            region: user['region'] ?? '', // Handle missing region
+                            uid: user['uid'] ?? '', // Handle missing uid
                             rating: double.parse(rating.toStringAsFixed(1)),
-                            phoneNumber: user['phoneNumber'],
+                            phoneNumber: user['phoneNumber'] ?? '', // Handle missing phoneNumber
                           );
                         },
                       );
@@ -279,7 +280,6 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
               IconButton(
                 highlightColor: Colors.amber,
                 onPressed: () {
-                  // Check if the current route is not the home screen
                   if (ModalRoute.of(context)?.settings.name != '/') {
                     Navigator.popAndPushNamed(context, "/");
                   }
@@ -308,7 +308,6 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
               IconButton(
                 highlightColor: Colors.amber,
                 onPressed: () {
-                  // Check if the current route is not the chatList screen
                   if (ModalRoute.of(context)?.settings.name != '/chatList') {
                     Navigator.pushNamed(context, "/chatList");
                   }
@@ -322,7 +321,6 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
               IconButton(
                 highlightColor: Colors.amber,
                 onPressed: () {
-                  // Check if the current route is not the profile screen
                   if (ModalRoute.of(context)?.settings.name != '/profile') {
                     Navigator.pushNamed(context, "/profile");
                   }
@@ -341,22 +339,45 @@ class _DiscoverIndependentsScreenState extends State<DiscoverIndependentsScreen>
     List<Map<String, dynamic>> userList = [];
 
     for (var user in users) {
-      double rating = await _getUserRating(user['uid']);
-      userList.add({
-        'uid': user['uid'],
-        'fullName': user['fullName'],
-        'email': user['email'],
-        'photoUrl': user['photoUrl'],
-        'bio': user['bio'],
-        'userType': user['userType'],
-        'imageGallery': user['imageGallery'],
-        'country': user['country'],
-        'city': user['city'],
-        'dateOfBirth': user['dateOfBirth'],
-        'region': user['region'],
-        'phoneNumber': user['phoneNumber'],
-        'rating': rating,
-      });
+      try {
+        final userData = user.data() as Map<String, dynamic>?; // Cast to Map<String, dynamic> and check for null
+
+        // Check if userData is null or if required fields are missing
+        if (userData == null ||
+            !userData.containsKey('uid') ||
+            !userData.containsKey('fullName') ||
+            !userData.containsKey('email') ||
+            !userData.containsKey('photoUrl') ||
+            !userData.containsKey('bio') ||
+            !userData.containsKey('userType') ||
+            !userData.containsKey('country') ||
+            !userData.containsKey('city') ||
+            !userData.containsKey('dateOfBirth') ||
+            !userData.containsKey('region') ||
+            !userData.containsKey('phoneNumber')) {
+          continue; // Skip this user if any required field is missing
+        }
+
+        double rating = await _getUserRating(userData['uid'] as String);
+        userList.add({
+          'uid': userData['uid'],
+          'fullName': userData['fullName'],
+          'email': userData['email'],
+          'photoUrl': userData['photoUrl'],
+          'bio': userData['bio'],
+          'userType': userData['userType'],
+          'imageGallery': userData['imageGallery'] ?? [], // Handle missing imageGallery
+          'country': userData['country'],
+          'city': userData['city'],
+          'dateOfBirth': userData['dateOfBirth'],
+          'region': userData['region'],
+          'phoneNumber': userData['phoneNumber'],
+          'rating': rating,
+        });
+      } catch (e) {
+        print("Error processing user data: $e");
+        continue; // Skip the user if there's an error
+      }
     }
 
     userList.sort((a, b) => b['rating'].compareTo(a['rating']));
